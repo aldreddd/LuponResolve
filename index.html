@@ -1,109 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="LuponResolve - Barangay dispute and case management portal">
-  <title>LuponResolve | Home</title>
-  <link rel="stylesheet" href="css/style.css">
-  <script src="js/app.js" defer></script>
-</head>
-<body>
-  <header class="site-header">
-    <a class="brand" href="index.html" aria-label="LuponResolve home">
-      <span class="brand-mark">LR</span>
-      <span>LuponResolve</span>
-    </a>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="LuponResolve - Barangay dispute and case management portal">
+    <title>LuponResolve | Home</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="LuponResolve home">
+        <span class="brand-mark">LR</span>
+        <span>LuponResolve</span>
+      </a>
 
-    <nav class="main-nav" aria-label="Main navigation">
-      <a href="#home">Home</a>
-      <a href="#about">About</a>
-      <a href="#services">Services</a>
-    </nav>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        <a href="#services">Services</a>
+      </nav>
 
-    <a class="button button-outline" href="#get-started">Get Started</a>
-  </header>
+      <a class="button button-outline" href="#get-started">Get Started</a>
+    </header>
 
-  <main>
-    <section class="hero" id="home">
-      <div class="hero-content">
-        <p class="eyebrow">BARANGAY DISPUTE RESOLUTION PORTAL</p>
-        <h1>Resolve disputes.<br><span>Build a peaceful</span> community.</h1>
-        <p class="hero-description">
-          A digital starting point for submitting complaints, tracking cases,
-          and supporting the barangay dispute-resolution process.
+    <main>
+      <section class="hero" id="home">
+        <div class="hero-content">
+          <p class="eyebrow">BARANGAY DISPUTE RESOLUTION PORTAL</p>
+          <h1>Resolve disputes.<br><span>Build a peaceful</span> community.</h1>
+          <p class="hero-description">
+            A digital starting point for submitting complaints, tracking cases,
+            and supporting the barangay dispute-resolution process.
+          </p>
+          <div class="hero-actions" id="get-started">
+            <a class="button button-primary" href="#services">Explore Services</a>
+            <a class="button button-text" href="#about">Learn More <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+
+        <div class="hero-panel" aria-label="Portal introduction">
+          <div class="panel-topline">
+            <span class="status-dot"></span>
+            <span>COMMUNITY SUPPORT PORTAL</span>
+          </div>
+          <div class="panel-icon" aria-hidden="true">⚖</div>
+          <h2>A clearer path to resolution.</h2>
+          <p>Submit concerns and follow the progress of your case through one organized portal.</p>
+          <div class="panel-footer">
+            <span>Resident-centered</span>
+            <span>•</span>
+            <span>Organized</span>
+            <span>•</span>
+            <span>Accessible</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="intro-section" id="about">
+        <p class="eyebrow">ABOUT LUPONRESOLVE</p>
+        <h2>Making the process easier to follow.</h2>
+        <p>
+          LuponResolve is designed to help residents and barangay personnel
+          organize complaint intake, case information, and dispute-resolution updates.
         </p>
-        <div class="hero-actions" id="get-started">
-          <a class="button button-primary" href="#services">Explore Services</a>
-          <a class="button button-text" href="#about">Learn More <span aria-hidden="true">→</span></a>
+      </section>
+      <section class="services-section" id="services">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">WHAT YOU CAN DO</p>
+            <h2>Portal services</h2>
+          </div>
+          <p>These are the starting points for the system's main workflows.</p>
         </div>
-      </div>
 
-      <div class="hero-panel" aria-label="Portal introduction">
-        <div class="panel-topline">
-          <span class="status-dot"></span>
-          <span>COMMUNITY SUPPORT PORTAL</span>
-        </div>
-        <div class="panel-icon" aria-hidden="true">⚖</div>
-        <h2>A clearer path to resolution.</h2>
-        <p>Submit concerns and follow the progress of your case through one organized portal.</p>
-        <div class="panel-footer">
-          <span>Resident-centered</span>
-          <span>•</span>
-          <span>Organized</span>
-          <span>•</span>
-          <span>Accessible</span>
-        </div>
-      </div>
-    </section>
+          <div class="service-grid">
 
-    <section class="intro-section" id="about">
-      <p class="eyebrow">ABOUT LUPONRESOLVE</p>
-      <h2>Making the process easier to follow.</h2>
-      <p>
-        LuponResolve is designed to help residents and barangay personnel
-        organize complaint intake, case information, and dispute-resolution updates.
-      </p>
-    </section>
-
-    <section class="services-section" id="services">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">WHAT YOU CAN DO</p>
-          <h2>Portal services</h2>
-        </div>
-        <p>These are the starting points for the system's main workflows.</p>
-      </div>
-
-      <div class="service-grid">
+        <!-- 01: Submit a Complaint -->
         <article class="service-card">
-          <span class="service-number">01</span>
-          <h3>Submit a complaint</h3>
-          <p>Provide the basic details of a concern for an initial review.</p>
-          <span class="coming-soon">Coming in the next build step</span>
+            <span class="service-number">01</span>
+            <h3>Submit a complaint</h3>
+            <p>Provide the basic details of a concern for an initial review.</p>
+            <a href="https://luponresolve.onrender.com/resident.html#dashboard"
+              class="service-action">
+                File a Complaint <span aria-hidden="true">→</span>
+            </a>
         </article>
-        <article class="service-card">
-          <span class="service-number">02</span>
-          <h3>Track a case</h3>
-          <p>View case information and follow status updates in one place.</p>
-          <span class="coming-soon">Coming in a later build step</span>
-        </article>
-        <article class="service-card">
-          <span class="service-number">03</span>
-          <h3>Barangay dashboard</h3>
-          <p>Give authorized personnel an organized view of submitted cases.</p>
-          <span class="coming-soon">Coming in a later build step</span>
-        </article>
-      </div>
-    </section>
-  </main>
 
-  <footer class="site-footer">
-    <a class="brand footer-brand" href="#home">
-      <span class="brand-mark">LR</span>
-      <span>LuponResolve</span>
-    </a>
-    <p>© <span id="currentYear"></span> LuponResolve. Project prototype.</p>
-  </footer>
-</body>
-</html>
+        <!-- 02: Track a Case -->
+        <article class="service-card">
+            <span class="service-number">02</span>
+            <h3>Track a case</h3>
+            <p>View case information and follow status updates in one place.</p>
+            <a href="https://luponresolve.onrender.com/resident.html#dashboard"
+              class="service-action">
+                Track Your Case <span aria-hidden="true">→</span>
+            </a>
+        </article>
+
+        <!-- 03: Barangay Dashboard -->
+        <article class="service-card">
+            <span class="service-number">03</span>
+            <h3>Barangay dashboard</h3>
+            <p>Give authorized personnel an organized view of submitted cases.</p>
+            <a href="https://luponresolve.onrender.com/secretary.html#overview"
+              class="service-action">
+                Staff Login <span aria-hidden="true">→</span>
+            </a>
+        </article>
+
+    </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <a class="brand footer-brand" href="#home">
+        <span class="brand-mark">LR</span>
+        <span>LuponResolve</span>
+      </a>
+      <p>© <span id="currentYear"></span> LuponResolve. Project prototype.</p>
+    </footer>
+  </body>
+  </html>
