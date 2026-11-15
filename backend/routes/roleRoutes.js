@@ -1,10 +1,12 @@
+
 const express = require("express");
 
 const router = express.Router();
 
-// Import database connection
-const db = require("../config/database");
-// Import our security middleware
+// Import PostgreSQL connection
+const pool = require("../config/postgres");
+
+// Import security middleware
 const {
     requireAuth,
     requireRole
@@ -90,46 +92,50 @@ router.get(
     }
 );
 
+
 // ======================================
 // GET ALL LUPON MEMBERS
-// SECRETARY ONLY
+// SECRETARY AND ADMIN ONLY
 // ======================================
 
 router.get(
     "/lupon-members",
     requireAuth,
     requireRole("secretary", "admin"),
-    (req, res) => {
+    async (req, res) => {
 
-        db.all(
-            `SELECT id, full_name, email
-             FROM users
-             WHERE role = ?
-             ORDER BY full_name ASC`,
-            ["lupon"],
-            (error, rows) => {
+        try {
 
-                if (error) {
-                    console.error("Failed to load Lupon members:", error);
+            const result = await pool.query(
+                `SELECT id, full_name, email
+                 FROM users
+                 WHERE role = $1
+                 ORDER BY full_name ASC`,
+                ["lupon"]
+            );
 
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to retrieve Lupon members."
-                    });
-                }
+            res.json({
+                success: true,
+                members: result.rows.map(member => ({
+                    id: member.id,
+                    fullName: member.full_name,
+                    email: member.email
+                }))
+            });
 
-                res.json({
-                    success: true,
-                    members: rows.map(member => ({
-                        id: member.id,
-                        fullName: member.full_name,
-                        email: member.email
-                    }))
-                });
+        } catch (error) {
 
-            }
-        );
+            console.error("Failed to load Lupon members:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to retrieve Lupon members."
+            });
+
+        }
 
     }
 );
+
+
 module.exports = router;

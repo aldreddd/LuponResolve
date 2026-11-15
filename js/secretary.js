@@ -77,7 +77,7 @@ async function loadCases() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:3000/api/cases",
+            window.API.cases,
             {
                 method: "GET",
                 credentials: "include"
@@ -801,7 +801,7 @@ async function loadLuponMembers() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:3000/api/roles/lupon-members",
+            "${window.API.roles}/lupon-members",
             {
                 method: "GET",
                 credentials: "include"
@@ -910,7 +910,7 @@ async function assignCaseToLupon() {
     try {
 
         const response = await fetch(
-            `http://127.0.0.1:3000/api/cases/${complaint.backendId}/assign`,
+            `${window.API.cases}/${complaint.backendId}/assign`,
             {
                 method: "POST",
 
@@ -1031,7 +1031,7 @@ async function saveSecretaryReview() {
 
         // Send the administrative review to the backend.
         const response = await fetch(
-            `http://127.0.0.1:3000/api/cases/${complaint.backendId}/status`,
+            `${window.API.cases}/${complaint.backendId}/status`,
             {
                 method: "PATCH",
 

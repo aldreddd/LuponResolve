@@ -1,7 +1,9 @@
+
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const db = require("../config/database");
+const pool = require("../config/postgres");
 const rateLimit = require("express-rate-limit");
+
 const router = express.Router();
 
 // ======================================
@@ -9,8 +11,8 @@ const router = express.Router();
 // ======================================
 
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 5,                 // Maximum 5 requests
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -18,13 +20,14 @@ const loginLimiter = rateLimit({
         message: "Too many login attempts. Please try again after 15 minutes."
     }
 });
+
 // ======================================
 // REGISTRATION RATE LIMITER
 // ======================================
 
 const registerLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    limit: 5,                 // Maximum 5 requests
+    windowMs: 60 * 60 * 1000,
+    limit: 5,
     standardHeaders: true,
     legacyHeaders: false,
     message: {
@@ -32,6 +35,7 @@ const registerLimiter = rateLimit({
         message: "Too many registration attempts. Please try again after one hour."
     }
 });
+
 // ======================================
 // POST /api/auth/register
 // Register a new resident account
@@ -39,7 +43,6 @@ const registerLimiter = rateLimit({
 
 router.post("/register", registerLimiter, async (req, res) => {
     try {
-        // 1. Get information from the request body
         const { fullName, email, password } = req.body || {};
 
         if (
@@ -56,7 +59,6 @@ router.post("/register", registerLimiter, async (req, res) => {
             });
         }
 
-        // 3. Clean and validate the information
         const cleanName = fullName.trim();
         const cleanEmail = email.trim().toLowerCase();
 
@@ -76,7 +78,7 @@ router.post("/register", registerLimiter, async (req, res) => {
             });
         }
 
-        if (typeof password !== "string" || password.length < 8) {
+        if (password.length < 8) {
             return res.status(400).json({
                 success: false,
                 message: "Password must contain at least 8 characters."
@@ -90,91 +92,54 @@ router.post("/register", registerLimiter, async (req, res) => {
             });
         }
 
-        // 4. Check whether the email is already registered
-        db.get(
-            "SELECT id FROM users WHERE email = ?",
-            [cleanEmail],
-            async (error, existingUser) => {
-
-                if (error) {
-                    console.error("Email lookup failed:", error);
-
-                    return res.status(500).json({
-                        success: false,
-                        message: "Something went wrong while checking the account."
-                    });
-                }
-
-                if (existingUser) {
-                    return res.status(409).json({
-                        success: false,
-                        message: "This email address is already registered."
-                    });
-                }
-
-                try {
-                    // 5. Hash the password
-                    const hashedPassword = await bcrypt.hash(password, 12);
-
-                    // 6. Save the new account
-                    // Public registration always creates a resident.
-                    db.run(
-                        `INSERT INTO users (full_name, email, password, role)
-                         VALUES (?, ?, ?, ?)`,
-                        [cleanName, cleanEmail, hashedPassword, "resident"],
-                        function (insertError) {
-
-                            if (insertError) {
-                                console.error("Registration failed:", insertError);
-
-                                if (insertError.code === "SQLITE_CONSTRAINT") {
-                                    return res.status(409).json({
-                                        success: false,
-                                        message: "This email address is already registered."
-                                    });
-                                }
-
-                                return res.status(500).json({
-                                    success: false,
-                                    message: "Unable to create your account."
-                                });
-                            }
-
-                            // 7. Return the successful registration response
-                            return res.status(201).json({
-                                success: true,
-                                message: "Resident account created successfully!",
-                                user: {
-                                    id: this.lastID,
-                                    fullName: cleanName,
-                                    email: cleanEmail,
-                                    role: "resident"
-                                }
-                            });
-                        }
-                    );
-
-                } catch (hashError) {
-                    console.error("Password hashing failed:", hashError);
-
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to process your registration."
-                    });
-                }
-            }
+        const existingUser = await pool.query(
+            "SELECT id FROM users WHERE email = $1",
+            [cleanEmail]
         );
+
+        if (existingUser.rows.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: "This email address is already registered."
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        const result = await pool.query(
+            `INSERT INTO users (full_name, email, password, role)
+             VALUES ($1, $2, $3, $4)
+             RETURNING id`,
+            [cleanName, cleanEmail, hashedPassword, "resident"]
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: "Resident account created successfully!",
+            user: {
+                id: result.rows[0].id,
+                fullName: cleanName,
+                email: cleanEmail,
+                role: "resident"
+            }
+        });
 
     } catch (error) {
         console.error("Registration error:", error);
 
+        if (error.code === "23505") {
+            return res.status(409).json({
+                success: false,
+                message: "This email address is already registered."
+            });
+        }
+
         return res.status(500).json({
             success: false,
-            message: "An unexpected server error occurred."
+            message: "Unable to create your account."
         });
     }
 });
-
 
 // ======================================
 // TEMPORARY TEST ROUTE
@@ -185,14 +150,15 @@ router.get("/test", (req, res) => {
         message: "Authentication routes are working!"
     });
 });
+
 // ======================================
 // POST /api/auth/login
 // Authenticate an existing user
 // ======================================
 
-router.post("/login", loginLimiter, (req, res) => {
-
-    const { email, password } = req.body || {};
+router.post("/login", loginLimiter, async (req, res) => {
+    try {
+        const { email, password } = req.body || {};
 
         if (
             typeof email !== "string" ||
@@ -218,107 +184,84 @@ router.post("/login", loginLimiter, (req, res) => {
             });
         }
 
-    // 2. Find the account using email
-    db.get(
-        "SELECT * FROM users WHERE email = ?",
-        [cleanEmail],
-        async (error, user) => {
+        const result = await pool.query(
+            "SELECT * FROM users WHERE email = $1",
+            [cleanEmail]
+        );
 
-            if (error) {
-                console.error("Login database error:", error);
+        const user = result.rows[0];
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        const passwordMatch = await bcrypt.compare(
+            password,
+            user.password
+        );
+
+        if (!passwordMatch) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        // Regenerate session to prevent session fixation.
+        req.session.regenerate((sessionError) => {
+            if (sessionError) {
+                console.error("Session error:", sessionError);
 
                 return res.status(500).json({
                     success: false,
-                    message: "Unable to process login."
+                    message: "Unable to create login session."
                 });
             }
 
-            // 3. Check if account exists
-            if (!user) {
-                return res.status(401).json({
-                    success: false,
-                    message: "Invalid email or password."
-                });
-            }
+            req.session.user = {
+                id: user.id,
+                fullName: user.full_name,
+                email: user.email,
+                role: user.role
+            };
 
-            try {
+            req.session.save((saveError) => {
+                if (saveError) {
+                    console.error("Session save error:", saveError);
 
-                // 4. Compare submitted password with stored hash
-                const passwordMatch = await bcrypt.compare(
-                    password,
-                    user.password
-                );
-
-                if (!passwordMatch) {
-                    return res.status(401).json({
+                    return res.status(500).json({
                         success: false,
-                        message: "Invalid email or password."
+                        message: "Unable to save login session."
                     });
                 }
 
-                // 5. Regenerate session to prevent session fixation
-                req.session.regenerate((sessionError) => {
-
-                    if (sessionError) {
-                        console.error("Session error:", sessionError);
-
-                        return res.status(500).json({
-                            success: false,
-                            message: "Unable to create login session."
-                        });
-                    }
-
-                    // 6. Save authenticated user information
-                    req.session.user = {
-                        id: user.id,
-                        fullName: user.full_name,
-                        email: user.email,
-                        role: user.role
-                    };
-
-                    // 7. Return successful login response
-                    req.session.save((saveError) => {
-
-                        if (saveError) {
-                            console.error("Session save error:", saveError);
-
-                            return res.status(500).json({
-                                success: false,
-                                message: "Unable to save login session."
-                            });
-                        }
-
-                        return res.status(200).json({
-                            success: true,
-                            message: "Login successful!",
-                            user: req.session.user
-                        });
-
-                    });
-
+                return res.status(200).json({
+                    success: true,
+                    message: "Login successful!",
+                    user: req.session.user
                 });
+            });
+        });
 
-            } catch (compareError) {
-                console.error("Password comparison error:", compareError);
+    } catch (error) {
+        console.error("Login database error:", error);
 
-                return res.status(500).json({
-                    success: false,
-                    message: "Unable to verify password."
-                });
-            }
-
-        }
-    );
-
+        return res.status(500).json({
+            success: false,
+            message: "Unable to process login."
+        });
+    }
 });
+
 // ======================================
 // GET /api/auth/me
 // Check currently authenticated user
 // ======================================
 
 router.get("/me", (req, res) => {
-
-    // Check whether a user is stored in the session
     if (!req.session.user) {
         return res.status(401).json({
             success: false,
@@ -326,24 +269,20 @@ router.get("/me", (req, res) => {
         });
     }
 
-    // Return the currently authenticated user
     return res.status(200).json({
         success: true,
         message: "Authenticated user found!",
         user: req.session.user
     });
-
 });
+
 // ======================================
 // POST /api/auth/logout
 // Destroy the current session
 // ======================================
 
 router.post("/logout", (req, res) => {
-
-    // Destroy the session
     req.session.destroy((error) => {
-
         if (error) {
             console.error("Logout error:", error);
 
@@ -353,7 +292,6 @@ router.post("/logout", (req, res) => {
             });
         }
 
-        // Remove the session cookie from the browser
         res.clearCookie("connect.sid", {
             path: "/"
         });
@@ -362,8 +300,7 @@ router.post("/logout", (req, res) => {
             success: true,
             message: "Logout successful!"
         });
-
     });
-
 });
+
 module.exports = router;

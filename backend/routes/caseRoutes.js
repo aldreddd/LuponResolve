@@ -2,8 +2,16 @@
 const express = require("express");
 const router = express.Router();
 
-const db = require("../config/database");
-const { requireAuth, requireRole } = require("../middleware/authMiddleware");
+const pool = require("../config/postgres");
+const {
+    requireAuth,
+    requireRole
+} = require("../middleware/authMiddleware");
+
+
+// ======================================
+// HELPER FUNCTIONS
+// ======================================
 
 // Safely convert JSON text into a JavaScript value.
 function parseJSON(value, fallback = []) {
@@ -15,6 +23,7 @@ function parseJSON(value, fallback = []) {
         return fallback;
     }
 }
+
 
 // Convert a database row into a clean case object.
 function formatCase(row) {
@@ -41,6 +50,7 @@ function formatCase(row) {
 
         caseHistory: parseJSON(row.case_history),
         caseProceedings: parseJSON(row.case_proceedings),
+
         resolutionOutcome: row.resolution_outcome,
         resolutionNotes: row.resolution_notes,
         resolvedAt: row.resolved_at,
@@ -49,255 +59,278 @@ function formatCase(row) {
         closureNotes: row.closure_notes,
         closedAt: row.closed_at,
         closedBy: row.closed_by,
+
         createdAt: row.created_at,
         updatedAt: row.updated_at
     };
 }
 
-// GET /api/cases
+
+// Execute multiple database operations as one transaction.
+async function withTransaction(callback) {
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        const result = await callback(client);
+
+        await client.query("COMMIT");
+
+        return result;
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+
+    } finally {
+        client.release();
+    }
+}
+
+
+// ======================================
+// GET ALL CASES
+// ======================================
+
 // Residents see their own cases.
 // Secretaries and admins see all cases.
 // Lupon members see only assigned cases.
+
 router.get(
     "/",
     requireAuth,
-    (req, res) => {
-        const user = req.session.user;
+    async (req, res) => {
 
-        let sql = `
-            SELECT cases.*
-            FROM cases
-        `;
+        try {
+            const user = req.session.user;
 
-        let params = [];
-
-        if (user.role === "resident") {
-            sql += ` WHERE cases.resident_id = ?`;
-            params.push(user.id);
-
-        } else if (user.role === "lupon") {
-            sql += `
-                INNER JOIN case_assignments
-                ON cases.id = case_assignments.case_id
-                WHERE case_assignments.lupon_user_id = ?
+            let sql = `
+                SELECT cases.*
+                FROM cases
             `;
-            params.push(user.id);
 
-        } else if (
-            user.role !== "secretary" &&
-            user.role !== "admin"
-        ) {
-            return res.status(403).json({
-                success: false,
-                message: "You do not have permission to view cases."
-            });
-        }
+            const params = [];
 
-        sql += ` ORDER BY cases.created_at DESC`;
+            if (user.role === "resident") {
+                sql += ` WHERE cases.resident_id = $1`;
+                params.push(user.id);
 
-        db.all(sql, params, (error, rows) => {
-            if (error) {
-                console.error("Get cases error:", error.message);
+            } else if (user.role === "lupon") {
+                sql += `
+                    INNER JOIN case_assignments
+                    ON cases.id = case_assignments.case_id
+                    WHERE case_assignments.lupon_user_id = $1
+                `;
+                params.push(user.id);
 
-                return res.status(500).json({
+            } else if (
+                user.role !== "secretary" &&
+                user.role !== "admin"
+            ) {
+                return res.status(403).json({
                     success: false,
-                    message: "Unable to retrieve cases."
+                    message: "You do not have permission to view cases."
                 });
             }
 
+            sql += ` ORDER BY cases.created_at DESC`;
+
+            const result = await pool.query(sql, params);
+
             res.json({
                 success: true,
-                count: rows.length,
-                cases: rows.map(formatCase)
+                count: result.rows.length,
+                cases: result.rows.map(formatCase)
             });
-        });
+
+        } catch (error) {
+            console.error("Get cases error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to retrieve cases."
+            });
+        }
     }
 );
 
-// POST /api/cases
+
+// ======================================
+// SUBMIT NEW COMPLAINT
+// ======================================
+
 // Only residents can submit new complaints.
+
 router.post(
     "/",
     requireAuth,
     requireRole("resident"),
-    (req, res) => {
-        const {
-            complainantName,
-            respondentName,
-            disputeType,
-            incidentDetails,
-            screeningStatus,
-            screeningReasons,
-            screeningWarnings,
-            screeningAnswers
-        } = req.body;
+    async (req, res) => {
 
-        if (
-            !complainantName ||
-            !respondentName ||
-            !disputeType ||
-            !incidentDetails
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide all required complaint information."
-            });
-        }
+        try {
+            const {
+                complainantName,
+                respondentName,
+                disputeType,
+                incidentDetails,
+                screeningStatus,
+                screeningReasons,
+                screeningWarnings,
+                screeningAnswers
+            } = req.body;
 
-        const cleanComplainant = String(complainantName).trim();
-        const cleanRespondent = String(respondentName).trim();
-        const cleanDisputeType = String(disputeType).trim();
-        const cleanIncidentDetails = String(incidentDetails).trim();
-
-        if (
-            !cleanComplainant ||
-            !cleanRespondent ||
-            !cleanDisputeType ||
-            !cleanIncidentDetails
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Complaint fields cannot be empty."
-            });
-        }
-
-        if (
-            cleanComplainant.length > 150 ||
-            cleanRespondent.length > 150 ||
-            cleanDisputeType.length > 100 ||
-            cleanIncidentDetails.length > 10000
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "One or more complaint fields are too long."
-            });
-        }
-
-        const sql = `
-            INSERT INTO cases (
-                resident_id,
-                complainant_name,
-                respondent_name,
-                dispute_type,
-                incident_details,
-                screening_status,
-                screening_reasons,
-                screening_warnings,
-                screening_answers
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-
-        const values = [
-            req.session.user.id,
-            cleanComplainant,
-            cleanRespondent,
-            cleanDisputeType,
-            cleanIncidentDetails,
-            screeningStatus || null,
-            JSON.stringify(screeningReasons || []),
-            JSON.stringify(screeningWarnings || []),
-            JSON.stringify(screeningAnswers || {})
-        ];
-
-        db.run(sql, values, function (error) {
-            if (error) {
-                console.error("Create case error:", error.message);
-
-                return res.status(500).json({
+            if (
+                !complainantName ||
+                !respondentName ||
+                !disputeType ||
+                !incidentDetails
+            ) {
+                return res.status(400).json({
                     success: false,
-                    message: "Unable to save complaint."
+                    message: "Please provide all required complaint information."
                 });
             }
 
-            const caseId = this.lastID;
-            const caseNumber = `LR-${String(caseId).padStart(5, "0")}`;
+            const cleanComplainant = String(complainantName).trim();
+            const cleanRespondent = String(respondentName).trim();
+            const cleanDisputeType = String(disputeType).trim();
+            const cleanIncidentDetails = String(incidentDetails).trim();
 
-            db.run(
-                `UPDATE cases SET case_number = ? WHERE id = ?`,
-                [caseNumber, caseId],
-                (updateError) => {
-                    if (updateError) {
-                        console.error(
-                            "Case number update error:",
-                            updateError.message
-                        );
+            if (
+                !cleanComplainant ||
+                !cleanRespondent ||
+                !cleanDisputeType ||
+                !cleanIncidentDetails
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Complaint fields cannot be empty."
+                });
+            }
 
-                        return res.status(500).json({
-                            success: false,
-                            message: "Complaint was saved, but its case number could not be generated."
-                        });
-                    }
+            if (
+                cleanComplainant.length > 150 ||
+                cleanRespondent.length > 150 ||
+                cleanDisputeType.length > 100 ||
+                cleanIncidentDetails.length > 10000
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "One or more complaint fields are too long."
+                });
+            }
 
-                    db.get(
-                        `SELECT * FROM cases WHERE id = ?`,
-                        [caseId],
-                        (getError, row) => {
-                            if (getError || !row) {
-                                return res.status(500).json({
-                                    success: false,
-                                    message: "Complaint was saved, but could not be retrieved."
-                                });
-                            }
+            const newCase = await withTransaction(async (client) => {
 
-                            res.status(201).json({
-                                success: true,
-                                message: "Complaint submitted successfully.",
-                                case: formatCase(row)
-                            });
-                        }
-                    );
-                }
-            );
-        });
+                const insertResult = await client.query(
+                    `INSERT INTO cases (
+                        resident_id,
+                        complainant_name,
+                        respondent_name,
+                        dispute_type,
+                        incident_details,
+                        screening_status,
+                        screening_reasons,
+                        screening_warnings,
+                        screening_answers
+                    )
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                    RETURNING id`,
+                    [
+                        req.session.user.id,
+                        cleanComplainant,
+                        cleanRespondent,
+                        cleanDisputeType,
+                        cleanIncidentDetails,
+                        screeningStatus || null,
+                        JSON.stringify(screeningReasons || []),
+                        JSON.stringify(screeningWarnings || []),
+                        JSON.stringify(screeningAnswers || {})
+                    ]
+                );
+
+                const caseId = insertResult.rows[0].id;
+
+                const caseNumber =
+                    `LR-${String(caseId).padStart(5, "0")}`;
+
+                await client.query(
+                    `UPDATE cases
+                     SET case_number = $1
+                     WHERE id = $2`,
+                    [caseNumber, caseId]
+                );
+
+                const caseResult = await client.query(
+                    `SELECT *
+                     FROM cases
+                     WHERE id = $1`,
+                    [caseId]
+                );
+
+                return caseResult.rows[0];
+            });
+
+            res.status(201).json({
+                success: true,
+                message: "Complaint submitted successfully.",
+                case: formatCase(newCase)
+            });
+
+        } catch (error) {
+            console.error("Create case error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to save complaint."
+            });
+        }
     }
 );
 
-// GET /api/cases/:id
+
+// ======================================
+// GET CASE DETAILS
+// ======================================
+
 // Check whether the current user is allowed to view this case.
-router.get("/:id", requireAuth, (req, res) => {
-    const caseId = Number(req.params.id);
 
-    if (!Number.isInteger(caseId) || caseId < 1) {
-        return res.status(400).json({
-            success: false,
-            message: "Invalid case ID."
-        });
-    }
+router.get(
+    "/:id",
+    requireAuth,
+    async (req, res) => {
 
-    const user = req.session.user;
+        try {
+            const caseId = Number(req.params.id);
 
-    const sql = `
-        SELECT cases.*
-        FROM cases
-        WHERE cases.id = ?
-        AND (
-            cases.resident_id = ?
-            OR ? IN ('secretary', 'admin')
-            OR EXISTS (
-                SELECT 1
-                FROM case_assignments
-                WHERE case_assignments.case_id = cases.id
-                AND case_assignments.lupon_user_id = ?
-            )
-        )
-    `;
-
-    db.get(
-        sql,
-        [caseId, user.id, user.role, user.id],
-        (error, row) => {
-            if (error) {
-                console.error("Get case details error:", error.message);
-
-                return res.status(500).json({
+            if (!Number.isInteger(caseId) || caseId < 1) {
+                return res.status(400).json({
                     success: false,
-                    message: "Unable to retrieve case details."
+                    message: "Invalid case ID."
                 });
             }
 
-            if (!row) {
-                // Do not reveal whether another user's case exists.
+            const user = req.session.user;
+
+            const result = await pool.query(
+                `SELECT cases.*
+                 FROM cases
+                 WHERE cases.id = $1
+                 AND (
+                     cases.resident_id = $2
+                     OR $3 IN ('secretary', 'admin')
+                     OR EXISTS (
+                         SELECT 1
+                         FROM case_assignments
+                         WHERE case_assignments.case_id = cases.id
+                         AND case_assignments.lupon_user_id = $4
+                     )
+                 )`,
+                [caseId, user.id, user.role, user.id]
+            );
+
+            if (result.rows.length === 0) {
                 return res.status(404).json({
                     success: false,
                     message: "Case not found."
@@ -306,61 +339,73 @@ router.get("/:id", requireAuth, (req, res) => {
 
             res.json({
                 success: true,
-                case: formatCase(row)
+                case: formatCase(result.rows[0])
+            });
+
+        } catch (error) {
+            console.error("Get case details error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to retrieve case details."
             });
         }
-    );
-});
+    }
+);
 
-// PATCH /api/cases/:id/status
-// Secretary or Admin updates the administrative review status.
+
+// ======================================
+// UPDATE ADMINISTRATIVE STATUS
+// ======================================
+
+// Secretary updates the administrative review status.
+
 router.patch(
     "/:id/status",
     requireAuth,
     requireRole("secretary"),
-    (req, res) => {
-        const caseId = Number(req.params.id);
-        const { status, secretaryNotes } = req.body;
+    async (req, res) => {
 
-        const allowedStatuses = [
-            "Pending Review",
-            "Under Review",
-            "Awaiting Clarification",
-            "Ready for Lupon Assessment"
-        ];
+        try {
+            const caseId = Number(req.params.id);
+            const { status, secretaryNotes } = req.body;
 
-        if (!Number.isInteger(caseId) || caseId < 1) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid case ID."
-            });
-        }
+            const allowedStatuses = [
+                "Pending Review",
+                "Under Review",
+                "Awaiting Clarification",
+                "Ready for Lupon Assessment"
+            ];
 
-        if (!allowedStatuses.includes(status)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid administrative status."
-            });
-        }
+            if (!Number.isInteger(caseId) || caseId < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid case ID."
+                });
+            }
 
-        db.get(
-            `SELECT * FROM cases WHERE id = ?`,
-            [caseId],
-            (error, existingCase) => {
-                if (error) {
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to find case."
-                    });
+            if (!allowedStatuses.includes(status)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid administrative status."
+                });
+            }
+
+            const updated = await withTransaction(async (client) => {
+
+                const lookup = await client.query(
+                    `SELECT *
+                     FROM cases
+                     WHERE id = $1
+                     FOR UPDATE`,
+                    [caseId]
+                );
+
+                if (lookup.rows.length === 0) {
+                    return false;
                 }
 
-                if (!existingCase) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Case not found."
-                    });
-                }
-
+                const existingCase = lookup.rows[0];
                 const history = parseJSON(existingCase.case_history);
 
                 history.push({
@@ -372,199 +417,193 @@ router.patch(
                     updatedAt: new Date().toISOString()
                 });
 
-                db.run(
+                await client.query(
                     `UPDATE cases
-                     SET status = ?,
-                         secretary_notes = ?,
-                         case_history = ?,
+                     SET status = $1,
+                         secretary_notes = $2,
+                         case_history = $3,
                          updated_at = CURRENT_TIMESTAMP
-                     WHERE id = ?`,
+                     WHERE id = $4`,
                     [
                         status,
                         secretaryNotes || existingCase.secretary_notes || "",
                         JSON.stringify(history),
                         caseId
-                    ],
-                    function (updateError) {
-                        if (updateError) {
-                            return res.status(500).json({
-                                success: false,
-                                message: "Unable to update case status."
-                            });
-                        }
-
-                        res.json({
-                            success: true,
-                            message: "Case status updated successfully."
-                        });
-                    }
+                    ]
                 );
+
+                return true;
+            });
+
+            if (!updated) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Case not found."
+                });
             }
-        );
+
+            res.json({
+                success: true,
+                message: "Case status updated successfully."
+            });
+
+        } catch (error) {
+            console.error("Update case status error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to update case status."
+            });
+        }
     }
 );
 
 
+// ======================================
+// UPDATE CASE WORKFLOW
+// ======================================
 
-// PATCH /api/cases/:id/workflow
-// Secretary or Admin updates the case workflow stage.
 router.patch(
     "/:id/workflow",
     requireAuth,
     requireRole("secretary"),
-    (req, res) => {
-        const caseId = Number(req.params.id);
+    async (req, res) => {
 
-        const {
-            caseStage,
-            arbitrationApplicable,
-            note
-        } = req.body;
+        try {
+            const caseId = Number(req.params.id);
 
-        const allowedStages = [
-            "Secretary Review",
-            "For Lupon Assessment",
-            "Mediation",
-            "Conciliation",
-            "Arbitration",
-            "Resolved",
-            "Certificate to File Action",
-            "Closed"
-        ];
+            const {
+                caseStage,
+                arbitrationApplicable,
+                note
+            } = req.body;
 
-        // Define which stages can follow each current stage.
-        const allowedTransitions = {
-            "Secretary Review": [
-                "For Lupon Assessment"
-            ],
-
-            "For Lupon Assessment": [
+            const allowedStages = [
+                "Secretary Review",
+                "For Lupon Assessment",
                 "Mediation",
                 "Conciliation",
-                "Arbitration"
-            ],
-
-            "Mediation": [
-                "Conciliation",
-                "Resolved",
-                "Certificate to File Action"
-            ],
-
-            "Conciliation": [
                 "Arbitration",
                 "Resolved",
-                "Certificate to File Action"
-            ],
-
-            "Arbitration": [
-                "Resolved",
-                "Certificate to File Action"
-            ],
-
-            "Resolved": [
+                "Certificate to File Action",
                 "Closed"
-            ],
+            ];
 
-            "Certificate to File Action": [
-                "Closed"
-            ],
+            const allowedTransitions = {
+                "Secretary Review": [
+                    "For Lupon Assessment"
+                ],
 
-            "Closed": []
-        };
+                "For Lupon Assessment": [
+                    "Mediation",
+                    "Conciliation",
+                    "Arbitration"
+                ],
 
-        // Validate case ID.
-        if (!Number.isInteger(caseId) || caseId < 1) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid case ID."
-            });
-        }
+                "Mediation": [
+                    "Conciliation",
+                    "Resolved",
+                    "Certificate to File Action"
+                ],
 
-        // Validate requested stage.
-        if (!allowedStages.includes(caseStage)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid workflow stage."
-            });
-        }
+                "Conciliation": [
+                    "Arbitration",
+                    "Resolved",
+                    "Certificate to File Action"
+                ],
 
-        // Validate arbitration setting.
-        if (typeof arbitrationApplicable !== "boolean") {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide a valid arbitration setting."
-            });
-        }
+                "Arbitration": [
+                    "Resolved",
+                    "Certificate to File Action"
+                ],
 
-        // Require update notes.
-        if (!note || !String(note).trim()) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide workflow update notes."
-            });
-        }
+                "Resolved": [
+                    "Closed"
+                ],
 
-        // Arbitration must be authorized.
-        if (caseStage === "Arbitration" && !arbitrationApplicable) {
-            return res.status(400).json({
-                success: false,
-                message: "Arbitration must be authorized before selecting this stage."
-            });
-        }
+                "Certificate to File Action": [
+                    "Closed"
+                ],
 
-        db.get(
-            `SELECT * FROM cases WHERE id = ?`,
-            [caseId],
-            (error, existingCase) => {
-                if (error) {
-                    console.error("Workflow lookup error:", error.message);
+                "Closed": []
+            };
 
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to retrieve case."
-                    });
+            if (!Number.isInteger(caseId) || caseId < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid case ID."
+                });
+            }
+
+            if (!allowedStages.includes(caseStage)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid workflow stage."
+                });
+            }
+
+            if (typeof arbitrationApplicable !== "boolean") {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please provide a valid arbitration setting."
+                });
+            }
+
+            if (!note || !String(note).trim()) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please provide workflow update notes."
+                });
+            }
+
+            if (caseStage === "Arbitration" && !arbitrationApplicable) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Arbitration must be authorized before selecting this stage."
+                });
+            }
+
+            const result = await withTransaction(async (client) => {
+
+                const lookup = await client.query(
+                    `SELECT *
+                     FROM cases
+                     WHERE id = $1
+                     FOR UPDATE`,
+                    [caseId]
+                );
+
+                if (lookup.rows.length === 0) {
+                    return { notFound: true };
                 }
 
-                if (!existingCase) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Case not found."
-                    });
-                }
+                const existingCase = lookup.rows[0];
 
-                // Prevent any further workflow updates after closure.
                 if (existingCase.case_stage === "Closed") {
-                    return res.status(400).json({
-                        success: false,
-                        message: "This case is already closed. No further workflow updates are allowed."
-                    });
+                    return {
+                        error: "This case is already closed. No further workflow updates are allowed."
+                    };
                 }
 
                 const previousStage =
                     existingCase.case_stage || "Secretary Review";
 
-                // Resolution and closure must use their dedicated routes.
-                        if (
-                            caseStage !== previousStage &&
-                            ["Resolved", "Closed"].includes(caseStage)
-                        ) {
-                            return res.status(400).json({
-                                success: false,
-                                message: "Use the dedicated resolution or closure form to complete this stage."
-                            });
-                        }
+                if (
+                    caseStage !== previousStage &&
+                    ["Resolved", "Closed"].includes(caseStage)
+                ) {
+                    return {
+                        error: "Use the dedicated resolution or closure form to complete this stage."
+                    };
+                }
 
-
-                // Check whether the requested transition is allowed.
-                // Saving notes without changing the stage is permitted.
                 if (
                     caseStage !== previousStage &&
                     !allowedTransitions[previousStage]?.includes(caseStage)
                 ) {
-                    return res.status(400).json({
-                        success: false,
-                        message: `Cannot move a case from ${previousStage} to ${caseStage}.`
-                    });
+                    return {
+                        error: `Cannot move a case from ${previousStage} to ${caseStage}.`
+                    };
                 }
 
                 const history = parseJSON(existingCase.case_history);
@@ -579,98 +618,116 @@ router.patch(
                     updatedBy: req.session.user.fullName
                 });
 
-                db.run(
+                await client.query(
                     `UPDATE cases
-                     SET case_stage = ?,
-                         arbitration_applicable = ?,
-                         case_history = ?,
+                     SET case_stage = $1,
+                         arbitration_applicable = $2,
+                         case_history = $3,
                          updated_at = CURRENT_TIMESTAMP
-                     WHERE id = ?`,
+                     WHERE id = $4`,
                     [
                         caseStage,
                         arbitrationApplicable ? 1 : 0,
                         JSON.stringify(history),
                         caseId
-                    ],
-                    function (updateError) {
-                        if (updateError) {
-                            console.error(
-                                "Workflow update error:",
-                                updateError.message
-                            );
-
-                            return res.status(500).json({
-                                success: false,
-                                message: "Unable to save workflow update."
-                            });
-                        }
-
-                        res.json({
-                            success: true,
-                            message: "Workflow updated successfully.",
-                            caseStage,
-                            arbitrationApplicable,
-                            history
-                        });
-                    }
+                    ]
                 );
+
+                return {
+                    caseStage,
+                    arbitrationApplicable,
+                    history
+                };
+            });
+
+            if (result.notFound) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Case not found."
+                });
             }
-        );
+
+            if (result.error) {
+                return res.status(400).json({
+                    success: false,
+                    message: result.error
+                });
+            }
+
+            res.json({
+                success: true,
+                message: "Workflow updated successfully.",
+                caseStage: result.caseStage,
+                arbitrationApplicable: result.arbitrationApplicable,
+                history: result.history
+            });
+
+        } catch (error) {
+            console.error("Workflow update error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to save workflow update."
+            });
+        }
     }
 );
 
-// PATCH /api/cases/:id/resolution
-// Secretary records the final resolution of a case.
+
+// ======================================
+// RECORD CASE RESOLUTION
+// ======================================
+
 router.patch(
     "/:id/resolution",
     requireAuth,
     requireRole("secretary"),
-    (req, res) => {
-        const caseId = Number(req.params.id);
+    async (req, res) => {
 
-        const { resolutionOutcome, resolutionNotes } = req.body;
+        try {
+            const caseId = Number(req.params.id);
 
-        if (!Number.isInteger(caseId) || caseId < 1) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid case ID."
-            });
-        }
+            const { resolutionOutcome, resolutionNotes } = req.body;
 
-        const cleanOutcome = String(resolutionOutcome || "").trim();
-        const cleanNotes = String(resolutionNotes || "").trim();
+            if (!Number.isInteger(caseId) || caseId < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid case ID."
+                });
+            }
 
-        if (!cleanOutcome || !cleanNotes) {
-            return res.status(400).json({
-                success: false,
-                message: "Resolution outcome and notes are required."
-            });
-        }
+            const cleanOutcome = String(resolutionOutcome || "").trim();
+            const cleanNotes = String(resolutionNotes || "").trim();
 
-        if (cleanOutcome.length > 100 || cleanNotes.length > 10000) {
-            return res.status(400).json({
-                success: false,
-                message: "Resolution information is too long."
-            });
-        }
+            if (!cleanOutcome || !cleanNotes) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Resolution outcome and notes are required."
+                });
+            }
 
-        db.get(
-            `SELECT * FROM cases WHERE id = ?`,
-            [caseId],
-            (error, existingCase) => {
-                if (error) {
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to retrieve case."
-                    });
+            if (cleanOutcome.length > 100 || cleanNotes.length > 10000) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Resolution information is too long."
+                });
+            }
+
+            const result = await withTransaction(async (client) => {
+
+                const lookup = await client.query(
+                    `SELECT *
+                     FROM cases
+                     WHERE id = $1
+                     FOR UPDATE`,
+                    [caseId]
+                );
+
+                if (lookup.rows.length === 0) {
+                    return { notFound: true };
                 }
 
-                if (!existingCase) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Case not found."
-                    });
-                }
+                const existingCase = lookup.rows[0];
 
                 const currentStage =
                     existingCase.case_stage || "Secretary Review";
@@ -682,24 +739,21 @@ router.patch(
                 ];
 
                 if (!eligibleStages.includes(currentStage)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "This case is not currently eligible for resolution recording."
-                    });
+                    return {
+                        error: "This case is not currently eligible for resolution recording."
+                    };
                 }
 
                 if (
                     existingCase.resolution_outcome ||
                     existingCase.resolved_at
                 ) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "A resolution has already been recorded for this case."
-                    });
+                    return {
+                        error: "A resolution has already been recorded for this case."
+                    };
                 }
 
                 const history = parseJSON(existingCase.case_history);
-
                 const recordedAt = new Date().toISOString();
 
                 history.push({
@@ -712,98 +766,112 @@ router.patch(
                     recordedAt
                 });
 
-                db.run(
+                await client.query(
                     `UPDATE cases
                      SET case_stage = 'Resolved',
-                         resolution_outcome = ?,
-                         resolution_notes = ?,
+                         resolution_outcome = $1,
+                         resolution_notes = $2,
                          resolved_at = CURRENT_TIMESTAMP,
-                         resolved_by = ?,
-                         case_history = ?,
+                         resolved_by = $3,
+                         case_history = $4,
                          updated_at = CURRENT_TIMESTAMP
-                     WHERE id = ?`,
+                     WHERE id = $5`,
                     [
                         cleanOutcome,
                         cleanNotes,
                         req.session.user.id,
                         JSON.stringify(history),
                         caseId
-                    ],
-                    function (updateError) {
-                        if (updateError) {
-                            console.error(
-                                "Resolution update error:",
-                                updateError.message
-                            );
-
-                            return res.status(500).json({
-                                success: false,
-                                message: "Unable to record case resolution."
-                            });
-                        }
-
-                        res.json({
-                            success: true,
-                            message: "Case resolution recorded successfully.",
-                            caseStage: "Resolved"
-                        });
-                    }
+                    ]
                 );
+
+                return { success: true };
+            });
+
+            if (result.notFound) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Case not found."
+                });
             }
-        );
+
+            if (result.error) {
+                return res.status(400).json({
+                    success: false,
+                    message: result.error
+                });
+            }
+
+            res.json({
+                success: true,
+                message: "Case resolution recorded successfully.",
+                caseStage: "Resolved"
+            });
+
+        } catch (error) {
+            console.error("Resolution update error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to record case resolution."
+            });
+        }
     }
 );
 
-// PATCH /api/cases/:id/closure
-// Secretary records the administrative closure of a case.
+
+// ======================================
+// CLOSE CASE
+// ======================================
+
 router.patch(
     "/:id/closure",
     requireAuth,
     requireRole("secretary"),
-    (req, res) => {
-        const caseId = Number(req.params.id);
-        const { closureNotes } = req.body;
+    async (req, res) => {
 
-        if (!Number.isInteger(caseId) || caseId < 1) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid case ID."
-            });
-        }
+        try {
+            const caseId = Number(req.params.id);
+            const { closureNotes } = req.body;
 
-        const cleanNotes = String(closureNotes || "").trim();
+            if (!Number.isInteger(caseId) || caseId < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid case ID."
+                });
+            }
 
-        if (!cleanNotes) {
-            return res.status(400).json({
-                success: false,
-                message: "Closure notes are required."
-            });
-        }
+            const cleanNotes = String(closureNotes || "").trim();
 
-        if (cleanNotes.length > 10000) {
-            return res.status(400).json({
-                success: false,
-                message: "Closure notes are too long."
-            });
-        }
+            if (!cleanNotes) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Closure notes are required."
+                });
+            }
 
-        db.get(
-            `SELECT * FROM cases WHERE id = ?`,
-            [caseId],
-            (error, existingCase) => {
-                if (error) {
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to retrieve case."
-                    });
+            if (cleanNotes.length > 10000) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Closure notes are too long."
+                });
+            }
+
+            const result = await withTransaction(async (client) => {
+
+                const lookup = await client.query(
+                    `SELECT *
+                     FROM cases
+                     WHERE id = $1
+                     FOR UPDATE`,
+                    [caseId]
+                );
+
+                if (lookup.rows.length === 0) {
+                    return { notFound: true };
                 }
 
-                if (!existingCase) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Case not found."
-                    });
-                }
+                const existingCase = lookup.rows[0];
 
                 const currentStage =
                     existingCase.case_stage || "Secretary Review";
@@ -814,17 +882,15 @@ router.patch(
                 ];
 
                 if (!eligibleStages.includes(currentStage)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Only resolved or certificate-to-file-action cases can be closed."
-                    });
+                    return {
+                        error: "Only resolved or certificate-to-file-action cases can be closed."
+                    };
                 }
 
                 if (existingCase.closed_at) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "This case has already been closed."
-                    });
+                    return {
+                        error: "This case has already been closed."
+                    };
                 }
 
                 const history = parseJSON(existingCase.case_history);
@@ -839,362 +905,380 @@ router.patch(
                     closedAt: recordedAt
                 });
 
-                db.run(
+                await client.query(
                     `UPDATE cases
                      SET case_stage = 'Closed',
-                         closure_notes = ?,
+                         closure_notes = $1,
                          closed_at = CURRENT_TIMESTAMP,
-                         closed_by = ?,
-                         case_history = ?,
+                         closed_by = $2,
+                         case_history = $3,
                          updated_at = CURRENT_TIMESTAMP
-                     WHERE id = ?`,
+                     WHERE id = $4`,
                     [
                         cleanNotes,
                         req.session.user.id,
                         JSON.stringify(history),
                         caseId
-                    ],
-                    function (updateError) {
-                        if (updateError) {
-                            console.error(
-                                "Case closure error:",
-                                updateError.message
-                            );
-
-                            return res.status(500).json({
-                                success: false,
-                                message: "Unable to close case."
-                            });
-                        }
-
-                        res.json({
-                            success: true,
-                            message: "Case closed successfully.",
-                            caseStage: "Closed"
-                        });
-                    }
+                    ]
                 );
+
+                return { success: true };
+            });
+
+            if (result.notFound) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Case not found."
+                });
             }
-        );
+
+            if (result.error) {
+                return res.status(400).json({
+                    success: false,
+                    message: result.error
+                });
+            }
+
+            res.json({
+                success: true,
+                message: "Case closed successfully.",
+                caseStage: "Closed"
+            });
+
+        } catch (error) {
+            console.error("Case closure error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to close case."
+            });
+        }
     }
 );
 
-// POST /api/cases/:id/assign
-// Secretary or Admin assigns a case to a Lupon member.
 
-// POST /api/cases/:id/assign
-// Secretary or Admin assigns a case to a Lupon member.
+// ======================================
+// ASSIGN CASE TO LUPON MEMBER
+// ======================================
+
 router.post(
     "/:id/assign",
     requireAuth,
     requireRole("secretary"),
-    (req, res) => {
-        const caseId = Number(req.params.id);
-        const luponUserId = Number(req.body.luponUserId);
+    async (req, res) => {
 
-        if (
-            !Number.isInteger(caseId) ||
-            caseId < 1 ||
-            !Number.isInteger(luponUserId) ||
-            luponUserId < 1
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "A valid case ID and Lupon member ID are required."
-            });
-        }
+        try {
+            const caseId = Number(req.params.id);
+            const luponUserId = Number(req.body.luponUserId);
 
-        db.get(
-            `SELECT id FROM cases WHERE id = ?`,
-            [caseId],
-            (caseError, existingCase) => {
-                if (caseError) {
-                    console.error("Case lookup error:", caseError.message);
+            if (
+                !Number.isInteger(caseId) ||
+                caseId < 1 ||
+                !Number.isInteger(luponUserId) ||
+                luponUserId < 1
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "A valid case ID and Lupon member ID are required."
+                });
+            }
 
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to verify case."
-                    });
+            const result = await withTransaction(async (client) => {
+
+                const caseResult = await client.query(
+                    `SELECT id
+                     FROM cases
+                     WHERE id = $1`,
+                    [caseId]
+                );
+
+                if (caseResult.rows.length === 0) {
+                    return { caseNotFound: true };
                 }
 
-                if (!existingCase) {
-                    return res.status(404).json({
-                        success: false,
-                        message: "Case not found."
-                    });
-                }
-
-                db.get(
+                const userResult = await client.query(
                     `SELECT id, full_name, role
                      FROM users
-                     WHERE id = ?`,
-                    [luponUserId],
-                    (userError, luponUser) => {
-                        if (userError) {
-                            console.error("Lupon lookup error:", userError.message);
-
-                            return res.status(500).json({
-                                success: false,
-                                message: "Unable to verify Lupon member."
-                            });
-                        }
-
-                        if (!luponUser || luponUser.role !== "lupon") {
-                            return res.status(400).json({
-                                success: false,
-                                message: "The selected account is not a Lupon member."
-                            });
-                        }
-
-                        db.run(
-                            `INSERT INTO case_assignments (
-                                case_id,
-                                lupon_user_id
-                            )
-                            VALUES (?, ?)
-                            ON CONFLICT(case_id, lupon_user_id) DO NOTHING`,
-                            [caseId, luponUserId],
-                            function (assignError) {
-                                if (assignError) {
-                                    console.error(
-                                        "ASSIGNMENT DATABASE ERROR:",
-                                        assignError.message
-                                    );
-
-                                    return res.status(500).json({
-                                        success: false,
-                                        message: "Unable to assign case."
-                                    });
-                                }
-
-                                // Capture INSERT result before entering another callback.
-                                const assignmentInserted = this.changes > 0;
-
-                                db.get(
-                                    `SELECT case_history
-                                     FROM cases
-                                     WHERE id = ?`,
-                                    [caseId],
-                                    (historyError, row) => {
-                                        if (historyError || !row) {
-                                            console.error(
-                                                "Assignment history lookup error:",
-                                                historyError?.message
-                                            );
-
-                                            return res.status(500).json({
-                                                success: false,
-                                                message: "Assignment saved, but history could not be retrieved."
-                                            });
-                                        }
-
-                                        const history = parseJSON(row.case_history);
-
-                                        if (assignmentInserted) {
-                                            history.push({
-                                                action: "Case assigned to Lupon member",
-                                                luponUserId: luponUser.id,
-                                                luponName: luponUser.full_name,
-                                                assignedBy: req.session.user.fullName,
-                                                assignedAt: new Date().toISOString()
-                                            });
-                                        }
-
-                                        db.run(
-                                            `UPDATE cases
-                                             SET case_history = ?,
-                                                 updated_at = CURRENT_TIMESTAMP
-                                             WHERE id = ?`,
-                                            [JSON.stringify(history), caseId],
-                                            (historyUpdateError) => {
-                                                if (historyUpdateError) {
-                                                    console.error(
-                                                        "Assignment history update error:",
-                                                        historyUpdateError.message
-                                                    );
-
-                                                    return res.status(500).json({
-                                                        success: false,
-                                                        message: "Assignment saved, but history could not be updated."
-                                                    });
-                                                }
-
-                                                res.json({
-                                                    success: true,
-                                                    message: "Case assignment processed.",
-                                                    assignedTo: luponUser.full_name
-                                                });
-                                            }
-                                        );
-                                    }
-                                );
-                            }
-                        );
-                    }
+                     WHERE id = $1`,
+                    [luponUserId]
                 );
+
+                const luponUser = userResult.rows[0];
+
+                if (!luponUser || luponUser.role !== "lupon") {
+                    return { invalidUser: true };
+                }
+
+                const assignment = await client.query(
+                    `INSERT INTO case_assignments (
+                        case_id,
+                        lupon_user_id
+                    )
+                    VALUES ($1, $2)
+                    ON CONFLICT (case_id, lupon_user_id)
+                    DO NOTHING
+                    RETURNING id`,
+                    [caseId, luponUserId]
+                );
+
+                const assignmentInserted = assignment.rowCount > 0;
+
+                const historyResult = await client.query(
+                    `SELECT case_history
+                     FROM cases
+                     WHERE id = $1
+                     FOR UPDATE`,
+                    [caseId]
+                );
+
+                const history = parseJSON(
+                    historyResult.rows[0].case_history
+                );
+
+                if (assignmentInserted) {
+                    history.push({
+                        action: "Case assigned to Lupon member",
+                        luponUserId: luponUser.id,
+                        luponName: luponUser.full_name,
+                        assignedBy: req.session.user.fullName,
+                        assignedAt: new Date().toISOString()
+                    });
+
+                    await client.query(
+                        `UPDATE cases
+                         SET case_history = $1,
+                             updated_at = CURRENT_TIMESTAMP
+                         WHERE id = $2`,
+                        [JSON.stringify(history), caseId]
+                    );
+                }
+
+                return {
+                    assignedTo: luponUser.full_name
+                };
+            });
+
+            if (result.caseNotFound) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Case not found."
+                });
             }
-        );
+
+            if (result.invalidUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: "The selected account is not a Lupon member."
+                });
+            }
+
+            res.json({
+                success: true,
+                message: "Case assignment processed.",
+                assignedTo: result.assignedTo
+            });
+
+        } catch (error) {
+            console.error("Assignment database error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to assign case."
+            });
+        }
     }
 );
 
 
+// ======================================
+// RECORD CASE PROCEEDINGS
+// ======================================
 
-// POST /api/cases/:id/proceedings
 // Assigned Lupon member records a proceeding.
+
 router.post(
     "/:id/proceedings",
     requireAuth,
     requireRole("lupon"),
-    (req, res) => {
-        const caseId = Number(req.params.id);
+    async (req, res) => {
 
-        const {
-            proceedingType,
-            meetingDate,
-            attendees,
-            outcome,
-            summary,
-            nextAction
-        } = req.body;
+        try {
+            const caseId = Number(req.params.id);
 
-        const allowedTypes = [
-            "Mediation",
-            "Conciliation",
-            "Arbitration"
-        ];
+            const {
+                proceedingType,
+                meetingDate,
+                attendees,
+                outcome,
+                summary,
+                nextAction
+            } = req.body;
 
-        if (!Number.isInteger(caseId) || caseId < 1) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid case ID."
-            });
-        }
+            const allowedTypes = [
+                "Mediation",
+                "Conciliation",
+                "Arbitration"
+            ];
 
-        if (
-            !allowedTypes.includes(proceedingType) ||
-            !meetingDate ||
-            !outcome ||
-            !summary
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide a valid proceeding type, meeting date, outcome, and summary."
-            });
-        }
+            if (!Number.isInteger(caseId) || caseId < 1) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid case ID."
+                });
+            }
 
-        db.get(
-            `SELECT cases.*
-             FROM cases
-             INNER JOIN case_assignments
-                ON cases.id = case_assignments.case_id
-             WHERE cases.id = ?
-               AND case_assignments.lupon_user_id = ?`,
-            [caseId, req.session.user.id],
-            (error, existingCase) => {
-                if (error) {
-                    return res.status(500).json({
-                        success: false,
-                        message: "Unable to verify case assignment."
-                    });
+            if (
+                !allowedTypes.includes(proceedingType) ||
+                !meetingDate ||
+                !outcome ||
+                !summary
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please provide a valid proceeding type, meeting date, outcome, and summary."
+                });
+            }
+
+            const result = await withTransaction(async (client) => {
+
+                const lookup = await client.query(
+                    `SELECT cases.*
+                     FROM cases
+                     INNER JOIN case_assignments
+                        ON cases.id = case_assignments.case_id
+                     WHERE cases.id = $1
+                       AND case_assignments.lupon_user_id = $2
+                     FOR UPDATE OF cases`,
+                    [caseId, req.session.user.id]
+                );
+
+                if (lookup.rows.length === 0) {
+                    return { notAssigned: true };
                 }
 
-                if (!existingCase) {
-                    return res.status(403).json({
-                        success: false,
-                        message: "You are not assigned to this case."
-                    });
-                }
-                // Prevent additional proceedings on completed cases.
+                const existingCase = lookup.rows[0];
+
                 if (
-                    ["Resolved", "Certificate to File Action", "Closed"].includes(
-                        existingCase.case_stage
-                    )
+                    [
+                        "Resolved",
+                        "Certificate to File Action",
+                        "Closed"
+                    ].includes(existingCase.case_stage)
                 ) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "No additional proceedings can be recorded because this case has reached a terminal stage."
-                    });
+                    return {
+                        error: "No additional proceedings can be recorded because this case has reached a terminal stage."
+                    };
                 }
+
                 if (
                     proceedingType === "Arbitration" &&
                     !existingCase.arbitration_applicable
                 ) {
-                    return res.status(403).json({
-                        success: false,
-                        message: "Arbitration has not been authorized for this case."
-                    });
+                    return {
+                        forbidden: true
+                    };
                 }
 
-                
-const proceedings = parseJSON(existingCase.case_proceedings);
-const history = parseJSON(existingCase.case_history);
+                const proceedings = parseJSON(
+                    existingCase.case_proceedings
+                );
 
-const newProceeding = {
-    proceedingType,
-    meetingDate,
-    attendees: Array.isArray(attendees) ? attendees : [],
-    outcome,
-    summary,
-    nextAction: nextAction || "",
-    recordedBy: req.session.user.fullName,
-    recordedAt: new Date().toISOString()
-};
+                const history = parseJSON(
+                    existingCase.case_history
+                );
 
-proceedings.push(newProceeding);
+                const recordedAt = new Date().toISOString();
 
-history.push({
-    action: `${proceedingType} proceeding recorded`,
-    proceedingType,
-    recordedBy: req.session.user.fullName,
-    recordedAt: new Date().toISOString()
-});
+                const newProceeding = {
+                    proceedingType,
+                    meetingDate,
+                    attendees: Array.isArray(attendees) ? attendees : [],
+                    outcome,
+                    summary,
+                    nextAction: nextAction || "",
+                    recordedBy: req.session.user.fullName,
+                    recordedAt
+                };
 
-// Determine the appropriate workflow stage.
-let nextStage = existingCase.case_stage || "Secretary Review";
+                proceedings.push(newProceeding);
 
-if (proceedingType === "Mediation") {
-    nextStage = "Mediation";
-} else if (proceedingType === "Conciliation") {
-    nextStage = "Conciliation";
-} else if (proceedingType === "Arbitration") {
-    nextStage = "Arbitration";
-}
+                history.push({
+                    action: `${proceedingType} proceeding recorded`,
+                    proceedingType,
+                    recordedBy: req.session.user.fullName,
+                    recordedAt
+                });
 
-// Save the proceeding, history, and workflow stage together.
-                db.run(
+                let nextStage =
+                    existingCase.case_stage || "Secretary Review";
+
+                if (proceedingType === "Mediation") {
+                    nextStage = "Mediation";
+                } else if (proceedingType === "Conciliation") {
+                    nextStage = "Conciliation";
+                } else if (proceedingType === "Arbitration") {
+                    nextStage = "Arbitration";
+                }
+
+                await client.query(
                     `UPDATE cases
-                    SET case_proceedings = ?,
-                        case_history = ?,
-                        case_stage = ?,
-                        updated_at = CURRENT_TIMESTAMP
-                    WHERE id = ?`,
+                     SET case_proceedings = $1,
+                         case_history = $2,
+                         case_stage = $3,
+                         updated_at = CURRENT_TIMESTAMP
+                     WHERE id = $4`,
                     [
                         JSON.stringify(proceedings),
                         JSON.stringify(history),
                         nextStage,
                         caseId
-                    ],
-                    function (updateError) {
-                        if (updateError) {
-                            console.error("Save proceeding error:", updateError.message);
-
-                            return res.status(500).json({
-                                success: false,
-                                message: "Unable to save proceeding."
-                            });
-                        }
-
-                        res.status(201).json({
-                            success: true,
-                            message: "Proceeding recorded successfully.",
-                            proceeding: newProceeding,
-                            caseStage: nextStage
-                        });
-                    }
+                    ]
                 );
+
+                return {
+                    proceeding: newProceeding,
+                    caseStage: nextStage
+                };
+            });
+
+            if (result.notAssigned) {
+                return res.status(403).json({
+                    success: false,
+                    message: "You are not assigned to this case."
+                });
             }
-        );
+
+            if (result.forbidden) {
+                return res.status(403).json({
+                    success: false,
+                    message: "Arbitration has not been authorized for this case."
+                });
+            }
+
+            if (result.error) {
+                return res.status(400).json({
+                    success: false,
+                    message: result.error
+                });
+            }
+
+            res.status(201).json({
+                success: true,
+                message: "Proceeding recorded successfully.",
+                proceeding: result.proceeding,
+                caseStage: result.caseStage
+            });
+
+        } catch (error) {
+            console.error("Save proceeding error:", error);
+
+            res.status(500).json({
+                success: false,
+                message: "Unable to save proceeding."
+            });
+        }
     }
 );
+
 
 module.exports = router;

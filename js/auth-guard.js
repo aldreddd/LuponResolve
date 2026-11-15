@@ -3,7 +3,7 @@
 // LUPONRESOLVE DASHBOARD AUTH GUARD
 // ======================================
 
-const AUTH_API = "http://127.0.0.1:3000/api/auth";
+const AUTH_API = window.API.auth;
 
 // Define which roles can access each protected page
 const pagePermissions = {

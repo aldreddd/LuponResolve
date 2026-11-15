@@ -1,72 +1,174 @@
-// Import packages
-const caseRoutes = require("./routes/caseRoutes");
-const express = require("express");
-const cors = require("cors");
+
+// ======================================
+// LOAD ENVIRONMENT VARIABLES
+// ======================================
+
 const dotenv = require("dotenv");
-const session = require("express-session");
-const SQLiteSessionStore = require("./config/sqliteSessionStore");
-
-// Import authentication routes
-const authRoutes = require("./routes/authRoutes");
-const roleRoutes = require("./routes/roleRoutes");
-const db = require("./config/database");
-
-// Load environment variables
 dotenv.config();
 
-// Create Express application
+
+// ======================================
+// IMPORT PACKAGES AND ROUTES
+// ======================================
+
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const session = require("express-session");
+const PgSession = require("connect-pg-simple")(session);
+
+const pool = require("./config/postgres");
+
+const authRoutes = require("./routes/authRoutes");
+const roleRoutes = require("./routes/roleRoutes");
+const caseRoutes = require("./routes/caseRoutes");
+
+
+// ======================================
+// CREATE EXPRESS APPLICATION
+// ======================================
+
 const app = express();
 
-// Set the server port
 const PORT = process.env.PORT || 3000;
+
+// Project root: LuponResolve/
+const PROJECT_ROOT = path.join(__dirname, "..");
+
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+
+
+// ======================================
+// PROXY CONFIGURATION
+// ======================================
+
+// Render uses a reverse proxy.
+// Trust the proxy when deployed so secure cookies work correctly.
+
+if (IS_PRODUCTION) {
+    app.set("trust proxy", 1);
+}
 
 
 // ======================================
 // MIDDLEWARE
 // ======================================
 
-// Allow frontend to communicate with backend
-app.use(cors({
-    origin: process.env.CLIENT_URL || "http://127.0.0.1:5500",
-    credentials: true
-}));
+// CORS is needed for local development because
+// Live Server and Express use different ports.
 
-// Allow Express to read JSON request bodies
+if (!IS_PRODUCTION) {
+    app.use(cors({
+        origin: process.env.CLIENT_URL || "http://127.0.0.1:5500",
+        credentials: true
+    }));
+}
+
+// Allow Express to read JSON request bodies.
 app.use(express.json());
 
-// Allow Express to read form data
+// Allow Express to read form data.
 app.use(express.urlencoded({ extended: true }));
 
-// Session configuration using the existing SQLite database
+
+// ======================================
+// SESSION CONFIGURATION
+// ======================================
+
 app.use(session({
+    store: new PgSession({
+        pool: pool,
+        tableName: "sessions",
+        createTableIfMissing: true
+    }),
+
     secret: process.env.SESSION_SECRET,
+
     resave: false,
     saveUninitialized: false,
+
     cookie: {
         httpOnly: true,
-        secure: false, // Use true when deployed with HTTPS
+        secure: IS_PRODUCTION,
         sameSite: "lax",
-        maxAge: 1000 * 60 * 60 * 2 // 2 hours
+        maxAge: 1000 * 60 * 60 * 2
     }
 }));
 
 
 // ======================================
-// ROUTES
+// API ROUTES
 // ======================================
 
-// Test route
-app.get("/", (req, res) => {
+// Backend health check.
+app.get("/api", (req, res) => {
     res.json({
         message: "LuponResolve Backend is running!",
         status: "Online"
     });
 });
 
-// Authentication routes
+// Authentication routes.
 app.use("/api/auth", authRoutes);
+
+// Role routes.
 app.use("/api/roles", roleRoutes);
+
+// Case routes.
 app.use("/api/cases", caseRoutes);
+
+
+// ======================================
+// FRONTEND STATIC ASSETS
+// ======================================
+
+// Serve only the frontend CSS and JavaScript folders.
+// Do not expose the entire project root or backend folder.
+
+app.use(
+    "/css",
+    express.static(path.join(PROJECT_ROOT, "css"))
+);
+
+app.use(
+    "/js",
+    express.static(path.join(PROJECT_ROOT, "js"))
+);
+
+
+// ======================================
+// FRONTEND HTML PAGES
+// ======================================
+
+// Main landing page.
+app.get("/", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "index.html"));
+});
+
+// Authentication page.
+app.get("/auth.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "auth.html"));
+});
+
+// Resident portal.
+app.get("/resident.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "resident.html"));
+});
+
+// Secretary portal.
+app.get("/secretary.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "secretary.html"));
+});
+
+// Lupon portal.
+app.get("/lupon.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "lupon.html"));
+});
+
+// Case workflow page.
+app.get("/workflow.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "workflow.html"));
+});
 
 
 // ======================================
@@ -74,5 +176,5 @@ app.use("/api/cases", caseRoutes);
 // ======================================
 
 app.listen(PORT, () => {
-    console.log(`LuponResolve server running at http://localhost:${PORT}`);
+    console.log(`LuponResolve server running on port ${PORT}`);
 });

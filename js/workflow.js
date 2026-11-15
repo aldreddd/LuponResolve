@@ -76,7 +76,7 @@ function escapeHTML(value) {
     async function loadCases() {
     try {
         const response = await fetch(
-            "http://127.0.0.1:3000/api/cases",
+            window.API.cases,
             {
                 method: "GET",
                 credentials: "include"
@@ -638,7 +638,7 @@ caseDetails.addEventListener("submit", async event => {
         saveButton.textContent = "Saving...";
 
         const response = await fetch(
-            `http://127.0.0.1:3000/api/cases/${selectedCase.backendId}/workflow`,
+            `${window.API.cases}/${selectedCase.backendId}/workflow`,
             {
                 method: "PATCH",
                 credentials: "include",
@@ -747,7 +747,7 @@ caseDetails.addEventListener("submit", async event => {
         button.textContent = "Saving...";
 
         const response = await fetch(
-            `http://127.0.0.1:3000/api/cases/${selectedCase.backendId}/${endpoint}`,
+            `${window.API.cases}/${selectedCase.backendId}/${endpoint}`,
             {
                 method: "PATCH",
                 credentials: "include",
