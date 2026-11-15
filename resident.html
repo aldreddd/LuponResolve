@@ -1,0 +1,538 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resident Dashboard | LuponResolve</title>
+
+    <link rel="stylesheet" href="css/resident.css">
+
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-icon">LR</div>
+            <div>
+                <h2>LuponResolve</h2>
+                <p>Resident Portal</p>
+            </div>
+        </div>
+
+        <nav class="navigation">
+            <p class="nav-label">MENU</p>
+
+            <a href="#dashboard" class="nav-link active" data-section="dashboard">
+                <span>⌂</span> Dashboard
+            </a>
+
+            <a href="#submit" class="nav-link" data-section="submit">
+                <span>＋</span> Submit Complaint
+            </a>
+
+            <a href="#cases" class="nav-link" data-section="cases">
+                <span>▤</span> My Cases
+            </a>
+
+            <p class="nav-label account-label">ACCOUNT</p>
+
+            <a href="#profile" class="nav-link" data-section="profile">
+                <span>◉</span> My Profile
+            </a>
+            <button type="button" class="nav-link logout-button" id="logoutButton">
+                <span>↪</span> Log Out
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="resident-avatar">R</div>
+            <div class="resident-info">
+                <strong>Resident Account</strong>
+                <small>Resident</small>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div>
+                <p class="breadcrumb">Resident Portal / <span id="breadcrumbPage">Dashboard</span></p>
+                <h1 id="pageTitle">Dashboard</h1>
+            </div>
+
+            <div class="topbar-right">
+                <span class="status-indicator"></span>
+                <span class="online-label">Online</span>
+            </div>
+        </header>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="page-section active">
+
+            <div class="welcome-banner">
+                <div>
+                    <p class="welcome-label">RESIDENT PORTAL</p>
+                    <h2>Welcome to LuponResolve</h2>
+                    <p>
+                        Manage your barangay complaints, monitor your cases,
+                        and stay informed about your dispute resolution process.
+                    </p>
+                    <button class="primary-button" data-go="submit">
+                        + Submit a Complaint
+                    </button>
+                </div>
+
+                <div class="welcome-icon">⚖</div>
+            </div>
+
+            <div class="section-heading">
+                <div>
+                    <h2>Overview</h2>
+                    <p>Here's a summary of your complaints.</p>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <div class="stat-icon blue">▤</div>
+                    <p>Total Cases</p>
+                    <h3 id="totalCases">0</h3>
+                    <small>All submitted complaints</small>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-icon orange">◷</div>
+                    <p>Pending Cases</p>
+                    <h3 id="pendingCases">0</h3>
+                    <small>Awaiting review</small>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-icon green">✓</div>
+                    <p>Resolved Cases</p>
+                    <h3 id="resolvedCases">0</h3>
+                    <small>Successfully resolved</small>
+                </article>
+            </div>
+
+            <div class="content-card">
+                <div class="card-heading">
+                    <div>
+                        <h2>Recent Cases</h2>
+                        <p>Your latest submitted complaints.</p>
+                    </div>
+                    <button class="text-button" data-go="cases">View All</button>
+                </div>
+
+                <div id="recentCases" class="case-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">▤</div>
+                        <h3>No complaints yet</h3>
+                        <p>Your submitted complaints will appear here.</p>
+                        <button class="primary-button" data-go="submit">
+                            Submit Your First Complaint
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Submit Complaint Section -->
+        <section id="submit" class="page-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>Submit a Complaint</h2>
+                    <p>Provide the information needed to begin your complaint.</p>
+                </div>
+            </div>
+
+            <div class="notice">
+                <strong>Before you continue</strong>
+                <p>
+                    Please provide accurate information. Your complaint
+                    will be subject to review by the barangay office.
+                </p>
+            </div>
+
+            <form id="complaintForm" class="content-card">
+
+                <div class="form-section">
+                    <h3>1. Complainant Information</h3>
+                    <p>Information about the person submitting the complaint.</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="complainantName">Full Name *</label>
+                            <input
+                                type="text"
+                                id="complainantName"
+                                placeholder="Enter your full name"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="complainantContact">Contact Number *</label>
+                            <input
+                                type="tel"
+                                id="complainantContact"
+                                placeholder="Enter your contact number"
+                                required
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-divider"></div>
+
+                <div class="form-section">
+                    <h3>2. Respondent Information</h3>
+                    <p>Information about the person you are filing a complaint against.</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="respondentName">Respondent's Full Name *</label>
+                            <input
+                                type="text"
+                                id="respondentName"
+                                placeholder="Enter respondent's name"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="respondentAddress">Respondent's Address</label>
+                            <input
+                                type="text"
+                                id="respondentAddress"
+                                placeholder="Enter respondent's address"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-divider"></div>
+
+                <div class="form-section">
+                    <h3>3. Complaint Details</h3>
+                    <p>Explain the nature and circumstances of your complaint.</p>
+
+                    <div class="form-group">
+                        <label for="disputeType">Type of Dispute *</label>
+                        <select id="disputeType" required>
+                            <option value="">Select dispute type</option>
+                            <option value="Physical Injury">Physical Injury</option>
+                            <option value="Property Dispute">Property Dispute</option>
+                            <option value="Debt or Financial Dispute">Debt or Financial Dispute</option>
+                            <option value="Boundary Dispute">Boundary Dispute</option>
+                            <option value="Noise Complaint">Noise Complaint</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="incidentDetails">Incident Details *</label>
+                        <textarea
+                            id="incidentDetails"
+                            rows="6"
+                            placeholder="Describe what happened, including relevant dates and circumstances..."
+                            required
+                        ></textarea>
+                    </div>
+                </div>
+
+<div class="form-divider"></div>
+
+<div class="form-section">
+    <h3>4. Preliminary Jurisdiction Screening</h3>
+    <p>
+        These questions help identify whether your complaint may fall
+        under the Katarungang Pambarangay process. Answer honestly.
+        If you are unsure, select "Not sure".
+    </p>
+
+    <div class="screening-notice">
+        <strong>Important</strong>
+        <p>
+            This is an initial screening only. Barangay personnel must
+            review the facts and applicable law before making any
+            official determination.
+        </p>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="complainantMunicipality">
+                Your city or municipality of actual residence *
+            </label>
+            <input
+                type="text"
+                id="complainantMunicipality"
+                placeholder="Example: Butuan City"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="complainantBarangay">
+                Your barangay of actual residence *
+            </label>
+            <input
+                type="text"
+                id="complainantBarangay"
+                placeholder="Enter your barangay"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="respondentMunicipality">
+                Respondent's city or municipality of actual residence *
+            </label>
+            <input
+                type="text"
+                id="respondentMunicipality"
+                placeholder="Enter city or municipality"
+                required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="respondentBarangay">
+                Respondent's barangay of actual residence *
+            </label>
+            <input
+                type="text"
+                id="respondentBarangay"
+                placeholder="Enter respondent's barangay"
+                required
+            >
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="governmentParty">
+            Is one of the parties the government or one of its
+            subdivisions or instrumentalities? *
+        </label>
+        <select id="governmentParty" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="publicOfficial">
+            Is a party a public officer or employee, and is the dispute
+            related to that person's official functions? *
+        </label>
+        <select id="publicOfficial" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="criminalOffense">
+            Does this complaint involve an alleged criminal offense? *
+        </label>
+        <select id="criminalOffense" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="penaltyThreshold">
+            If it involves an offense, could the penalty exceed
+            one year of imprisonment or a ₱5,000 fine? *
+        </label>
+        <select id="penaltyThreshold" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure / I don't know the penalty</option>
+            <option value="not_applicable">Not applicable - no criminal offense</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="privateOffendedParty">
+            Is there a private individual who was directly offended
+            or harmed by the alleged offense? *
+        </label>
+        <select id="privateOffendedParty" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+            <option value="not_applicable">Not applicable - no criminal offense</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="realPropertyDispute">
+            Does the dispute involve real property or an interest in it? *
+        </label>
+        <select id="realPropertyDispute" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="propertyDifferentCities">
+            If yes, are the properties located in different cities
+            or municipalities? *
+        </label>
+        <select id="propertyDifferentCities" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+            <option value="not_applicable">Not applicable</option>
+        </select>
+    </div>
+
+<div class="form-group">
+    <label for="propertyPartiesAgree">
+        If the properties are in different cities or municipalities,
+        do the parties agree to submit the dispute to an appropriate Lupon? *
+    </label>
+    <select id="propertyPartiesAgree" required>
+        <option value="">Select an answer</option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+        <option value="unsure">Not sure / Agreement not obtained</option>
+        <option value="not_applicable">Not applicable</option>
+    </select>
+</div>
+
+
+    <div class="form-group">
+        <label for="barangaysAdjoining">
+            If the parties reside in different cities or municipalities,
+            are their barangays adjoining? *
+        </label>
+        <select id="barangaysAdjoining" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+            <option value="not_applicable">Not applicable</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="partiesAgree">
+            If their barangays are adjoining, do both parties agree
+            to submit the dispute to an appropriate Lupon? *
+        </label>
+        <select id="partiesAgree" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure / Agreement not obtained</option>
+            <option value="not_applicable">Not applicable</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="otherException">
+            Are you aware of any other legal reason why this dispute
+            may not be handled through barangay conciliation? *
+        </label>
+        <select id="otherException" required>
+            <option value="">Select an answer</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+        </select>
+    </div>
+
+    <div id="screeningResult" class="screening-result" hidden
+         role="status" aria-live="polite">
+    </div>
+</div>
+
+                <div class="form-divider"></div>
+
+                <div class="form-actions">
+                    <button type="reset" class="secondary-button">Clear Form</button>
+                    <button type="submit" class="primary-button">Submit Complaint</button>
+                </div>
+
+                <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
+
+            </form>
+        </section>
+
+        <!-- My Cases Section -->
+        <section id="cases" class="page-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>My Cases</h2>
+                    <p>View and monitor the status of your submitted complaints.</p>
+                </div>
+                <button class="primary-button" data-go="submit">
+                    + New Complaint
+                </button>
+            </div>
+
+            <div class="content-card">
+                <div id="allCases" class="case-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">▤</div>
+                        <h3>No cases found</h3>
+                        <p>You haven't submitted any complaints yet.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="page-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>My Profile</h2>
+                    <p>Resident account information.</p>
+                </div>
+            </div>
+
+            <div class="content-card profile-card">
+                <div class="profile-avatar">R</div>
+                <h2>Resident Account</h2>
+                <p>Resident Portal User</p>
+                <div class="profile-note">
+                    Profile editing and account management will be added
+                    when we implement authentication.
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>LuponResolve &copy; 2026. Barangay Dispute Resolution Portal.</p>
+        </footer>
+
+    </main>
+
+    <script src="js/resident.js"></script>
+</body>
+</html>

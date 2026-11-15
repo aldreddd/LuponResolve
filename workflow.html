@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuponResolve | Case Workflow</title>
+    <link rel="stylesheet" href="css/design-system.css">
+    <link rel="stylesheet" href="css/workflow.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+    <div class="workflow-layout">
+
+        <aside class="workflow-sidebar">
+            <div class="brand">
+                <div class="brand-icon">LR</div>
+                <div>
+                    <h2>LuponResolve</h2>
+                    <p>Case Management</p>
+                </div>
+            </div>
+
+            <nav>
+                <a href="secretary.html">Secretary Dashboard</a>
+                <a href="workflow.html" class="active">Case Workflow</a>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <p>Administrative workspace</p>
+                <small>Prototype version</small>
+            </div>
+            <button type="button" class="logout-button" id="logoutButton">
+                ↪ Log Out
+            </button>
+        </aside>
+
+        <main class="workflow-main">
+
+            <header class="workflow-header">
+                <div>
+                    <p class="eyebrow">CASE MANAGEMENT</p>
+                    <h1>Case Workflow</h1>
+                    <p class="subtitle">
+                        Monitor case progress and record important updates.
+                    </p>
+                </div>
+                <a href="secretary.html" class="back-link">Back to Dashboard</a>
+            </header>
+
+            <section class="workflow-notice">
+                <strong>Important:</strong>
+                These stages are for administrative tracking. They do not
+                determine legal eligibility or replace decisions by authorized
+                barangay personnel.
+            </section>
+
+            <section class="workflow-stats">
+                <article class="stat-card">
+                    <span>Total Cases</span>
+                    <strong id="workflowTotal">0</strong>
+                </article>
+
+                <article class="stat-card">
+                    <span>In Progress</span>
+                    <strong id="workflowProgress">0</strong>
+                </article>
+
+                <article class="stat-card">
+                    <span>Resolved</span>
+                    <strong id="workflowResolved">0</strong>
+                </article>
+            </section>
+
+            <section class="workflow-content">
+
+                <div class="case-list-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Cases</h2>
+                            <p>Select a complaint to manage its workflow.</p>
+                        </div>
+                    </div>
+
+                    <div class="case-search">
+                        <input
+                            type="search"
+                            id="workflowSearch"
+                            placeholder="Search complainant or case ID..."
+                        >
+                    </div>
+
+                    <div id="workflowCaseList" class="workflow-case-list">
+                        <p class="empty-state">Loading cases...</p>
+                    </div>
+                </div>
+
+                <div class="case-detail-panel" id="workflowDetails">
+                    <div class="empty-state detail-empty">
+                        <div class="empty-icon">↗</div>
+                        <h3>No case selected</h3>
+                        <p>Select a case from the list to view its workflow.</p>
+                    </div>
+                </div>
+
+            </section>
+
+            <footer class="workflow-footer">
+                LuponResolve Case Management Prototype
+            </footer>
+
+        </main>
+    </div>
+
+    <script src="js/workflow.js"></script>
+</body>
+</html>

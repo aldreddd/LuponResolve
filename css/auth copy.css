@@ -1,0 +1,573 @@
+/* ==========================================================
+   LuponResolve — Sign in / Register
+   Same institutional theme as the resident portal: deep navy,
+   government blue, white, subtle teal, restrained gold.
+   Light + dark themes.
+
+   Drop-in replacement for css/auth.css. auth.html is unchanged.
+
+   THEMES
+   - Follows the device setting automatically.
+   - To force one: <html data-theme="light"> or "dark".
+   - Tokens match resident.css. Dark tokens appear twice
+     (system preference + manual override); keep them in sync.
+========================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:wght@500;600&display=swap");
+
+
+/* =====================================
+   DESIGN TOKENS
+   ===================================== */
+
+:root {
+    color-scheme: light;
+
+    --font-body: "Public Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --font-serif: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+
+    --bg: #f3f6fb;
+    --surface: #ffffff;
+    --field: #ffffff;
+    --line: #e1e7f1;
+    --line-strong: #c9d3e5;
+
+    --text: #0e1b36;
+    --text-muted: #4f607a;
+    --text-faint: #66768f;
+
+    --primary: #1d4fa6;
+    --primary-hover: #163f86;
+    --primary-text: #1d4fa6;
+    --ring: rgba(29, 79, 166, 0.2);
+    --focus: #1d4fa6;
+
+    --teal-soft: #e0f4f2;
+    --teal-line: #a9dcd7;
+    --teal-text: #0b6e69;
+
+    --gold-bright: #e0bd6a;
+
+    --rose-soft: #fdecec;
+    --rose-line: #f1bcbc;
+    --rose-text: #b42a2a;
+
+    /* brand panel stays navy in both themes */
+    --hero-a: #0b2150;
+    --hero-b: #1b4a9e;
+
+    --shadow: 0 1px 2px rgba(14, 27, 54, 0.06), 0 30px 70px -30px rgba(14, 27, 54, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+
+        --bg: #0a1325;
+        --surface: #0f1c35;
+        --field: #0b172d;
+        --line: rgba(150, 180, 230, 0.14);
+        --line-strong: rgba(150, 180, 230, 0.28);
+
+        --text: #e7eefb;
+        --text-muted: #9bacca;
+        --text-faint: #8091b0;
+
+        --primary: #2f6bd1;
+        --primary-hover: #2459b5;
+        --primary-text: #86b4ff;
+        --ring: rgba(110, 160, 240, 0.32);
+        --focus: #86b4ff;
+
+        --teal-soft: rgba(43, 179, 168, 0.14);
+        --teal-line: rgba(43, 179, 168, 0.4);
+        --teal-text: #5fd6cb;
+
+        --rose-soft: rgba(239, 100, 100, 0.12);
+        --rose-line: rgba(239, 100, 100, 0.4);
+        --rose-text: #f3a0a0;
+
+        --hero-a: #0c1f48;
+        --hero-b: #163d82;
+
+        --shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 30px 70px -30px rgba(0, 0, 0, 0.8);
+    }
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #0a1325;
+    --surface: #0f1c35;
+    --field: #0b172d;
+    --line: rgba(150, 180, 230, 0.14);
+    --line-strong: rgba(150, 180, 230, 0.28);
+
+    --text: #e7eefb;
+    --text-muted: #9bacca;
+    --text-faint: #8091b0;
+
+    --primary: #2f6bd1;
+    --primary-hover: #2459b5;
+    --primary-text: #86b4ff;
+    --ring: rgba(110, 160, 240, 0.32);
+    --focus: #86b4ff;
+
+    --teal-soft: rgba(43, 179, 168, 0.14);
+    --teal-line: rgba(43, 179, 168, 0.4);
+    --teal-text: #5fd6cb;
+
+    --rose-soft: rgba(239, 100, 100, 0.12);
+    --rose-line: rgba(239, 100, 100, 0.4);
+    --rose-text: #f3a0a0;
+
+    --hero-a: #0c1f48;
+    --hero-b: #163d82;
+
+    --shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 30px 70px -30px rgba(0, 0, 0, 0.8);
+}
+
+
+/* ======================================
+   GENERAL
+====================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+::selection {
+    background: var(--ring);
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    -webkit-font-smoothing: antialiased;
+}
+
+
+/* ======================================
+   MAIN CONTAINER
+====================================== */
+
+.auth-container {
+    width: 100%;
+    max-width: 980px;
+    min-height: 600px;
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 3px solid var(--gold-bright);
+    box-shadow: var(--shadow);
+    animation: container-in 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes container-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+
+/* ======================================
+   BRAND PANEL
+====================================== */
+
+.auth-brand {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: 56px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #ffffff;
+    background: linear-gradient(150deg, var(--hero-a), var(--hero-b));
+}
+
+/* faint concentric rings, a quiet nod to a seal */
+.auth-brand::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    right: -150px;
+    bottom: -150px;
+    width: 440px;
+    height: 440px;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle,
+        transparent 0 30px,
+        rgba(255, 255, 255, 0.08) 30px 31px);
+    -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 72%);
+    mask-image: radial-gradient(circle, #000 30%, transparent 72%);
+}
+
+/* government-blue seal with a gold edge, as in the portal sidebar */
+.brand-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #ffffff;
+    background: #1f5fc9;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 -4px 0 var(--gold-bright);
+}
+
+.auth-brand h1 {
+    font-family: var(--font-serif);
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: 14px;
+}
+
+.auth-brand p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 32ch;
+}
+
+.brand-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 56px;
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.brand-footer::before {
+    content: "";
+    width: 28px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--gold-bright);
+}
+
+
+/* ======================================
+   AUTHENTICATION PANEL
+====================================== */
+
+.auth-panel {
+    padding: 56px 52px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--surface);
+}
+
+.auth-heading {
+    margin-bottom: 30px;
+}
+
+.auth-heading h2 {
+    font-family: var(--font-serif);
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.auth-heading p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+
+/* ======================================
+   FORMS
+====================================== */
+
+/* answers the user's action: form eases in when switched */
+.auth-panel form {
+    animation: form-in 0.25s ease both;
+}
+
+@keyframes form-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 13px 14px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--field);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group input::placeholder {
+    color: var(--text-faint);
+}
+
+.form-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* keep browser autofill on-theme */
+.form-group input:-webkit-autofill,
+.form-group input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--text);
+    caret-color: var(--text);
+    -webkit-box-shadow: 0 0 0 100px var(--field) inset;
+    transition: background-color 9999s ease-in-out 0s;
+}
+
+.auth-panel form > button[type="submit"] {
+    width: 100%;
+    min-height: 48px;
+    padding: 13px;
+    margin-top: 4px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--primary);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(14, 27, 54, 0.25);
+    transition: background 0.15s, transform 0.15s;
+}
+
+.auth-panel form > button[type="submit"]:hover {
+    background: var(--primary-hover);
+}
+
+.auth-panel form > button[type="submit"]:active {
+    transform: translateY(1px);
+}
+
+.auth-panel form > button[type="submit"]:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+}
+
+.auth-panel form > button[type="submit"]:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* ======================================
+   FORM SWITCH
+====================================== */
+
+.form-switch {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.form-switch button {
+    background: none;
+    border: none;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary-text);
+    cursor: pointer;
+}
+
+.form-switch button:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.form-switch button:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.registration-note {
+    text-align: center;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--text-faint);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* ======================================
+   FEEDBACK MESSAGE
+====================================== */
+
+.auth-message {
+    padding: 13px 16px;
+    margin-top: 20px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    border-left-width: 4px;
+    font-size: 14px;
+    line-height: 1.55;
+    animation: form-in 0.25s ease both;
+}
+
+.auth-message.success {
+    background: var(--teal-soft);
+    border-color: var(--teal-line);
+    color: var(--teal-text);
+}
+
+.auth-message.error {
+    background: var(--rose-soft);
+    border-color: var(--rose-line);
+    color: var(--rose-text);
+}
+
+
+/* ======================================
+   UTILITIES
+====================================== */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ======================================
+   RESPONSIVE DESIGN
+====================================== */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 14px;
+        align-items: flex-start;
+    }
+
+    .auth-container {
+        grid-template-columns: 1fr;
+        max-width: 460px;
+        min-height: 0;
+        margin: auto;
+        border-radius: 18px;
+    }
+
+    .auth-brand {
+        padding: 28px 26px;
+    }
+
+    .brand-logo {
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        font-size: 16px;
+        margin-bottom: 18px;
+    }
+
+    .auth-brand h1 {
+        font-size: 26px;
+        margin-bottom: 8px;
+    }
+
+    .auth-brand p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .brand-footer {
+        display: none;
+    }
+
+    .auth-brand::after {
+        width: 300px;
+        height: 300px;
+        right: -120px;
+        bottom: -140px;
+    }
+
+    .auth-panel {
+        padding: 32px 24px 36px;
+    }
+
+    .auth-heading h2 {
+        font-size: 24px;
+    }
+
+    /* 16px stops iOS from zooming into fields */
+    .form-group input {
+        font-size: 16px;
+        padding: 14px;
+    }
+}
+
+
+/* ======================================
+   ACCESSIBILITY
+====================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .auth-container,
+    .auth-panel form,
+    .auth-message {
+        animation: none;
+    }
+
+    .auth-panel form > button[type="submit"],
+    .form-group input {
+        transition: none;
+    }
+}

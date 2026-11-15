@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LuponResolve | Lupon Member Portal</title>
+    <link rel="stylesheet" href="css/lupon.css">
+    <script src="js/auth-guard.js"></script>
+</head>
+<body>
+
+    <div class="lupon-layout">
+
+        <aside class="lupon-sidebar">
+            <div class="lupon-brand">
+                <div class="brand-icon">LR</div>
+                <div>
+                    <h2>LuponResolve</h2>
+                    <p>Lupon Member Portal</p>
+                </div>
+            </div>
+
+            <nav>
+                <a href="lupon.html" class="active">My Cases</a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <p>Lupon Member Workspace</p>
+                <small>Prototype version</small>
+            </div>
+            <button type="button" class="logout-button" id="logoutButton">
+                ↪ Log Out
+            </button>
+        </aside>
+
+        <main class="lupon-main">
+
+            <header class="lupon-header">
+                <div>
+                    <p class="eyebrow">LUPON MEMBER WORKSPACE</p>
+                    <h1>Case Proceedings</h1>
+                    <p class="subtitle">
+                        Review complaints and document dispute-resolution proceedings.
+                    </p>
+                </div>
+            </header>
+
+            <section class="lupon-notice">
+                <strong>Prototype access:</strong>
+                All stored complaints are currently visible. Real member
+                assignments and access restrictions will be implemented with
+                authentication and role-based permissions.
+            </section>
+
+            <section class="lupon-stats">
+                <article class="stat-card">
+                    <span>Total Cases</span>
+                    <strong id="luponTotal">0</strong>
+                </article>
+
+                <article class="stat-card">
+                    <span>For Proceedings</span>
+                    <strong id="luponActive">0</strong>
+                </article>
+
+                <article class="stat-card">
+                    <span>Completed Proceedings</span>
+                    <strong id="luponResolved">0</strong>
+                </article>
+            </section>
+
+            <section class="lupon-workspace">
+
+                <div class="lupon-case-panel">
+                    <div class="panel-heading">
+                        <h2>Case List</h2>
+                        <p>Select a complaint to review.</p>
+                    </div>
+
+                    <input
+                        type="search"
+                        id="luponSearch"
+                        placeholder="Search case or complainant..."
+                    >
+
+                    <div id="luponCaseList" class="lupon-case-list">
+                        <p class="empty-state">Loading cases...</p>
+                    </div>
+                </div>
+
+                <div id="luponCaseDetails" class="lupon-detail-panel">
+                    <div class="empty-state">
+                        <div class="empty-icon">⚖</div>
+                        <h3>No case selected</h3>
+                        <p>Select a complaint from the case list.</p>
+                    </div>
+                </div>
+
+            </section>
+
+            <footer class="lupon-footer">
+                LuponResolve — Case Proceedings Prototype
+            </footer>
+
+        </main>
+    </div>
+
+    <script src="js/lupon.js"></script>
+</body>
+</html>

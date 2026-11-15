@@ -1,0 +1,1101 @@
+/* ==========================================================
+   LuponResolve — Case Workflow
+   ChatGPT-inspired theme, identical to the resident portal,
+   sign-in page and secretary dashboard: light gray sidebar,
+   flat bordered cards, pill-shaped controls, a solid black
+   (light) / white (dark) main button, and ChatGPT green as
+   the accent. Light + dark themes.
+
+   Drop-in replacement for css/workflow.css. Every original
+   selector is kept, so no HTML changes are needed.
+
+   THEMES
+   - Follows the device setting automatically.
+   - To force one: <html data-theme="light"> or "dark".
+   - Tokens match the other stylesheets. Dark tokens appear twice
+     (system preference + manual override); keep them in sync.
+
+   COLOUR ROLES
+   - Black/white  main buttons
+   - Green        accent: focus, selected case, history markers
+   - Blue         current stage
+   - Amber        attention (the notice)
+   - Rose         errors only
+========================================================== */
+
+
+/* =====================================
+   DESIGN TOKENS
+   ===================================== */
+
+:root {
+    color-scheme: light;
+
+    --font-body: "Söhne", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+    /* surfaces */
+    --bg: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #f7f7f8;
+    --field: #ffffff;
+    --line: #ececec;
+    --line-strong: #d4d4d4;
+
+    /* text */
+    --text: #0d0d0d;
+    --text-muted: #5d5d5d;
+    --text-faint: #767676;
+
+    /* main button */
+    --btn-bg: #0d0d0d;
+    --btn-bg-hover: #2b2b2b;
+    --btn-text: #ffffff;
+
+    /* green accent */
+    --primary: #10a37f;
+    --primary-hover: #0e8f6f;
+    --primary-soft: #e8f7f2;
+    --primary-line: #bfe8da;
+    --primary-text: #0b7a5e;
+    --ring: rgba(16, 163, 127, 0.25);
+    --focus: #10a37f;
+
+    /* success (same green family) */
+    --teal: #10a37f;
+    --teal-soft: #e8f7f2;
+    --teal-line: #bfe8da;
+    --teal-text: #0b7a5e;
+
+    /* blue: current stage / info */
+    --blue-soft: #eef4ff;
+    --blue-line: #cddffe;
+    --blue-text: #1d4ed8;
+
+    /* amber: attention */
+    --gold: #d99a1f;
+    --gold-soft: #fff6e0;
+    --gold-line: #f1dba0;
+    --gold-text: #8a5d00;
+
+    /* rose (errors only) */
+    --rose-soft: #fef0f0;
+    --rose-line: #f6caca;
+    --rose-text: #c0332f;
+
+    /* sidebar */
+    --nav-bg: #f9f9f9;
+    --nav-line: #ececec;
+    --nav-text: #2f2f2f;
+    --nav-strong: #0d0d0d;
+    --nav-muted: #6b6b6b;
+    --nav-hover: #ececec;
+    --nav-active: #e3e3e3;
+
+    /* logo */
+    --logo-bg: #0d0d0d;
+    --logo-text: #ffffff;
+
+    --radius-pill: 999px;
+    --shadow: none;
+
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%236b6b6b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+
+        --bg: #212121;
+        --surface: #262626;
+        --surface-2: #2f2f2f;
+        --field: #2f2f2f;
+        --line: #3a3a3a;
+        --line-strong: #4d4d4d;
+
+        --text: #ececec;
+        --text-muted: #b4b4b4;
+        --text-faint: #8f8f8f;
+
+        --btn-bg: #ececec;
+        --btn-bg-hover: #ffffff;
+        --btn-text: #0d0d0d;
+
+        --primary: #10a37f;
+        --primary-hover: #1ab394;
+        --primary-soft: rgba(16, 163, 127, 0.14);
+        --primary-line: rgba(16, 163, 127, 0.45);
+        --primary-text: #3fd0aa;
+        --ring: rgba(63, 208, 170, 0.3);
+        --focus: #3fd0aa;
+
+        --teal: #10a37f;
+        --teal-soft: rgba(16, 163, 127, 0.14);
+        --teal-line: rgba(16, 163, 127, 0.45);
+        --teal-text: #5fe0bd;
+
+        --blue-soft: rgba(96, 165, 250, 0.14);
+        --blue-line: rgba(96, 165, 250, 0.4);
+        --blue-text: #93c5fd;
+
+        --gold: #f2b84b;
+        --gold-soft: rgba(245, 184, 64, 0.12);
+        --gold-line: rgba(245, 184, 64, 0.38);
+        --gold-text: #f2c063;
+
+        --rose-soft: rgba(239, 100, 100, 0.12);
+        --rose-line: rgba(239, 100, 100, 0.4);
+        --rose-text: #f3a0a0;
+
+        --nav-bg: #171717;
+        --nav-line: rgba(255, 255, 255, 0.08);
+        --nav-text: #d4d4d4;
+        --nav-strong: #ffffff;
+        --nav-muted: #8f8f8f;
+        --nav-hover: #212121;
+        --nav-active: #2f2f2f;
+
+        --logo-bg: #ececec;
+        --logo-text: #212121;
+
+        --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23b4b4b4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    --bg: #212121;
+    --surface: #262626;
+    --surface-2: #2f2f2f;
+    --field: #2f2f2f;
+    --line: #3a3a3a;
+    --line-strong: #4d4d4d;
+
+    --text: #ececec;
+    --text-muted: #b4b4b4;
+    --text-faint: #8f8f8f;
+
+    --btn-bg: #ececec;
+    --btn-bg-hover: #ffffff;
+    --btn-text: #0d0d0d;
+
+    --primary: #10a37f;
+    --primary-hover: #1ab394;
+    --primary-soft: rgba(16, 163, 127, 0.14);
+    --primary-line: rgba(16, 163, 127, 0.45);
+    --primary-text: #3fd0aa;
+    --ring: rgba(63, 208, 170, 0.3);
+    --focus: #3fd0aa;
+
+    --teal: #10a37f;
+    --teal-soft: rgba(16, 163, 127, 0.14);
+    --teal-line: rgba(16, 163, 127, 0.45);
+    --teal-text: #5fe0bd;
+
+    --blue-soft: rgba(96, 165, 250, 0.14);
+    --blue-line: rgba(96, 165, 250, 0.4);
+    --blue-text: #93c5fd;
+
+    --gold: #f2b84b;
+    --gold-soft: rgba(245, 184, 64, 0.12);
+    --gold-line: rgba(245, 184, 64, 0.38);
+    --gold-text: #f2c063;
+
+    --rose-soft: rgba(239, 100, 100, 0.12);
+    --rose-line: rgba(239, 100, 100, 0.4);
+    --rose-text: #f3a0a0;
+
+    --nav-bg: #171717;
+    --nav-line: rgba(255, 255, 255, 0.08);
+    --nav-text: #d4d4d4;
+    --nav-strong: #ffffff;
+    --nav-muted: #8f8f8f;
+    --nav-hover: #212121;
+    --nav-active: #2f2f2f;
+
+    --logo-bg: #ececec;
+    --logo-text: #212121;
+
+    --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%23b4b4b4' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+
+/* =====================================
+   GENERAL
+   ===================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scrollbar-color: var(--line-strong) transparent;
+    scrollbar-width: thin;
+}
+
+::selection {
+    background: var(--ring);
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.5;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+}
+
+.workflow-layout {
+    min-height: 100vh;
+    display: flex;
+}
+
+
+/* =====================================
+   SIDEBAR
+   ===================================== */
+
+.workflow-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    flex-shrink: 0;
+    width: 260px;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--nav-bg);
+    border-right: 1px solid var(--nav-line);
+    color: var(--nav-strong);
+    display: flex;
+    flex-direction: column;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 18px 16px;
+}
+
+.brand-icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--logo-text);
+    background: var(--logo-bg);
+}
+
+.brand h2 {
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--nav-strong);
+}
+
+.brand p {
+    font-size: 12.5px;
+    color: var(--nav-muted);
+    margin-top: 1px;
+}
+
+.workflow-sidebar nav {
+    display: grid;
+    gap: 2px;
+    padding: 8px 12px 16px;
+}
+
+.workflow-sidebar nav a {
+    position: relative;
+    text-decoration: none;
+    color: var(--nav-text);
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 14.5px;
+    font-weight: 500;
+    transition: background 0.15s, color 0.15s;
+}
+
+.workflow-sidebar nav a:hover {
+    background: var(--nav-hover);
+    color: var(--nav-strong);
+}
+
+.workflow-sidebar nav a.active {
+    background: var(--nav-active);
+    color: var(--nav-strong);
+}
+
+.workflow-sidebar nav a:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.sidebar-bottom {
+    margin-top: auto;
+    padding: 14px 18px;
+    border-top: 1px solid var(--nav-line);
+    color: var(--nav-muted);
+    font-size: 12.5px;
+    line-height: 1.7;
+}
+
+
+/* =====================================
+   MAIN + HEADER
+   ===================================== */
+
+.workflow-main {
+    flex: 1;
+    min-width: 0;
+    padding: 36px clamp(20px, 4vw, 48px);
+}
+
+/* content stays in a centred column on wide screens */
+.workflow-header,
+.workflow-notice,
+.workflow-stats,
+.workflow-content,
+.workflow-footer {
+    max-width: 1240px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.workflow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 26px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.workflow-header h1 {
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 14.5px;
+}
+
+/* same look as the secondary button in the other portals */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 10px 22px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: transparent;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14.5px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.back-link:hover {
+    background: var(--surface-2);
+}
+
+.back-link:active {
+    transform: scale(0.98);
+}
+
+.back-link:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.workflow-notice {
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-line);
+    color: var(--gold-text);
+    padding: 15px 18px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 22px;
+}
+
+
+/* =====================================
+   STATISTICS
+   ===================================== */
+
+.workflow-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--surface);
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+.stat-card span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.stat-card strong {
+    font-size: 30px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* =====================================
+   CASE LIST + DETAIL PANELS
+   ===================================== */
+
+.workflow-content {
+    display: grid;
+    grid-template-columns: minmax(270px, 0.85fr) minmax(0, 1.5fr);
+    gap: 20px;
+    align-items: start;
+}
+
+.case-list-panel,
+.case-detail-panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 24px;
+    min-width: 0;
+    box-shadow: var(--shadow);
+}
+
+.panel-heading h2 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.panel-heading p {
+    color: var(--text-muted);
+    font-size: 13.5px;
+}
+
+.case-search {
+    margin: 18px 0;
+}
+
+.case-search input {
+    width: 100%;
+    height: 48px;
+    padding: 0 20px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--text);
+    background: var(--field);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.case-search input::placeholder {
+    color: var(--text-faint);
+}
+
+.case-search input:hover,
+.workflow-form select:hover,
+.workflow-form textarea:hover,
+.workflow-form input:hover {
+    border-color: var(--text-faint);
+}
+
+.case-search input:focus,
+.workflow-form select:focus,
+.workflow-form textarea:focus,
+.workflow-form input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--ring);
+}
+
+.workflow-case-list {
+    display: grid;
+    gap: 10px;
+}
+
+/* each case is a <button>: reset it, then style it as a selectable row */
+.workflow-case-item {
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.workflow-case-item:hover {
+    border-color: var(--line-strong);
+    background: var(--surface-2);
+}
+
+.workflow-case-item.selected {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+}
+
+.workflow-case-item:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.workflow-case-item strong {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    overflow-wrap: anywhere;
+}
+
+.workflow-case-item span {
+    display: block;
+    color: var(--text-muted);
+    font-size: 12.5px;
+    margin-top: 3px;
+}
+
+.stage-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    padding: 4px 12px;
+    background: var(--blue-soft);
+    border: 1px solid var(--blue-line);
+    color: var(--blue-text);
+    border-radius: var(--radius-pill);
+    font-size: 12.5px;
+    font-weight: 500;
+}
+
+.stage-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* inside the highlighted row, give the pill a solid backing */
+.workflow-case-item.selected .stage-pill {
+    background: var(--surface);
+}
+
+
+/* =====================================
+   CASE DETAIL
+   ===================================== */
+
+.detail-heading {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+}
+
+.detail-heading h2 {
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+}
+
+.detail-heading p {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    margin-top: 6px;
+}
+
+.detail-section {
+    margin-bottom: 26px;
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.detail-section h3 {
+    font-size: 15.5px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.case-information {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.info-box {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    padding: 12px 16px;
+    border-radius: 14px;
+    min-width: 0;
+}
+
+.info-box span {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+}
+
+.info-box strong {
+    font-size: 14.5px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+
+/* =====================================
+   WORKFLOW FORM
+   ===================================== */
+
+.workflow-form {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 20px;
+}
+
+.workflow-form label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin: 14px 0 8px;
+    padding-left: 4px;
+}
+
+.workflow-form label:first-child {
+    margin-top: 0;
+}
+
+.workflow-form select,
+.workflow-form textarea,
+.workflow-form input[type="text"],
+.workflow-form input[type="date"],
+.workflow-form input[type="time"],
+.workflow-form input[type="number"] {
+    width: 100%;
+    height: 48px;
+    padding: 0 20px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background-color: var(--field);
+    color: var(--text);
+    font: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.workflow-form select {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 46px;
+    cursor: pointer;
+    background-image: var(--select-arrow);
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+}
+
+.workflow-form select option {
+    background: var(--surface);
+    color: var(--text);
+}
+
+/* long text can't be a pill: softer corners instead */
+.workflow-form textarea {
+    height: auto;
+    padding: 14px 20px;
+    border-radius: 20px;
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.workflow-form textarea::placeholder,
+.workflow-form input::placeholder {
+    color: var(--text-faint);
+}
+
+/* the checkbox row overrides the generic label rules, as in the original */
+.arbitration-check {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 10px;
+    font-weight: normal !important;
+    line-height: 1.55;
+}
+
+.arbitration-check input {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+/* same look as the primary button in the other portals */
+.save-stage-button {
+    width: 100%;
+    min-height: 48px;
+    border: none;
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    padding: 12px 22px;
+    border-radius: var(--radius-pill);
+    margin-top: 18px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+.save-stage-button:hover {
+    background: var(--btn-bg-hover);
+}
+
+.save-stage-button:active {
+    transform: scale(0.98);
+}
+
+.save-stage-button:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+}
+
+.save-stage-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+
+/* =====================================
+   CASE HISTORY — TIMELINE
+   ===================================== */
+
+.history-list {
+    border-left: 2px solid var(--line-strong);
+    margin-left: 6px;
+    padding-left: 22px;
+    display: grid;
+    gap: 20px;
+}
+
+.history-item {
+    position: relative;
+}
+
+/* marker sits on the line; the surface-coloured halo hides the line behind it */
+.history-item::before {
+    content: "";
+    position: absolute;
+    left: -29px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--surface);
+}
+
+.history-item strong {
+    font-size: 14.5px;
+    font-weight: 600;
+}
+
+.history-item p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
+
+.history-item time {
+    display: block;
+    color: var(--text-faint);
+    font-size: 12.5px;
+    margin-top: 6px;
+}
+
+
+/* =====================================
+   EMPTY STATES
+   ===================================== */
+
+.empty-state {
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 26px 12px;
+    line-height: 1.6;
+}
+
+.detail-empty {
+    padding: 60px 16px;
+}
+
+.empty-icon {
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--text-muted);
+    font-size: 26px;
+}
+
+.detail-empty h3 {
+    color: var(--text);
+    font-size: 16.5px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+
+/* =====================================
+   FOOTER
+   ===================================== */
+
+.workflow-footer {
+    margin-top: 30px;
+    color: var(--text-faint);
+    font-size: 12.5px;
+    text-align: center;
+}
+
+
+/* =====================================
+   RESPONSIVE
+   ===================================== */
+
+@media (max-width: 900px) {
+    .workflow-sidebar {
+        width: 216px;
+    }
+
+    .workflow-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile: brand bar on top, thumb-reach tab bar at the bottom.
+   Tabs share the width evenly whatever the number of links. */
+@media (max-width: 650px) {
+    .workflow-layout {
+        display: block;
+    }
+
+    .workflow-sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        overflow: visible;
+        border-right: none;
+        border-bottom: 1px solid var(--nav-line);
+    }
+
+    .brand {
+        padding: 12px 16px;
+    }
+
+    .brand-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
+    }
+
+    .brand h2 {
+        font-size: 15px;
+    }
+
+    .sidebar-bottom {
+        display: none;
+    }
+
+    .workflow-sidebar nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 20;
+        display: flex;
+        gap: 2px;
+        overflow-x: auto;
+        padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+        background: var(--nav-bg);
+        border-top: 1px solid var(--nav-line);
+    }
+
+    .workflow-sidebar nav a {
+        flex: 1 0 72px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 48px;
+        padding: 8px 6px;
+        font-size: 12.5px;
+        line-height: 1.2;
+        text-align: center;
+    }
+
+    .workflow-main {
+        padding: 22px 16px calc(84px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .workflow-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 20px;
+        padding-bottom: 18px;
+    }
+
+    .workflow-header h1 {
+        font-size: 23px;
+    }
+
+    .workflow-stats {
+        gap: 9px;
+    }
+
+    .stat-card {
+        padding: 14px;
+        border-radius: 16px;
+    }
+
+    .stat-card span {
+        font-size: 12.5px;
+    }
+
+    .stat-card strong {
+        font-size: 24px;
+    }
+
+    .case-list-panel,
+    .case-detail-panel {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    .case-information {
+        grid-template-columns: 1fr;
+    }
+
+    /* 16px stops iOS from zooming into fields */
+    .case-search input,
+    .workflow-form select,
+    .workflow-form textarea,
+    .workflow-form input[type="text"],
+    .workflow-form input[type="date"],
+    .workflow-form input[type="time"],
+    .workflow-form input[type="number"] {
+        font-size: 16px;
+    }
+
+    .case-search input,
+    .workflow-form select,
+    .workflow-form input[type="text"],
+    .workflow-form input[type="date"],
+    .workflow-form input[type="time"],
+    .workflow-form input[type="number"] {
+        height: 50px;
+    }
+
+    .workflow-form {
+        padding: 16px;
+    }
+
+    .back-link,
+    .save-stage-button {
+        min-height: 48px;
+    }
+}
+
+/* very narrow: stats stack as label-left, figure-right rows */
+@media (max-width: 480px) {
+    .workflow-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .stat-card span {
+        margin-bottom: 0;
+    }
+}
+
+
+/* =====================================
+   ACCESSIBILITY
+   ===================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .workflow-sidebar nav a,
+    .back-link,
+    .workflow-case-item,
+    .case-search input,
+    .workflow-form select,
+    .workflow-form textarea,
+    .workflow-form input,
+    .save-stage-button {
+        transition: none;
+    }
+}
