@@ -62,6 +62,19 @@ async function initializePostgresSchema() {
             )
         `);
 
+            // Add respondent contact fields to existing cases.
+            // IF NOT EXISTS makes this safe to run more than once.
+
+            await client.query(`
+                ALTER TABLE cases
+                ADD COLUMN IF NOT EXISTS respondent_address TEXT
+            `);
+
+            await client.query(`
+                ALTER TABLE cases
+                ADD COLUMN IF NOT EXISTS respondent_email TEXT
+            `);
+
         // 3. Lupon case assignments
         await client.query(`
             CREATE TABLE IF NOT EXISTS case_assignments (

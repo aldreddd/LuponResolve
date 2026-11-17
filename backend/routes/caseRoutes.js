@@ -34,6 +34,8 @@ function formatCase(row) {
 
         complainantName: row.complainant_name,
         respondentName: row.respondent_name,
+        respondentAddress: row.respondent_address,
+        respondentEmail: row.respondent_email,
         disputeType: row.dispute_type,
         incidentDetails: row.incident_details,
 
@@ -169,9 +171,11 @@ router.post(
     async (req, res) => {
 
         try {
-            const {
+                const {
                 complainantName,
                 respondentName,
+                respondentAddress,
+                respondentEmail,
                 disputeType,
                 incidentDetails,
                 screeningStatus,
@@ -179,7 +183,32 @@ router.post(
                 screeningWarnings,
                 screeningAnswers
             } = req.body;
+            const cleanRespondentAddress =
+                String(respondentAddress || "").trim();
 
+            const cleanRespondentEmail =
+                String(respondentEmail || "").trim().toLowerCase();
+
+            // Validate optional respondent email.
+            if (
+                cleanRespondentEmail &&
+                !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanRespondentEmail)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please provide a valid respondent email address."
+                });
+            }
+
+            if (
+                cleanRespondentAddress.length > 500 ||
+                cleanRespondentEmail.length > 254
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Respondent contact information is too long."
+                });
+            }
             if (
                 !complainantName ||
                 !respondentName ||
@@ -228,6 +257,8 @@ router.post(
                         resident_id,
                         complainant_name,
                         respondent_name,
+                        respondent_address,
+                        respondent_email,
                         dispute_type,
                         incident_details,
                         screening_status,
@@ -235,12 +266,17 @@ router.post(
                         screening_warnings,
                         screening_answers
                     )
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                    VALUES (
+                        $1, $2, $3, $4, $5, $6,
+                        $7, $8, $9, $10, $11
+                    )
                     RETURNING id`,
                     [
                         req.session.user.id,
                         cleanComplainant,
                         cleanRespondent,
+                        cleanRespondentAddress || null,
+                        cleanRespondentEmail || null,
                         cleanDisputeType,
                         cleanIncidentDetails,
                         screeningStatus || null,

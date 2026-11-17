@@ -6,7 +6,8 @@ async function setupDatabase() {
         await initializePostgresSchema();
         console.log("PostgreSQL database setup completed!");
     } catch (error) {
-        console.error("Database setup failed.");
+        console.error("Database setup failed:");
+        console.error(error);
         process.exitCode = 1;
     } finally {
         const pool = require("./config/postgres");

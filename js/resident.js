@@ -831,6 +831,9 @@ complaintForm.addEventListener("submit", async function(event) {
     const respondentAddress =
         document.getElementById("respondentAddress").value.trim();
 
+    const respondentEmail =
+        document.getElementById("respondentEmail").value.trim();
+
     const disputeType =
         document.getElementById("disputeType").value;
 
@@ -928,6 +931,8 @@ complaintForm.addEventListener("submit", async function(event) {
 
         respondentAddress: respondentAddress,
 
+        respondentEmail: respondentEmail,
+
         disputeType: disputeType,
 
         incidentDetails: incidentDetails,
@@ -970,6 +975,8 @@ complaintForm.addEventListener("submit", async function(event) {
                 body: JSON.stringify({
                     complainantName: complaint.complainantName,
                     respondentName: complaint.respondentName,
+                    respondentAddress: complaint.respondentAddress,
+                    respondentEmail: complaint.respondentEmail,
                     disputeType: complaint.disputeType,
                     incidentDetails: complaint.incidentDetails,
 
