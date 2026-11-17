@@ -1037,6 +1037,323 @@ body {
    ACCESSIBILITY
    ===================================== */
 
+
+/* =====================================
+   HEARING MANAGEMENT
+   ===================================== */
+
+.hearing-management {
+    max-width: 1240px;
+    margin: 38px auto 0;
+    display: grid;
+    gap: 22px;
+}
+
+.hearing-section-heading {
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.hearing-section-heading h2 {
+    font-family: var(--font-serif);
+    font-size: 25px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.hearing-form-panel,
+.hearing-list-panel {
+    min-width: 0;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+}
+
+.hearing-form-panel .panel-heading,
+.hearing-list-panel .panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.hearing-form-panel .panel-heading h3,
+.hearing-list-panel .panel-heading h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.hearing-form-panel .panel-heading p,
+.hearing-list-panel .panel-heading p {
+    color: var(--text-muted);
+    font-size: 13.5px;
+}
+
+/* Schedule form */
+
+.hearing-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.hearing-form-grid .form-group {
+    min-width: 0;
+}
+
+.hearing-full-width {
+    grid-column: 1 / -1;
+}
+
+.hearing-form-grid label {
+    display: block;
+    color: var(--text);
+    font-size: 13.5px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.hearing-form-grid input,
+.hearing-form-grid select,
+.hearing-form-grid textarea {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 13px;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--field);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.hearing-form-grid select {
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 40px;
+    background-image: var(--select-arrow);
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+}
+
+.hearing-form-grid select option {
+    background: var(--surface);
+    color: var(--text);
+}
+
+.hearing-form-grid input:focus,
+.hearing-form-grid select:focus,
+.hearing-form-grid textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--ring);
+}
+
+.hearing-form-grid input::placeholder,
+.hearing-form-grid textarea::placeholder {
+    color: var(--text-faint);
+}
+
+.hearing-form-grid textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.hearing-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.hearing-form-actions button {
+    min-height: 46px;
+    padding: 11px 22px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--primary);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(14, 27, 54, 0.2);
+    transition: background 0.15s, transform 0.15s;
+}
+
+.hearing-form-actions button:hover {
+    background: var(--primary-hover);
+}
+
+.hearing-form-actions button:active {
+    transform: translateY(1px);
+}
+
+.hearing-form-actions button:focus-visible,
+.secondary-button:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+}
+
+.hearing-form-actions button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.hearing-message {
+    margin-top: 12px;
+    font-size: 13.5px;
+    color: var(--text-muted);
+}
+
+/* Refresh button */
+
+.secondary-button {
+    min-height: 40px;
+    padding: 8px 15px;
+    border: 1px solid var(--line-strong);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--primary-text);
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.secondary-button:hover {
+    background: var(--primary-soft);
+    border-color: var(--primary-line);
+}
+
+/* Scheduled hearing list */
+
+.hearing-list {
+    display: grid;
+    gap: 14px;
+}
+
+.hearing-card {
+    padding: 18px 18px 18px 22px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface-2);
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.hearing-card:hover {
+    border-color: var(--primary-line);
+}
+
+.hearing-card::before {
+    left: -29px;
+}
+
+.hearing-card > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.hearing-card > div:first-child strong {
+    color: var(--text);
+    font-size: 15px;
+}
+
+.hearing-card p {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin-top: 6px;
+    overflow-wrap: anywhere;
+}
+
+.hearing-card p strong {
+    color: var(--text);
+    font-size: 13px;
+}
+
+/* Hearing form feedback */
+
+.hearing-message:empty {
+    display: none;
+}
+
+/* =====================================
+   HEARING RESPONSIVE LAYOUT
+   ===================================== */
+
+@media (max-width: 650px) {
+    .hearing-management {
+        margin-top: 28px;
+        gap: 16px;
+    }
+
+    .hearing-section-heading h2 {
+        font-size: 22px;
+    }
+
+    .hearing-form-panel,
+    .hearing-list-panel {
+        padding: 18px;
+        border-radius: 14px;
+    }
+
+    .hearing-form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .hearing-full-width {
+        grid-column: auto;
+    }
+
+    .hearing-form-grid input,
+    .hearing-form-grid select,
+    .hearing-form-grid textarea {
+        font-size: 16px;
+    }
+
+    .hearing-form-actions {
+        display: block;
+    }
+
+    .hearing-form-actions button {
+        width: 100%;
+    }
+
+    .hearing-list-panel .panel-heading {
+        align-items: flex-start;
+    }
+
+    .hearing-card {
+        padding: 15px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hearing-form-grid input,
+    .hearing-form-grid select,
+    .hearing-form-grid textarea,
+    .hearing-form-actions button,
+    .secondary-button,
+    .hearing-card {
+        transition: none;
+    }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
 
     .workflow-sidebar nav a,
@@ -1048,5 +1365,113 @@ body {
     .workflow-form input,
     .save-stage-button {
         transition: none;
+    }
+}
+
+/* =========================================
+   HEARING MANAGEMENT ACTION BUTTONS
+========================================= */
+
+.hearing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.hearing-action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* Reschedule */
+
+.hearing-action-button[data-hearing-action="reschedule"] {
+    color: #ffffff;
+    background: #174a78;
+    border-color: #174a78;
+}
+
+.hearing-action-button[data-hearing-action="reschedule"]::before {
+    content: "↻";
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.hearing-action-button[data-hearing-action="reschedule"]:hover {
+    background: #10385e;
+    border-color: #10385e;
+    box-shadow: 0 4px 12px rgba(23, 74, 120, 0.2);
+    transform: translateY(-1px);
+}
+
+/* Cancel */
+
+.hearing-action-danger {
+    color: #a52d36;
+    background: #fff5f5;
+    border-color: #f0c7ca;
+}
+
+.hearing-action-danger::before {
+    content: "×";
+    font-size: 1.15rem;
+    line-height: 1;
+}
+
+.hearing-action-danger:hover {
+    color: #ffffff;
+    background: #a52d36;
+    border-color: #a52d36;
+    box-shadow: 0 4px 12px rgba(165, 45, 54, 0.18);
+    transform: translateY(-1px);
+}
+
+/* Keyboard focus */
+
+.hearing-action-button:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.35);
+    outline-offset: 3px;
+}
+
+/* Disabled state */
+
+.hearing-action-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive layout */
+
+@media (max-width: 480px) {
+    .hearing-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .hearing-action-button {
+        width: 100%;
     }
 }

@@ -22,6 +22,8 @@ const pool = require("./config/postgres");
 const authRoutes = require("./routes/authRoutes");
 const roleRoutes = require("./routes/roleRoutes");
 const caseRoutes = require("./routes/caseRoutes");
+const hearingRoutes = require("./routes/hearingRoutes");
+const gmailRoutes = require("./routes/gmailRoutes");
 
 
 // ======================================
@@ -116,6 +118,11 @@ app.use("/api/roles", roleRoutes);
 
 // Case routes.
 app.use("/api/cases", caseRoutes);
+
+// Hearing management routes.
+app.use("/api/hearings", hearingRoutes);
+
+app.use("/api/gmail", gmailRoutes);
 
 
 // ======================================

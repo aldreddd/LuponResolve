@@ -801,7 +801,7 @@ async function loadLuponMembers() {
     try {
 
         const response = await fetch(
-            "${window.API.roles}/lupon-members",
+            `${window.API.roles}/lupon-members`,
             {
                 method: "GET",
                 credentials: "include"

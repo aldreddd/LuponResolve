@@ -105,9 +105,149 @@
 
             </section>
 
+            
+            </section>
+
+            <!-- ======================================
+                 HEARING MANAGEMENT
+            ======================================= -->
+
+            <section class="hearing-management" id="hearingManagement">
+
+                <div class="hearing-section-heading">
+                    <div>
+                        <p class="eyebrow">HEARING COORDINATION</p>
+                        <h2>Hearing Management</h2>
+                        <p class="subtitle">
+                            Schedule, monitor, reschedule, and cancel case hearings.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SCHEDULE HEARING -->
+
+                <div class="hearing-form-panel">
+
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Schedule a Hearing</h3>
+                            <p>
+                                Select a case and provide its hearing details.
+                            </p>
+                        </div>
+                    </div>
+
+                    <form id="scheduleHearingForm">
+
+                        <div class="hearing-form-grid">
+
+                            <div class="form-group">
+                                <label for="hearingCase">Select Case</label>
+                                <select id="hearingCase" required>
+                                    <option value="">Loading cases...</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="hearingType">Hearing Type</label>
+                                <select id="hearingType" required>
+                                    <option value="">Select hearing type</option>
+                                    <option value="Mediation">Mediation</option>
+                                    <option value="Conciliation">Conciliation</option>
+                                    <option value="Arbitration">Arbitration</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="hearingDate">Hearing Date</label>
+                                <input
+                                    type="date"
+                                    id="hearingDate"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="hearingTime">Hearing Time</label>
+                                <input
+                                    type="time"
+                                    id="hearingTime"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group hearing-full-width">
+                                <label for="hearingVenue">Venue</label>
+                                <input
+                                    type="text"
+                                    id="hearingVenue"
+                                    placeholder="e.g. Barangay Hall"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-group hearing-full-width">
+                                <label for="hearingNotes">Additional Notes</label>
+                                <textarea
+                                    id="hearingNotes"
+                                    rows="3"
+                                    placeholder="Optional hearing instructions or notes"
+                                ></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="hearing-form-actions">
+                            <button type="submit" id="scheduleHearingButton">
+                                Schedule Hearing
+                            </button>
+                        </div>
+
+                        <p
+                            id="hearingFormMessage"
+                            class="hearing-message"
+                            role="status"
+                            aria-live="polite"
+                        ></p>
+
+                    </form>
+
+                </div>
+
+                <!-- HEARING LIST -->
+
+                <div class="hearing-list-panel">
+
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Scheduled Hearings</h3>
+                            <p>
+                                Review and manage hearings associated with cases.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="refreshHearingsButton"
+                            class="secondary-button"
+                        >
+                            Refresh
+                        </button>
+                    </div>
+
+                    <div id="hearingList" class="hearing-list">
+                        <p class="empty-state">Loading hearings...</p>
+                    </div>
+
+                </div>
+
+            </section>
+
             <footer class="workflow-footer">
                 LuponResolve Case Management Prototype
             </footer>
+
 
         </main>
     </div>

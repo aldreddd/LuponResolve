@@ -50,6 +50,12 @@ const allowedTransitions = {
 const caseList = document.getElementById("workflowCaseList");
 const caseDetails = document.getElementById("workflowDetails");
 const searchInput = document.getElementById("workflowSearch");
+const hearingCaseSelect = document.getElementById("hearingCase");
+const hearingList = document.getElementById("hearingList");
+const refreshHearingsButton = document.getElementById("refreshHearingsButton");
+const scheduleHearingForm = document.getElementById("scheduleHearingForm");
+const scheduleHearingButton = document.getElementById("scheduleHearingButton");
+const hearingFormMessage = document.getElementById("hearingFormMessage");
 
 function getCaseId(caseItem) {
     return String(
@@ -73,6 +79,293 @@ function escapeHTML(value) {
         return characters[character];
     });
 }
+
+function populateHearingCaseOptions() {
+    if (!hearingCaseSelect) return;
+
+    const previousValue = hearingCaseSelect.value;
+
+    const availableCases = cases.filter(caseItem =>
+        caseItem.caseStage !== "Closed" &&
+        caseItem.status !== "Closed"
+    );
+
+    hearingCaseSelect.innerHTML = `
+        <option value="">Select a case</option>
+        ${availableCases.map(caseItem => `
+            <option value="${escapeHTML(caseItem.backendId)}">
+                ${escapeHTML(caseItem.id)} -
+                ${escapeHTML(caseItem.complainantName || "Unknown complainant")}
+            </option>
+        `).join("")}
+    `;
+
+    if (
+        previousValue &&
+        availableCases.some(
+            item => String(item.backendId) === previousValue
+        )
+    ) {
+        hearingCaseSelect.value = previousValue;
+    }
+}
+
+
+function formatHearingDate(dateValue) {
+    if (!dateValue) return "Date not available";
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return "Invalid date";
+    }
+
+    return new Intl.DateTimeFormat("en-PH", {
+        dateStyle: "long",
+        timeStyle: "short",
+        timeZone: "Asia/Manila"
+    }).format(date);
+}
+
+
+
+async function loadHearings() {
+    if (!hearingList) return;
+
+    hearingList.innerHTML = `
+        <p class="empty-state">Loading hearings...</p>
+    `;
+
+    try {
+        const response = await fetch(window.API.hearings, {
+            method: "GET",
+            credentials: "include"
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Unable to load hearings.");
+        }
+
+        const hearings = data.hearings || [];
+
+        if (hearings.length === 0) {
+            hearingList.innerHTML = `
+                <p class="empty-state">
+                    No hearings have been scheduled yet.
+                </p>
+            `;
+            return;
+        }
+
+        hearingList.innerHTML = hearings.map(hearing => {
+            const status = (hearing.status || "Scheduled").toLowerCase();
+
+            const canManage = !["cancelled", "completed"].includes(status);
+
+            return `
+                <article class="history-item hearing-card">
+
+                    <div>
+                        <strong>
+                            ${escapeHTML(hearing.case_number || "Unknown case")}
+                        </strong>
+
+                        <span class="stage-pill">
+                            ${escapeHTML(hearing.status || "Scheduled")}
+                        </span>
+                    </div>
+
+                    <p>
+                        <strong>Hearing Type:</strong>
+                        ${escapeHTML(hearing.hearing_type || "Not specified")}
+                    </p>
+
+                    <p>
+                        <strong>Complainant:</strong>
+                        ${escapeHTML(hearing.complainant_name || "Not provided")}
+                    </p>
+
+                    <p>
+                        <strong>Respondent:</strong>
+                        ${escapeHTML(hearing.respondent_name || "Not provided")}
+                    </p>
+
+                    <p>
+                        <strong>Date and Time:</strong>
+                        ${escapeHTML(formatHearingDate(hearing.scheduled_at))}
+                    </p>
+
+                    <p>
+                        <strong>Venue:</strong>
+                        ${escapeHTML(hearing.venue || "Not specified")}
+                    </p>
+
+                    ${hearing.notes ? `
+                        <p>
+                            <strong>Notes:</strong>
+                            ${escapeHTML(hearing.notes)}
+                        </p>
+                    ` : ""}
+
+                    ${canManage ? `
+                        <div class="hearing-actions">
+                            <button
+                                type="button"
+                                class="hearing-action-button"
+                                data-hearing-action="reschedule"
+                                data-hearing-id="${hearing.id}"
+                            >
+                                Reschedule
+                            </button>
+
+                            <button
+                                type="button"
+                                class="hearing-action-button hearing-action-danger"
+                                data-hearing-action="cancel"
+                                data-hearing-id="${hearing.id}"
+                            >
+                                Cancel Hearing
+                            </button>
+                        </div>
+                    ` : ""}
+
+                </article>
+            `;
+        }).join("");
+
+        // Attach hearing management actions.
+        hearingList.querySelectorAll("[data-hearing-action]").forEach(button => {
+
+            button.addEventListener("click", async () => {
+                const hearingId = button.dataset.hearingId;
+                const action = button.dataset.hearingAction;
+
+                if (!hearingId) return;
+
+                let endpoint = "";
+                let requestBody = {};
+
+                if (action === "reschedule") {
+
+                    const newDateTime = prompt(
+                        "Enter the new hearing date and time.\n\nFormat: YYYY-MM-DDTHH:mm\nExample: 2026-11-25T09:30"
+                    );
+
+                    if (newDateTime === null) return;
+
+                    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(newDateTime)) {
+                        alert("Invalid date format. Please use YYYY-MM-DDTHH:mm.");
+                        return;
+                    }
+
+                    const scheduledAt = `${newDateTime}:00+08:00`;
+
+                    if (Number.isNaN(Date.parse(scheduledAt)) ||
+                        new Date(scheduledAt) <= new Date()) {
+                        alert("Please enter a valid future hearing date and time.");
+                        return;
+                    }
+
+                    const newVenue = prompt(
+                        "Enter the hearing venue:"
+                    );
+
+                    if (newVenue === null) return;
+
+                    if (!newVenue.trim()) {
+                        alert("The hearing venue is required.");
+                        return;
+                    }
+
+                    endpoint = `${window.API.hearings}/${hearingId}/reschedule`;
+
+                    requestBody = {
+                        scheduledAt,
+                        venue: newVenue.trim()
+                    };
+
+                } else if (action === "cancel") {
+
+                    const reason = prompt(
+                        "Enter the cancellation reason (optional):"
+                    );
+
+                    if (reason === null) return;
+
+                    const confirmed = confirm(
+                        "Are you sure you want to cancel this hearing?"
+                    );
+
+                    if (!confirmed) return;
+
+                    endpoint = `${window.API.hearings}/${hearingId}/cancel`;
+
+                    requestBody = {
+                        reason: reason.trim()
+                    };
+
+                } else {
+                    return;
+                }
+
+                const originalText = button.textContent;
+
+                try {
+                    button.disabled = true;
+                    button.textContent = "Processing...";
+
+                    const actionResponse = await fetch(endpoint, {
+                        method: "PATCH",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+
+                    const actionData = await actionResponse.json();
+
+                    if (!actionResponse.ok || !actionData.success) {
+                        throw new Error(
+                            actionData.message || "Unable to update hearing."
+                        );
+                    }
+
+                    alert(
+                        actionData.message ||
+                        "Hearing successfully updated."
+                    );
+
+                    await loadHearings();
+
+                } catch (error) {
+                    console.error("Hearing management error:", error);
+
+                    alert(
+                        error.message || "Something went wrong."
+                    );
+
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            });
+        });
+
+    } catch (error) {
+        console.error("Unable to load hearings:", error);
+
+        hearingList.innerHTML = `
+            <p class="empty-state">
+                Unable to load hearings.
+                Please check your login and backend connection.
+            </p>
+        `;
+    }
+}
+
+
     async function loadCases() {
     try {
         const response = await fetch(
@@ -129,6 +422,7 @@ function escapeHTML(value) {
         );
 
         renderEverything();
+        populateHearingCaseOptions();
 
     } catch (error) {
         console.error("Unable to load workflow cases:", error);
@@ -582,6 +876,90 @@ caseList.addEventListener("click", event => {
 });
 
 searchInput.addEventListener("input", renderCaseList);
+if (refreshHearingsButton) {
+    refreshHearingsButton.addEventListener(
+        "click",
+        loadHearings
+    );
+}
+
+
+if (scheduleHearingForm) {
+    scheduleHearingForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const caseId = Number(hearingCaseSelect.value);
+        const hearingType = document.getElementById("hearingType").value;
+        const hearingDate = document.getElementById("hearingDate").value;
+        const hearingTime = document.getElementById("hearingTime").value;
+        const venue = document.getElementById("hearingVenue").value.trim();
+        const notes = document.getElementById("hearingNotes").value.trim();
+
+        if (!caseId || !hearingType || !hearingDate || !hearingTime || !venue) {
+            hearingFormMessage.textContent =
+                "Please complete all required fields.";
+            return;
+        }
+
+        // Philippines time (UTC+08:00)
+        const scheduledAt =
+            `${hearingDate}T${hearingTime}:00+08:00`;
+
+        if (new Date(scheduledAt) <= new Date()) {
+            hearingFormMessage.textContent =
+                "Please select a future hearing date and time.";
+            return;
+        }
+
+        scheduleHearingButton.disabled = true;
+        scheduleHearingButton.textContent = "Scheduling...";
+
+        hearingFormMessage.textContent = "Submitting hearing schedule...";
+
+        try {
+            const response = await fetch(window.API.hearings, {
+                method: "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    caseId,
+                    hearingType,
+                    scheduledAt,
+                    venue,
+                    notes
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message || "Unable to schedule hearing."
+                );
+            }
+
+            hearingFormMessage.textContent =
+                data.message || "Hearing successfully scheduled.";
+
+            scheduleHearingForm.reset();
+
+            await loadHearings();
+
+        } catch (error) {
+            console.error("Schedule hearing error:", error);
+
+            hearingFormMessage.textContent =
+                error.message || "Something went wrong.";
+
+        } finally {
+            scheduleHearingButton.disabled = false;
+            scheduleHearingButton.textContent = "Schedule Hearing";
+        }
+    });
+}
+
 
 
 caseDetails.addEventListener("submit", async event => {
@@ -785,7 +1163,9 @@ caseDetails.addEventListener("submit", async event => {
 
 function startWorkflow() {
     searchInput.value = "";
+
     loadCases();
+    loadHearings();
 }
 
 startWorkflow();

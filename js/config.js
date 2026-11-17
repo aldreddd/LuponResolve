@@ -15,5 +15,6 @@ window.API_BASE_URL =
 window.API = {
     auth: `${window.API_BASE_URL}/api/auth`,
     cases: `${window.API_BASE_URL}/api/cases`,
-    roles: `${window.API_BASE_URL}/api/roles`
+    roles: `${window.API_BASE_URL}/api/roles`,
+    hearings: `${window.API_BASE_URL}/api/hearings`
 };
