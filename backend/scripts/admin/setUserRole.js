@@ -1,5 +1,5 @@
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 const email = process.argv[2];
 const newRole = process.argv[3];
@@ -43,3 +43,4 @@ async function updateUserRole() {
 }
 
 updateUserRole();
+

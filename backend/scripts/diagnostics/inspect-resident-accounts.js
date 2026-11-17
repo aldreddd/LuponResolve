@@ -1,7 +1,7 @@
 
 require("dotenv").config();
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 async function inspectResidents() {
     try {
@@ -46,3 +46,5 @@ async function inspectResidents() {
 }
 
 inspectResidents();
+
+

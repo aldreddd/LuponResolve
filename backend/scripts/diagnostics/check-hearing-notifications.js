@@ -1,7 +1,7 @@
 
 require("dotenv").config();
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 async function checkNotifications() {
     try {
@@ -33,3 +33,5 @@ async function checkNotifications() {
 }
 
 checkNotifications();
+
+

@@ -1,6 +1,6 @@
 
-const initializePostgresSchema = require("./config/postgresSchema");
-const initializeHearingSchema = require("./config/hearingSchema");
+const initializePostgresSchema = require("../../config/postgresSchema");
+const initializeHearingSchema = require("../../config/hearingSchema");
 
 async function setupDatabase() {
     try {
@@ -16,9 +16,10 @@ async function setupDatabase() {
         console.error(error);
         process.exitCode = 1;
     } finally {
-        const pool = require("./config/postgres");
+        const pool = require("../../config/postgres");
         await pool.end();
     }
 }
 
 setupDatabase();
+

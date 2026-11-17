@@ -1,7 +1,7 @@
 
 require("dotenv").config();
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 async function inspectCaseSchema() {
     try {
@@ -46,3 +46,5 @@ async function inspectCaseSchema() {
 }
 
 inspectCaseSchema();
+
+

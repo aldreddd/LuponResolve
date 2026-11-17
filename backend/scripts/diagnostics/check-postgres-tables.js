@@ -1,5 +1,5 @@
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 async function checkTables() {
     try {
@@ -21,3 +21,5 @@ async function checkTables() {
 }
 
 checkTables();
+
+

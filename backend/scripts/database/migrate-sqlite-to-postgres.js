@@ -2,9 +2,9 @@
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
-const dbPath = path.join(__dirname, "config", "luponresolve.db");
+const dbPath = path.join(__dirname, "..", "..", "config", "luponresolve.db");
 const sqlite = new sqlite3.Database(dbPath);
 
 function getSqliteRows(table) {
@@ -156,3 +156,4 @@ async function migrate() {
 }
 
 migrate();
+

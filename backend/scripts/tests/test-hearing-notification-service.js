@@ -1,11 +1,11 @@
 
 require("dotenv").config();
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 const {
     notifyHearingParties
-} = require("./services/hearingNotificationService");
+} = require("../../services/hearingNotificationService");
 
 async function testNotificationService() {
     try {
@@ -37,3 +37,4 @@ async function testNotificationService() {
 }
 
 testNotificationService();
+

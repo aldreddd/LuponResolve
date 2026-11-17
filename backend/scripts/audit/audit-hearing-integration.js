@@ -1,7 +1,7 @@
 
 require("dotenv").config();
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 async function auditHearingIntegration() {
     try {
@@ -87,3 +87,4 @@ async function auditHearingIntegration() {
 }
 
 auditHearingIntegration();
+

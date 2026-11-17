@@ -1,5 +1,5 @@
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 async function promoteLuponMember() {
     const email = "nathanielmandin7@gmail.com";
@@ -38,3 +38,4 @@ async function promoteLuponMember() {
 }
 
 promoteLuponMember();
+

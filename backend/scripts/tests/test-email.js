@@ -4,7 +4,7 @@ require("dotenv").config();
 const {
     createHearingEmail,
     formatHearingDate
-} = require("./services/emailService");
+} = require("../../services/emailService");
 
 const testHearing = {
     recipientName: "Test Resident",
@@ -52,3 +52,4 @@ console.log(
 );
 
 console.log("\nEmail template tests completed.");
+

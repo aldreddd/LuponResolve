@@ -1,5 +1,5 @@
 
-const pool = require("./config/postgres");
+const pool = require("../../config/postgres");
 
 async function verifyMigration() {
     try {
@@ -47,3 +47,5 @@ async function verifyMigration() {
 }
 
 verifyMigration();
+
+
