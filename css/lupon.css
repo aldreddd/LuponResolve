@@ -87,7 +87,7 @@
 /* =====================================
    DARK THEME — SYSTEM PREFERENCE
 ===================================== */
-
+/*
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
@@ -142,7 +142,7 @@
 
 /* =====================================
    DARK THEME — MANUAL OVERRIDE
-===================================== */
+===================================== 
 
 :root[data-theme="dark"] {
     color-scheme: dark;
@@ -194,7 +194,7 @@
     --shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.7);
 }
 
-
+*/
 /* =====================================
    GENERAL
 ===================================== */

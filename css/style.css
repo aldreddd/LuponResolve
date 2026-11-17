@@ -55,7 +55,7 @@
 /* =====================================
    2. DARK THEME
 ===================================== */
-
+/*
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         color-scheme: dark;
@@ -95,7 +95,7 @@
 }
 
 
-/* Manual dark theme override */
+/* Manual dark theme override 
 
 :root[data-theme="dark"] {
     color-scheme: dark;
@@ -133,7 +133,7 @@
         0 25px 65px rgba(0, 0, 0, 0.5);
 }
 
-
+*/
 /* =====================================
    3. GENERAL STYLES
 ===================================== */
