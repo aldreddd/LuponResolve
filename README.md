@@ -8,11 +8,11 @@
 
 **LuponResolve** is a web-based Barangay Dispute Resolution and Case Management System designed to support the Katarungang Pambarangay process.
 
-The system aims to improve complaint intake, preliminary jurisdiction screening, case monitoring, hearing scheduling, and the administrative management of barangay dispute-resolution proceedings.
+The system provides a digital platform for complaint submission, preliminary jurisdiction screening, case tracking, case administration, Lupon assignment, dispute-resolution proceedings, hearing scheduling, and email notifications.
 
-It provides separate portals for residents, barangay secretaries, and Lupon members, with role-based access to relevant case information and workflows.
+Residents can file complaints without creating an account and track their submitted cases using a case number and private tracking code. Authorized barangay personnel, including Secretaries and Lupon members, use secured staff portals to manage cases and proceedings.
 
-The application uses a client-server architecture with a Node.js and Express backend, PostgreSQL database hosted on Neon, and Gmail integration for hearing-related email notifications.
+The application follows a client-server architecture using HTML, CSS, JavaScript, Node.js, Express, Neon PostgreSQL, and Gmail API integration.
 
 **Live Application:** https://luponresolve.onrender.com/
 
@@ -25,7 +25,12 @@ The application uses a client-server architecture with a Node.js and Express bac
 - [Implemented Features](#implemented-features)
 - [User Roles](#user-roles)
 - [Case Management Workflow](#case-management-workflow)
-- [Hearing Management and Notifications](#hearing-management-and-notifications)
+- [Public Complaint Submission](#public-complaint-submission)
+- [Public Case Tracking](#public-case-tracking)
+- [Preliminary Jurisdiction Screening](#preliminary-jurisdiction-screening)
+- [Staff Portals](#staff-portals)
+- [Case Management and Proceedings](#case-management-and-proceedings)
+- [Hearing Management and Email Notifications](#hearing-management-and-email-notifications)
 - [Technology Stack](#technology-stack)
 - [System Architecture](#system-architecture)
 - [Project Structure](#project-structure)
@@ -35,7 +40,7 @@ The application uses a client-server architecture with a Node.js and Express bac
 - [Gmail Integration](#gmail-integration)
 - [Deployment](#deployment)
 - [Git Workflow](#git-workflow)
-- [Security and Data Considerations](#security-and-data-considerations)
+- [Security and Data Privacy](#security-and-data-privacy)
 - [Testing and Verification](#testing-and-verification)
 - [Future Improvements](#future-improvements)
 - [Project Team](#project-team)
@@ -46,110 +51,136 @@ The application uses a client-server architecture with a Node.js and Express bac
 
 ## Project Overview
 
-Traditional barangay dispute-resolution processes often depend on physical records, manual complaint screening, and in-person inquiries regarding case progress.
+Traditional barangay dispute-resolution processes often involve paper-based records, manual complaint intake, in-person inquiries, and administrative coordination.
 
-LuponResolve aims to provide a centralized digital platform where residents can submit complaints and authorized barangay personnel can review, organize, monitor, and manage case records.
+LuponResolve aims to support this process through a centralized web application that allows residents to submit complaints online and authorized barangay personnel to review, organize, monitor, and manage cases.
 
-The system focuses on:
+The system is designed to:
 
-- Digitizing complaint submission and case records.
-- Providing preliminary jurisdiction screening.
-- Improving administrative case organization.
-- Managing case assignments to Lupon members.
-- Supporting structured dispute-resolution proceedings.
-- Managing hearings and schedule changes.
-- Sending email notifications regarding hearing schedules.
-- Providing role-based access to relevant case information.
-- Maintaining persistent records through a cloud-hosted database.
+- Digitize barangay complaint submission.
+- Allow residents to file complaints without resident accounts.
+- Provide preliminary jurisdiction screening.
+- Generate unique case numbers.
+- Generate private tracking credentials for complainants.
+- Provide limited public case-status tracking.
+- Organize case records for barangay personnel.
+- Assign cases to authorized Lupon members.
+- Support mediation, conciliation, and arbitration workflows.
+- Manage resolutions and case closures.
+- Schedule and reschedule hearings.
+- Send hearing-related email notifications.
+- Maintain records using a cloud-hosted PostgreSQL database.
+- Restrict staff access through authentication and role-based authorization.
 
-The project is developed as an academic software engineering project and is currently deployed as a working web application prototype.
+LuponResolve is developed as an academic software engineering project and is currently deployed as a working web application prototype.
 
 ---
 
 ## Current Project Status
 
-**Status: Deployed and Functional Working Prototype**
+**Status: Deployed Working Prototype — Under Continued Development**
 
-LuponResolve is publicly accessible and deployed through Render. The backend is connected to a Neon PostgreSQL database, and the application includes authentication, role-based portals, case management, workflow enforcement, hearing management, and Gmail integration.
+The application is deployed through Render and uses Neon PostgreSQL for persistent database storage.
 
 | Component | Status |
 |---|---|
-| Frontend | Implemented |
+| Frontend web interface | Implemented |
 | Express backend | Implemented |
 | REST API | Implemented |
-| User authentication | Implemented |
-| Password hashing | Implemented |
+| Guest complaint submission | Implemented |
+| Resident account requirement removed from complaint intake | Implemented |
+| Case number generation | Implemented |
+| Private tracking code generation | Implemented |
+| Secure tracking-code hash storage | Implemented |
+| Public case tracking | Implemented |
+| Preliminary jurisdiction screening | Implemented |
+| Secretary authentication | Implemented |
+| Lupon authentication | Implemented |
 | Session-based authentication | Implemented |
+| Password hashing | Implemented |
 | Role-based access control | Implemented |
-| Resident portal | Implemented |
 | Secretary portal | Implemented |
 | Lupon portal | Implemented |
-| Admin role support | Implemented |
-| Complaint submission | Implemented |
-| Preliminary jurisdiction screening | Implemented |
-| Case management | Implemented |
 | Case assignment | Implemented |
 | Proceedings management | Implemented |
-| Workflow validation | Implemented |
+| Case workflow validation | Implemented |
 | Resolution management | Implemented |
 | Case closure management | Implemented |
 | Hearing scheduling | Implemented |
 | Hearing rescheduling | Implemented |
 | Hearing history | Implemented |
+| Gmail API integration | Implemented |
 | Hearing email notifications | Implemented |
-| Gmail OAuth integration | Implemented |
-| Gmail connection status | Implemented |
-| Test email functionality | Implemented |
-| SQLite development database | Used during early development |
 | PostgreSQL migration | Completed |
 | Neon PostgreSQL production database | Implemented |
 | PostgreSQL session persistence | Implemented |
+| Database migration utilities | Added |
+| Screening diagnostic scripts | Added |
 | GitHub repository | Connected |
-| Render deployment | Live |
-| Production email sending test | Successfully tested |
+| Render deployment | Active |
 
-The project is currently undergoing continued testing, refinement, and security improvement.
+The project continues to undergo testing, refinement, and security improvement.
 
 ---
 
 ## Implemented Features
 
-### 1. User Authentication and Authorization
+### 1. Guest Complaint Submission
 
-LuponResolve implements authentication and access control to ensure that users can access the appropriate parts of the system.
+Residents can file complaints through the public complaint form without creating an account or logging in.
 
 Implemented capabilities:
 
-- User registration.
-- User login and logout.
-- Password hashing using bcrypt.
-- Session-based authentication using Express Session.
-- Server-side session persistence.
-- Authentication status verification.
-- Role-based access control.
-- Protected API routes.
-- Access restrictions for unauthorized roles.
+- Public complaint submission form.
+- Complainant information collection.
+- Respondent information collection.
+- Dispute classification.
+- Incident details submission.
+- Barangay and municipality information.
+- Preliminary screening questionnaire.
+- Server-side validation.
+- Unique case number generation.
+- Private tracking code generation.
+- Submission confirmation.
+- Preliminary screening result display.
+- Input sanitization and safe rendering of dynamic content.
+- Honeypot field for basic automated-spam detection.
 
-Authentication and authorization are enforced through backend middleware and role-specific access checks.
+Complaint submission is handled through the backend API, which processes the complaint and stores the case record in PostgreSQL.
+
+Residents receive their case number and private tracking code after a successful submission. The tracking code is displayed at submission and should be saved securely by the complainant.
 
 ---
 
-### 2. Resident Portal
+### 2. Public Case Tracking
 
-The Resident Portal provides residents with an interface for submitting complaints and monitoring their submitted cases.
+LuponResolve includes a public tracking page that allows complainants to check limited information about their submitted complaints.
+
+Tracking requires two credentials:
+
+- **Case Number** — the assigned case reference.
+- **Private Tracking Code** — the secret credential generated during submission.
 
 Implemented capabilities:
 
-- Resident account registration and login.
-- Resident dashboard.
-- Complaint submission form.
-- Preliminary complaint screening.
-- View submitted cases.
-- Monitor case statuses.
-- View relevant case information.
-- Access resident-specific case records.
+- Public tracking interface.
+- Case number input.
+- Private tracking code input.
+- Server-side credential verification.
+- SHA-256 tracking-code hashing.
+- Timing-safe hash comparison.
+- Rate limiting for tracking attempts.
+- Limited public case information.
+- Current status display.
+- Current case stage display.
+- Submission date display.
+- Last-updated date display.
+- Error handling for invalid credentials.
+- Responsive tracking interface.
 
-Residents retain account-based access to their submitted cases.
+The tracking system does not require residents to create accounts.
+
+Public tracking is intentionally limited and does not expose complainant or respondent personal information, incident narratives, screening answers, secretary notes, case proceedings, or internal case history.
 
 ---
 
@@ -159,33 +190,36 @@ The complaint intake process includes preliminary screening based on jurisdictio
 
 The screening considers information such as:
 
-- Whether the parties reside in the same city or municipality.
-- Whether a government party is involved.
+- Whether the parties reside within the same city or municipality.
+- Whether government involvement is present.
 - Whether a public officer is involved in relation to official functions.
 - Criminal offense classification and applicable penalty.
 - Presence of a private offended party.
-- Real property location.
+- Real property dispute conditions.
+- Property location and jurisdiction.
+- Barangay relationship and adjacency considerations.
 - Applicable jurisdictional exceptions.
 - Whether parties may agree to certain jurisdictional conditions.
 
-The screening generates preliminary indicators to assist barangay personnel during complaint review.
-
 Possible screening classifications include:
 
-- Potentially Eligible for KP Review.
-- Requires Barangay Staff Review.
-- Potentially Outside KP Jurisdiction.
+- **Potentially Eligible for KP Review**
+- **Requires Barangay Staff Review**
+- **Potentially Outside KP Jurisdiction**
 
-The screening is intended as an administrative aid and does not replace the legal assessment or decision of authorized barangay officials.
+The screening system generates preliminary indicators to assist barangay personnel during complaint review.
+
+Screening is an administrative aid only. It does not replace the legal assessment, determination, or decision of authorized barangay officials.
 
 ---
 
 ### 4. Secretary Portal
 
-The Secretary Portal provides barangay secretaries with tools for administrative complaint review and case management.
+The Secretary Portal provides authorized barangay secretaries with tools for complaint review and administrative case management.
 
 Implemented capabilities:
 
+- Secure staff login.
 - View submitted complaints.
 - Access case information.
 - Review complainant and respondent details.
@@ -196,53 +230,56 @@ Implemented capabilities:
 - Record proceedings.
 - Manage resolution information.
 - Manage case closure.
-- Access case workflow tools.
+- Access workflow tools.
 - Manage hearing schedules.
+- View relevant case information for administrative processing.
 
-The secretary serves as the primary administrative role for processing and organizing cases within the system.
+The Secretary serves as the primary administrative role for complaint intake review, case organization, assignment, and coordination.
 
 ---
 
 ### 5. Lupon Portal
 
-The Lupon Portal provides Lupon members with access to cases assigned to them.
+The Lupon Portal provides authorized Lupon members access to cases assigned to them.
 
 Implemented capabilities:
 
+- Secure staff login.
 - View assigned cases.
 - Access relevant case details.
 - Review case workflow information.
 - Monitor assigned case progress.
-- Record relevant proceedings.
+- Record proceedings.
 - Manage proceeding information.
-- Monitor case progression and completion.
+- Monitor case progression.
+- View case completion status.
 
-Case visibility is restricted based on assignments and role authorization.
+Case visibility is restricted through backend authorization and assignment-based access controls.
 
 ---
 
 ### 6. Case Management
 
-The case management system provides structured storage and processing of barangay complaints.
+The case-management system provides structured storage and processing of barangay complaints.
 
 Implemented capabilities:
 
 - Create and store complaint records.
-- Generate case numbers.
+- Generate unique case numbers.
 - Retrieve case records through API endpoints.
-- Display case information based on user role.
+- Display case information according to user role.
 - Manage case statuses.
 - Assign cases to Lupon members.
 - Track case progression.
 - Store proceeding records.
 - Manage case resolution.
-- Manage closure information.
+- Manage case closure.
 
 Case numbers follow the system's designated format:
 
 `LR-00001`
 
-Each case contains relevant complainant, respondent, dispute, incident, screening, workflow, assignment, and resolution information.
+Case records contain relevant complaint information, screening results, workflow details, assignments, proceedings, and resolution or closure information.
 
 ---
 
@@ -261,7 +298,7 @@ Supported case stages include:
 - Certificate to File Action
 - Closed
 
-The system validates permitted transitions between stages instead of allowing unrestricted status changes.
+The system validates permitted transitions instead of allowing unrestricted case-stage changes.
 
 Resolution and closure are handled through dedicated operations rather than unrestricted workflow updates.
 
@@ -271,17 +308,17 @@ This helps maintain consistency in case progression and reduces invalid administ
 
 ### 8. Case Assignment
 
-The system includes case assignment functionality for distributing cases to Lupon members.
+The system supports assigning cases to authorized Lupon members.
 
 Implemented capabilities:
 
-- Assign cases to authorized Lupon members.
+- Assign cases to Lupon members.
 - Store case assignments.
 - Retrieve assigned cases.
 - Restrict Lupon case visibility based on assignment.
 - Support case assignment during administrative processing.
 
-Assignments are stored in the database and used by the backend to determine case access.
+Assignments are stored in PostgreSQL and used by backend authorization logic to determine access to assigned cases.
 
 ---
 
@@ -325,11 +362,77 @@ The system separates workflow progression from resolution and closure operations
 
 ---
 
-## Hearing Management and Notifications
+## Public Complaint Submission
+
+The guest complaint submission process is designed to reduce barriers for residents.
+
+### Submission Flow
+
+1. Resident opens the public complaint form.
+2. Resident provides the required complaint and party information.
+3. Resident completes the preliminary screening questionnaire.
+4. The frontend sends the complaint to the backend API.
+5. The backend validates and processes the submitted information.
+6. The preliminary screening utility evaluates jurisdictional indicators.
+7. The backend generates a case number and private tracking code.
+8. The case information is stored in Neon PostgreSQL.
+9. The tracking code is hashed before being stored.
+10. The frontend displays the submission confirmation, case number, tracking code, and screening result.
+
+Residents should keep their tracking credentials private and save them after submission.
+
+---
+
+## Public Case Tracking
+
+The public tracking page allows residents to retrieve limited information about an existing complaint.
+
+### Tracking Flow
+
+1. Resident opens the Track Your Case page.
+2. Resident enters the case number.
+3. Resident enters the private tracking code.
+4. The frontend sends the credentials to the backend tracking endpoint.
+5. The backend hashes the submitted tracking code.
+6. The stored hash is verified securely.
+7. If valid, limited tracking information is returned.
+8. The frontend displays the case's current tracking details.
+
+### Publicly Available Tracking Information
+
+The public tracking response is intentionally restricted to fields such as:
+
+- Case number.
+- Current status.
+- Current case stage.
+- Date submitted.
+- Last updated date.
+
+### Protected Case Information
+
+Public tracking does not return:
+
+- Complainant or respondent names.
+- Addresses.
+- Phone numbers.
+- Email addresses.
+- Incident narratives.
+- Screening answers.
+- Screening reasons or internal warnings.
+- Secretary notes.
+- Case history.
+- Proceedings details.
+- Internal staff information.
+
+The tracking code serves as a private access credential and should not be shared publicly.
+
+---
+
+## Hearing Management and Email Notifications
 
 ### 11. Hearing Management
 
-LuponResolve includes hearing management functionality for organizing dispute-resolution sessions.
+LuponResolve includes hearing-management functionality for organizing dispute-resolution sessions.
 
 Implemented capabilities:
 
@@ -340,25 +443,25 @@ Implemented capabilities:
 - View scheduled hearings.
 - Reschedule hearings.
 - Maintain hearing-related history.
-- Associate hearings with their respective case records.
+- Associate hearings with case records.
 
-The hearing management functionality supports coordination between administrative case processing and dispute-resolution proceedings.
+The hearing-management functionality supports coordination between administrative case processing and dispute-resolution proceedings.
 
 ### 12. Hearing Email Notifications
 
-The system integrates email notifications into hearing management to communicate hearing-related information to concerned parties.
+The system integrates email notifications into hearing management to communicate hearing-related information.
 
 Implemented capabilities:
 
 - Send email notifications for scheduled hearings.
-- Send email notifications when hearings are rescheduled.
+- Send notifications when hearings are rescheduled.
 - Communicate hearing schedule changes.
 - Notify involved parties through email.
 - Integrate email notification functionality with hearing operations.
 
 Email notifications are intended to help keep complainants and respondents informed of hearing-related changes.
 
-### 13. Hearing History and Tracking
+### 13. Hearing History
 
 Hearing-related records are maintained to support scheduling and administrative tracking.
 
@@ -370,22 +473,37 @@ Implemented capabilities include:
 - Associate hearing history with case records.
 - Track scheduled hearing information.
 
-This allows authorized users to review hearing information and related scheduling history.
+Authorized users can review hearing information and scheduling history.
+
+### Hearing Notification Flow
+
+1. Authorized staff schedules or updates a hearing.
+2. The backend processes the hearing operation.
+3. Hearing information is stored in PostgreSQL.
+4. The notification process is triggered.
+5. Gmail API sends the notification.
+6. The concerned party receives the email, provided delivery succeeds.
+
+For rescheduled hearings, the system processes the updated schedule and sends the corresponding notification.
+
+Email delivery depends on valid recipient email addresses, Gmail authorization, and successful API processing.
 
 ---
 
 ## User Roles
 
-LuponResolve supports role-based access to system functions.
+LuponResolve currently uses the following roles:
 
 | Role | Main Responsibilities |
 |---|---|
-| Resident | Submit complaints and monitor submitted cases |
+| Resident / Guest | Submit complaints without an account and track submitted cases using private credentials |
 | Secretary | Review complaints, manage case records, assign Lupon members, manage hearings, and oversee case administration |
 | Lupon Member | Access assigned cases and manage proceedings |
-| Admin | Administrative access to authorized system functions and system integrations |
+| Admin | Administrative access to authorized system functions and integrations |
 
-Access to protected resources is controlled through backend authentication and authorization checks.
+Residents do not need to authenticate to submit complaints or use the public tracking feature.
+
+Staff-only functions are protected through backend authentication and authorization checks.
 
 ---
 
@@ -395,62 +513,33 @@ The application supports a structured case-management process.
 
 ```text
 Resident submits complaint
-         |
-         v
+        |
+        v
 Preliminary jurisdiction screening
-         |
-         v
+        |
+        v
 Secretary reviews complaint
-         |
-         v
+        |
+        v
 For Lupon Assessment
-         |
-         v
+        |
+        v
 Case assigned to Lupon member
-         |
-         v
+        |
+        v
 Mediation / Conciliation
-         |
-         v
+        |
+        v
 Arbitration (when applicable)
-         |
-         v
+        |
+        v
 Resolved / Certificate to File Action
-         |
-         v
+        |
+        v
 Closed
 ```
 
 The actual case progression depends on applicable procedures, case circumstances, and the system's permitted workflow transitions.
-
----
-
-## Hearing Notification Flow
-
-The hearing management and email integration process generally follows this flow:
-
-```text
-Authorized user schedules or updates a hearing
-                  |
-                  v
-        Hearing record is processed
-                  |
-                  v
-       Hearing information is stored
-                  |
-                  v
-      Email notification is triggered
-                  |
-                  v
-       Gmail API sends notification
-                  |
-                  v
- Complainant / Respondent receives email
-```
-
-For rescheduled hearings, the system processes the updated schedule and sends the corresponding notification.
-
-Email delivery depends on valid recipient email addresses, Gmail authorization, and successful API processing.
 
 ---
 
@@ -460,10 +549,12 @@ Email delivery depends on valid recipient email addresses, Gmail authorization, 
 
 - HTML5
 - CSS3
-- JavaScript (Vanilla JavaScript)
-- Responsive interface design
-- Role-specific portals
-- Light and dark theme support for portal interfaces
+- Vanilla JavaScript
+- Responsive web design
+- Public complaint submission interface
+- Public case-tracking interface
+- Staff portals
+- Role-specific interfaces
 
 ### Backend
 
@@ -489,7 +580,17 @@ Email delivery depends on valid recipient email addresses, Gmail authorization, 
 - `googleapis`
 - OAuth authorization and refresh token handling
 - AES-256-GCM token encryption
-- Automated hearing email notifications
+- Hearing-related email notifications
+
+### Security and Utilities
+
+- SHA-256 tracking-code hashing
+- Timing-safe tracking credential verification
+- API rate limiting
+- Input validation
+- Role-based access control
+- Honeypot spam-detection field
+- Environment-based secret management
 
 ### Development Tools
 
@@ -512,38 +613,38 @@ Email delivery depends on valid recipient email addresses, Gmail authorization, 
 
 ## System Architecture
 
-LuponResolve follows a client-server architecture with a frontend, Express backend, and PostgreSQL database.
+LuponResolve follows a client-server architecture with a frontend, Express backend, PostgreSQL database, and external Gmail service.
 
 ### Application Architecture
 
 ```text
-                  USERS
-                    |
-                    v
+                 USERS
+                   |
+                   v
           WEB APPLICATION FRONTEND
            HTML / CSS / JavaScript
-                    |
-                    v
-           NODE.JS / EXPRESS SERVER
-                    |
-        +-----------+------------+
-        |           |            |
-        v           v            v
+                   |
+                   v
+          NODE.JS / EXPRESS SERVER
+                   |
+       +-----------+------------+
+       |           |            |
+       v           v            v
  Authentication  Case Mgmt   Hearing Mgmt
  & Authorization & Workflow   & Notifications
-        |           |            |
-        +-----------+------------+
-                    |
-          +---------+----------+
-          |                    |
-          v                    v
-    NEON POSTGRESQL        GMAIL API
-    Persistent Data       Email Delivery
-          |                    |
-          v                    v
-  Users, Cases, Sessions   Hearing Emails
-  Assignments, Hearings
-  History, Proceedings
+       |           |            |
+       +-----------+------------+
+                   |
+         +---------+----------+
+         |                    |
+         v                    v
+   NEON POSTGRESQL        GMAIL API
+   Persistent Data       Email Delivery
+         |                    |
+         v                    v
+ Users, Cases, Sessions   Hearing Emails
+ Assignments, Hearings
+ History, Proceedings
 ```
 
 ### Production Architecture
@@ -551,25 +652,27 @@ LuponResolve follows a client-server architecture with a frontend, Express backe
 | Service | Responsibility |
 |---|---|
 | GitHub | Stores and versions application source code |
-| Render | Hosts the frontend and Express backend |
+| Render | Hosts the Express application and frontend |
 | Neon | Managed PostgreSQL database |
 | Google OAuth | Authorizes Gmail access |
 | Gmail API | Sends hearing-related email notifications |
 
-The Express application serves the frontend pages and static assets from the same deployed service.
+The Express application serves the frontend HTML pages, CSS, JavaScript assets, and API endpoints through the deployed service.
 
 ---
 
 ## Project Structure
 
-The following represents the primary application structure. Additional configuration, database, utility, and migration scripts may also exist.
+The following represents the primary application structure. Additional configuration, database, utility, middleware, migration, and diagnostic scripts may exist.
 
 ```text
 LuponResolve/
 │
 ├── index.html
 ├── auth.html
-├── resident.html
+├── guest-complaint.html
+├── track-case.html
+├── resident.html             # Legacy / inactive resident interface
 ├── secretary.html
 ├── lupon.html
 ├── workflow.html
@@ -577,6 +680,8 @@ LuponResolve/
 ├── css/
 │   ├── style.css
 │   ├── auth.css
+│   ├── guest-complaint.css
+│   ├── track-case.css
 │   ├── resident.css
 │   ├── secretary.css
 │   ├── lupon.css
@@ -584,8 +689,11 @@ LuponResolve/
 │
 ├── js/
 │   ├── config.js
+│   ├── app.js
 │   ├── auth.js
 │   ├── auth-guard.js
+│   ├── guest-complaint.js
+│   ├── track-case.js
 │   ├── resident.js
 │   ├── secretary.js
 │   ├── lupon.js
@@ -596,14 +704,31 @@ LuponResolve/
 │   │   ├── postgres.js
 │   │   └── postgresSchema.js
 │   │
+│   ├── middleware/
+│   │   └── ...
+│   │
 │   ├── routes/
 │   │   ├── authRoutes.js
 │   │   ├── roleRoutes.js
 │   │   ├── caseRoutes.js
-│   │   └── ...
+│   │   ├── hearingRoutes.js
+│   │   └── gmailRoutes.js
 │   │
 │   ├── services/
 │   │   └── gmailService.js
+│   │
+│   ├── utils/
+│   │   └── complaintScreening.js
+│   │
+│   ├── scripts/
+│   │   ├── database/
+│   │   │   └── migrate-guest-complaints.js
+│   │   └── diagnostics/
+│   │       ├── inspect-case-schema.js
+│   │       ├── check-case-number-duplicates.js
+│   │       ├── check-case-sequence.js
+│   │       ├── test-screening.js
+│   │       └── test-screening-robustness.js
 │   │
 │   ├── server.js
 │   ├── package.json
@@ -614,7 +739,7 @@ LuponResolve/
 └── README.md
 ```
 
-*Note: The actual project structure may contain additional files, folders, migration scripts, diagnostic utilities, middleware, and services not shown above.*
+*Note: Some legacy resident-related files remain in the repository from earlier development stages. The current public complaint submission and tracking flow does not require resident login.*
 
 ---
 
@@ -676,13 +801,23 @@ http://localhost:3000/
 
 The Express server serves the frontend pages and static assets.
 
-If using Live Server during frontend development, the frontend may also be accessed through:
+The public pages include:
+
+| Page | Local URL |
+|---|---|
+| Homepage | `http://localhost:3000/` |
+| Homepage (explicit) | `http://localhost:3000/index.html` |
+| Guest complaint form | `http://localhost:3000/guest-complaint.html` |
+| Public case tracking | `http://localhost:3000/track-case.html` |
+| Staff authentication | `http://localhost:3000/auth.html` |
+
+If using VS Code Live Server during frontend development, the frontend may also be accessed through:
 
 ```text
-http://127.0.0.1:5500
+http://127.0.0.1:5500/
 ```
 
-The backend CORS configuration must allow the selected frontend origin.
+When using Live Server, the backend CORS configuration must allow the selected frontend origin during local development.
 
 ---
 
@@ -716,7 +851,7 @@ EMAIL_TEST_MODE=false
 EMAIL_TEST_RECIPIENT=your_test_email_address
 ```
 
-The email testing variables are used to control email testing behavior during development and testing.
+The email testing variables control email testing behavior during development and testing.
 
 ### Production Configuration
 
@@ -757,9 +892,10 @@ LuponResolve uses **Neon PostgreSQL** as its production database.
 
 The database stores application information including:
 
-- User accounts.
+- Staff user accounts.
 - Authentication information.
 - Complaint and case records.
+- Tracking-code hashes.
 - Case assignments.
 - Case workflow information.
 - Proceedings.
@@ -784,7 +920,7 @@ The migration involved adapting database connectivity, query handling, schema in
 - Connection pooling through the configured PostgreSQL connection string.
 - Environment-based database configuration.
 - PostgreSQL-backed session persistence.
-- Database schema initialization.
+- Database schema initialization and migration utilities.
 - Persistent cloud database storage.
 
 Database resets, migrations, and schema changes should be performed carefully to avoid accidental loss of production data.
@@ -799,7 +935,7 @@ LuponResolve integrates the Gmail API to send hearing-related email notification
 
 The Gmail integration uses Google OAuth 2.0 to authorize an administrator's Gmail account.
 
-The administrator authorizes the application to send email using the connected Gmail account.
+The administrator authorizes the application to send emails using the connected Gmail account.
 
 ### Implemented Capabilities
 
@@ -834,7 +970,7 @@ Email sending requires:
 - Properly configured environment variables.
 - Successful Gmail API requests.
 
-The integration has been connected and tested successfully in the deployed environment.
+The integration has been connected and tested during development.
 
 ---
 
@@ -936,13 +1072,15 @@ git pull origin main
 git log --oneline
 ```
 
+If local and remote branches diverge, inspect the commit history before integrating changes. Avoid force-pushing unless there is a deliberate, verified reason.
+
 After pushing, Render automatically deploys the latest committed version when automatic deployment is enabled.
 
 ---
 
-## Security and Data Considerations
+## Security and Data Privacy
 
-LuponResolve handles information related to complaints, users, and dispute-resolution proceedings.
+LuponResolve handles complaint information, personal details, authentication data, and dispute-resolution records.
 
 Security considerations include:
 
@@ -955,14 +1093,33 @@ Security considerations include:
 - Secure handling of OAuth credentials.
 - Encrypted Gmail token storage.
 - Restricted access to protected API endpoints.
-- Role-based case visibility.
-- Session persistence through PostgreSQL.
+- Assignment-based case visibility.
+- PostgreSQL session persistence.
+- Hashed private tracking credentials.
+- Timing-safe tracking-code verification.
+- Rate limiting for public tracking requests.
+- Limited public tracking responses.
+- Safe rendering of dynamic frontend content.
+
+### Tracking Credential Security
+
+Public tracking credentials are sensitive.
+
+The system is designed to:
+
+- Generate cryptographically random tracking codes.
+- Store tracking-code hashes instead of plaintext tracking codes.
+- Verify credentials server-side.
+- Avoid exposing private complaint information through public tracking.
+- Limit repeated tracking attempts.
+
+Tracking codes should not be stored in public URLs, logs, source code, or GitHub.
 
 ### Data Privacy
 
 The system may process sensitive personal information, including complainant and respondent details, allegations, and proceeding information.
 
-The publicly accessible application should be used with synthetic or test records during demonstrations.
+The publicly accessible application should use synthetic or test records during demonstrations.
 
 The system is an academic prototype and should not be treated as a fully certified production government information system.
 
@@ -986,13 +1143,17 @@ LuponResolve has undergone development testing and functional verification durin
 
 ### Tested Areas
 
-- User registration.
-- User authentication.
+- Staff authentication.
 - Session-based access.
 - Role-based access restrictions.
-- Complaint submission.
-- Case retrieval.
+- Guest complaint submission.
+- Case number generation.
+- Tracking code generation.
+- Tracking-code hash storage.
+- Public case tracking.
+- Invalid tracking credential handling.
 - Preliminary screening.
+- Screening edge cases and robustness.
 - Case review.
 - Case assignment.
 - Workflow stage validation.
@@ -1006,19 +1167,27 @@ LuponResolve has undergone development testing and functional verification durin
 - Gmail connection status.
 - Test email sending.
 - Hearing scheduling.
-- Hearing-related email notification functionality.
+- Hearing-related email notifications.
+- Public tracking information restrictions.
 
 ### Development Testing
 
-Testing has been performed through local development, browser inspection, API requests, and deployed application verification.
+Testing has been performed through:
 
-The application is still subject to further testing to identify bugs, improve edge-case handling, and strengthen security and reliability.
+- Local development.
+- Browser inspection.
+- API requests.
+- Backend diagnostic scripts.
+- Database inspection.
+- Deployed application verification.
+
+The application remains subject to further testing to identify bugs, improve edge-case handling, and strengthen security and reliability.
 
 ---
 
 ## Future Improvements
 
-Although LuponResolve currently provides a functional case-management workflow and hearing notification system, further development is planned to improve reliability, security, usability, and maintainability.
+Although LuponResolve currently provides a functional complaint submission, case-management workflow, public tracking, and hearing notification system, further development is planned to improve reliability, security, usability, and maintainability.
 
 Potential future improvements include:
 
