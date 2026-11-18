@@ -1,0 +1,756 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap");
+
+/* =====================================
+   1. DESIGN TOKENS
+===================================== */
+
+:root {
+    --font-body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+    --font-serif: "Source Serif 4", Georgia, serif;
+
+    --bg: #f3f6fb;
+    --surface: #ffffff;
+    --surface-soft: #edf2fa;
+
+    --line: #e1e7f1;
+    --line-strong: #c9d3e5;
+
+    --text: #0e1b36;
+    --text-muted: #4f607a;
+    --text-faint: #66768f;
+
+    --primary: #1d4fa6;
+    --primary-hover: #163f86;
+    --primary-text: #1d4fa6;
+
+    --focus: #1d4fa6;
+    --ring: rgba(29, 79, 166, 0.2);
+
+    --gold: #e0bd6a;
+    --gold-muted: #b8923a;
+
+    --teal-soft: #e0f4f2;
+    --teal-line: #a9dcd7;
+    --teal-text: #0e7f79;
+
+    --danger: #b42318;
+    --danger-soft: #fff1f0;
+    --success: #16734a;
+    --success-soft: #eaf6ef;
+
+    --shadow:
+        0 1px 2px rgba(14, 27, 54, 0.04),
+        0 12px 35px rgba(14, 27, 54, 0.06);
+}
+
+
+/* =====================================
+   2. RESET AND BASE
+===================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 30px;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+
+    background: var(--bg);
+    color: var(--text);
+
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+    background: var(--ring);
+}
+
+
+/* =====================================
+   3. HEADER
+===================================== */
+
+.guest-header {
+    width: min(1160px, calc(100% - 48px));
+    min-height: 82px;
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+
+    color: var(--text);
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+}
+
+.brand-mark {
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 11px;
+
+    background: var(--primary);
+    color: #ffffff;
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 -4px 0 var(--gold);
+
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 600;
+
+    transition: color 160ms ease;
+}
+
+.back-link:hover {
+    color: var(--primary);
+}
+
+
+/* =====================================
+   4. MAIN LAYOUT
+===================================== */
+
+.guest-main {
+    width: min(900px, calc(100% - 48px));
+    margin: 38px auto 90px;
+}
+
+.guest-intro {
+    max-width: 740px;
+    margin-bottom: 36px;
+}
+
+.eyebrow {
+    margin-bottom: 12px;
+
+    color: var(--primary-text);
+
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.guest-intro h1 {
+    margin: 0;
+
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 5vw, 3.6rem);
+    font-weight: 600;
+
+    line-height: 1.12;
+    letter-spacing: -0.045em;
+}
+
+.guest-intro > p:not(.eyebrow) {
+    max-width: 670px;
+    margin-top: 18px;
+
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+
+/* =====================================
+   5. NOTICES
+===================================== */
+
+.guest-notice {
+    margin-top: 25px;
+    padding: 18px 20px;
+
+    border: 1px solid var(--teal-line);
+    border-left: 4px solid var(--teal-text);
+    border-radius: 8px;
+
+    background: var(--teal-soft);
+    color: var(--text-muted);
+
+    font-size: 0.88rem;
+    line-height: 1.75;
+}
+
+.guest-notice strong {
+    color: var(--teal-text);
+}
+
+.screening-notice {
+    margin: 0 0 26px;
+    padding: 15px 18px;
+
+    border: 1px solid var(--line);
+    border-radius: 8px;
+
+    background: var(--surface-soft);
+    color: var(--text-muted);
+
+    font-size: 0.88rem;
+    line-height: 1.7;
+}
+
+
+/* =====================================
+   6. FORM SECTIONS
+===================================== */
+
+#guestComplaintForm {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.form-section {
+    padding: 32px;
+
+    border: 1px solid var(--line);
+    border-radius: 14px;
+
+    background: var(--surface);
+
+    box-shadow: 0 2px 8px rgba(14, 27, 54, 0.025);
+}
+
+.form-section-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+
+    margin-bottom: 28px;
+}
+
+.section-number {
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    background: var(--surface-soft);
+    border: 1px solid var(--line);
+
+    color: var(--gold-muted);
+
+    font-size: 0.82rem;
+    font-weight: 800;
+}
+
+.form-section-heading h2 {
+    margin: 0;
+
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    font-weight: 600;
+
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+
+.form-section-heading p {
+    margin-top: 5px;
+
+    color: var(--text-muted);
+    font-size: 0.86rem;
+    line-height: 1.6;
+}
+
+
+/* =====================================
+   7. FORM GRID
+===================================== */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    min-width: 0;
+    margin-bottom: 24px;
+}
+
+.form-grid .form-field {
+    margin-bottom: 0;
+}
+
+.form-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-field label {
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.6;
+}
+
+.required {
+    color: var(--danger);
+}
+
+.form-field small {
+    color: var(--text-faint);
+    font-size: 0.77rem;
+    line-height: 1.6;
+}
+
+
+/* =====================================
+   8. INPUTS AND SELECTS
+===================================== */
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+    width: 100%;
+    min-height: 48px;
+
+    padding: 12px 14px;
+
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+
+    background: var(--surface);
+    color: var(--text);
+
+    font-size: 0.9rem;
+    line-height: 1.5;
+
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        background 160ms ease;
+}
+
+.form-field textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.form-field textarea#incidentDetails {
+    min-height: 190px;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+    color: var(--text-faint);
+    opacity: 0.85;
+}
+
+.form-field select {
+    cursor: pointer;
+}
+
+.form-field input:hover,
+.form-field textarea:hover,
+.form-field select:hover {
+    border-color: #aabbd5;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+    outline: none;
+
+    border-color: var(--focus);
+    box-shadow: 0 0 0 4px var(--ring);
+}
+
+.form-field input:focus-visible,
+.form-field textarea:focus-visible,
+.form-field select:focus-visible {
+    outline: none;
+}
+
+
+/* =====================================
+   9. HONEYPOT
+===================================== */
+
+.honeypot {
+    position: absolute !important;
+
+    width: 1px !important;
+    height: 1px !important;
+
+    overflow: hidden !important;
+
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =====================================
+   10. SUBMISSION SECTION
+===================================== */
+
+.form-submit-section {
+    padding: 28px 4px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.form-privacy-note {
+    max-width: 740px;
+
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.75;
+}
+
+.button {
+    min-height: 48px;
+    padding: 0 24px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: 1px solid transparent;
+    border-radius: 8px;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        transform 160ms ease,
+        background 160ms ease,
+        box-shadow 160ms ease,
+        opacity 160ms ease;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+}
+
+.button-primary {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+
+    box-shadow: 0 3px 10px var(--ring);
+}
+
+.button-primary:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 6px 18px var(--ring);
+}
+
+.button-primary:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 4px;
+}
+
+.button-primary:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.cancel-link {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+
+    transition: color 160ms ease;
+}
+
+.cancel-link:hover {
+    color: var(--primary-text);
+}
+
+
+/* =====================================
+   11. FORM MESSAGES
+===================================== */
+
+.form-message {
+    display: none;
+
+    width: 100%;
+    padding: 15px 18px;
+
+    border: 1px solid var(--line);
+    border-radius: 8px;
+
+    font-size: 0.88rem;
+    line-height: 1.7;
+}
+
+.form-message.visible {
+    display: block;
+}
+
+.form-message.error {
+    background: var(--danger-soft);
+    border-color: #f1c1bd;
+    color: var(--danger);
+}
+
+.form-message.success {
+    background: var(--success-soft);
+    border-color: #b8dfc7;
+    color: var(--success);
+}
+
+
+/* =====================================
+   12. FOOTER
+===================================== */
+
+.guest-footer {
+    min-height: 100px;
+
+    padding: 24px max(24px, calc((100% - 1160px) / 2));
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    border-top: 1px solid var(--line);
+
+    background: var(--surface);
+}
+
+.footer-brand {
+    font-size: 0.95rem;
+}
+
+.footer-brand .brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+}
+
+.guest-footer p {
+    margin: 0;
+
+    color: var(--text-faint);
+    font-size: 0.8rem;
+}
+
+
+/* =====================================
+   13. TABLET
+===================================== */
+
+@media (max-width: 800px) {
+
+    .guest-main {
+        margin-top: 28px;
+    }
+
+    .form-section {
+        padding: 26px;
+    }
+
+    .form-section-heading h2 {
+        font-size: 1.35rem;
+    }
+}
+
+
+/* =====================================
+   14. MOBILE
+===================================== */
+
+@media (max-width: 560px) {
+
+    .guest-header {
+        width: calc(100% - 32px);
+        min-height: 72px;
+    }
+
+    .brand {
+        font-size: 1rem;
+    }
+
+    .brand-mark {
+        width: 36px;
+        height: 36px;
+    }
+
+    .back-link {
+        font-size: 0.8rem;
+    }
+
+    .guest-main {
+        width: calc(100% - 32px);
+        margin: 25px auto 60px;
+    }
+
+    .guest-intro h1 {
+        font-size: 2.5rem;
+    }
+
+    .guest-intro > p:not(.eyebrow) {
+        font-size: 0.92rem;
+    }
+
+    .guest-notice {
+        padding: 15px;
+        font-size: 0.82rem;
+    }
+
+    #guestComplaintForm {
+        gap: 16px;
+    }
+
+    .form-section {
+        padding: 22px 18px;
+        border-radius: 11px;
+    }
+
+    .form-section-heading {
+        gap: 12px;
+        margin-bottom: 23px;
+    }
+
+    .section-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        font-size: 0.76rem;
+    }
+
+    .form-section-heading h2 {
+        font-size: 1.23rem;
+    }
+
+    .form-section-heading p {
+        font-size: 0.8rem;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .form-field.full-width {
+        grid-column: auto;
+    }
+
+    .form-field label {
+        font-size: 0.84rem;
+    }
+
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+        font-size: 16px;
+    }
+
+    .form-field textarea#incidentDetails {
+        min-height: 165px;
+    }
+
+    .form-submit-section {
+        padding: 20px 0;
+    }
+
+    .form-privacy-note {
+        font-size: 0.78rem;
+    }
+
+    .button {
+        width: 100%;
+    }
+
+    .guest-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+
+        padding: 26px 20px;
+    }
+}
+
+
+/* =====================================
+   15. ACCESSIBILITY
+===================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

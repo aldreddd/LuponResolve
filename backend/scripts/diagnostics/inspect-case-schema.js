@@ -25,14 +25,12 @@ async function inspectCaseSchema() {
 
         const constraints = await pool.query(`
             SELECT
-                constraint_name,
-                constraint_type
-            FROM information_schema.table_constraints
-            WHERE table_name = 'cases'
-              AND table_schema = 'public'
-            ORDER BY constraint_type, constraint_name
+                conname AS constraint_name,
+                pg_get_constraintdef(oid) AS definition
+            FROM pg_constraint
+            WHERE conrelid = 'public.cases'::regclass
+            ORDER BY conname
         `);
-
         console.table(constraints.rows);
 
         console.log("\nSchema inspection completed.");

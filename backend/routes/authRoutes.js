@@ -37,110 +37,17 @@ const registerLimiter = rateLimit({
 });
 
 // ======================================
+// ======================================
 // POST /api/auth/register
-// Register a new resident account
+// PUBLIC REGISTRATION DISABLED
 // ======================================
 
-router.post("/register", registerLimiter, async (req, res) => {
-    try {
-        const { fullName, email, password } = req.body || {};
-
-        if (
-            typeof fullName !== "string" ||
-            typeof email !== "string" ||
-            typeof password !== "string" ||
-            !fullName.trim() ||
-            !email.trim() ||
-            !password
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Please provide a valid name, email, and password."
-            });
-        }
-
-        const cleanName = fullName.trim();
-        const cleanEmail = email.trim().toLowerCase();
-
-        if (cleanName.length < 2 || cleanName.length > 100) {
-            return res.status(400).json({
-                success: false,
-                message: "Full name must be between 2 and 100 characters."
-            });
-        }
-
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!emailPattern.test(cleanEmail)) {
-            return res.status(400).json({
-                success: false,
-                message: "Please enter a valid email address."
-            });
-        }
-
-        if (password.length < 8) {
-            return res.status(400).json({
-                success: false,
-                message: "Password must contain at least 8 characters."
-            });
-        }
-
-        if (password.length > 72) {
-            return res.status(400).json({
-                success: false,
-                message: "Password must not exceed 72 characters."
-            });
-        }
-
-        const existingUser = await pool.query(
-            "SELECT id FROM users WHERE email = $1",
-            [cleanEmail]
-        );
-
-        if (existingUser.rows.length > 0) {
-            return res.status(409).json({
-                success: false,
-                message: "This email address is already registered."
-            });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const result = await pool.query(
-            `INSERT INTO users (full_name, email, password, role)
-             VALUES ($1, $2, $3, $4)
-             RETURNING id`,
-            [cleanName, cleanEmail, hashedPassword, "resident"]
-        );
-
-        return res.status(201).json({
-            success: true,
-            message: "Resident account created successfully!",
-            user: {
-                id: result.rows[0].id,
-                fullName: cleanName,
-                email: cleanEmail,
-                role: "resident"
-            }
-        });
-
-    } catch (error) {
-        console.error("Registration error:", error);
-
-        if (error.code === "23505") {
-            return res.status(409).json({
-                success: false,
-                message: "This email address is already registered."
-            });
-        }
-
-        return res.status(500).json({
-            success: false,
-            message: "Unable to create your account."
-        });
-    }
+router.post("/register", (req, res) => {
+    return res.status(403).json({
+        success: false,
+        message: "Resident registration is disabled. Residents may submit complaints without an account."
+    });
 });
-
 // ======================================
 // TEMPORARY TEST ROUTE
 // ======================================
@@ -209,7 +116,23 @@ router.post("/login", loginLimiter, async (req, res) => {
                 message: "Invalid email or password."
             });
         }
+        // ======================================
+        // RESIDENT LOGIN DISABLED
+        // ======================================
 
+        if (user.role === "resident") {
+            return res.status(403).json({
+                success: false,
+                message: "Resident accounts no longer use login. Please file complaints through the public complaint form."
+            });
+        }
+                // Resident accounts no longer use the login portal.
+        if (user.role === "resident") {
+            return res.status(403).json({
+                success: false,
+                message: "Resident accounts no longer use login. Please file complaints through the public complaint form."
+            });
+        }
         // Regenerate session to prevent session fixation.
         req.session.regenerate((sessionError) => {
             if (sessionError) {

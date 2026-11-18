@@ -97,37 +97,40 @@ async function loadCases() {
 
         cases = data.cases.map(item => ({
 
-            backendId: item.id,
+        backendId: item.id,
 
-            caseId: item.caseNumber,
+        caseId: item.caseNumber,
 
-            complainantName: item.complainantName,
+        complainantName: item.complainantName,
+        complainantContact: item.complainantContact,
 
-            respondentName: item.respondentName,
+        respondentName: item.respondentName,
+        respondentAddress: item.respondentAddress,
+        respondentEmail: item.respondentEmail,
 
-            disputeType: item.disputeType,
+        disputeType: item.disputeType,
 
-            incidentDetails: item.incidentDetails,
+        incidentDetails: item.incidentDetails,
 
-            status: item.status,
+        status: item.status,
 
-            screeningStatus: item.screeningStatus,
+        screeningStatus: item.screeningStatus,
 
-            screeningReasons: item.screeningReasons || [],
+        screeningReasons: item.screeningReasons || [],
 
-            screeningWarnings: item.screeningWarnings || [],
+        screeningWarnings: item.screeningWarnings || [],
 
-            screeningAnswers: item.screeningAnswers || {},
+        screeningAnswers: item.screeningAnswers || {},
 
-            secretaryNotes: item.secretaryNotes || "",
+        secretaryNotes: item.secretaryNotes || "",
 
-            dateSubmitted: item.createdAt
-                ? new Date(
-                    item.createdAt.replace(" ", "T")
-                ).toLocaleDateString()
-                : "Unknown"
+        dateSubmitted: item.createdAt
+            ? new Date(
+                item.createdAt.replace(" ", "T")
+            ).toLocaleDateString()
+            : "Unknown"
 
-        }));
+    }));
 
         console.log(
             "Secretary complaints loaded from backend:",

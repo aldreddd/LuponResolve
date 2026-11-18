@@ -1,0 +1,561 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Submit a barangay complaint through LuponResolve.">
+    <title>File a Complaint | LuponResolve</title>
+
+    <link rel="stylesheet" href="css/guest-complaint.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/config.js" defer></script>
+    <script src="js/guest-complaint.js" defer></script>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header class="guest-header">
+        <a class="brand" href="index.html" aria-label="LuponResolve home">
+            <span class="brand-mark">LR</span>
+            <span>LuponResolve</span>
+        </a>
+
+        <a href="index.html" class="back-link">
+            ← Back to Home
+        </a>
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="guest-main">
+
+        <!-- INTRODUCTION -->
+        <section class="guest-intro">
+            <p class="eyebrow">PUBLIC COMPLAINT FILING</p>
+
+            <h1>File a complaint</h1>
+
+            <p>
+                Provide the details of your concern so barangay personnel
+                can conduct an initial review. You do not need a resident
+                account to submit this form.
+            </p>
+
+            <div class="guest-notice">
+                <strong>Important:</strong>
+                Submitting this form does not guarantee that your complaint
+                will be accepted for Barangay Justice System proceedings.
+                Your submission will be reviewed by authorized barangay personnel.
+            </div>
+        </section>
+
+
+        <!-- FORM -->
+        <form id="guestComplaintForm">
+
+            <!-- HONEYPOT: ANTI-SPAM FIELD -->
+            <div class="honeypot" aria-hidden="true">
+                <label for="companyWebsite">Leave this field empty</label>
+                <input
+                    type="text"
+                    id="companyWebsite"
+                    name="companyWebsite"
+                    tabindex="-1"
+                    autocomplete="off"
+                >
+            </div>
+
+
+            <!-- SECTION 1: COMPLAINANT -->
+            <section class="form-section">
+
+                <div class="form-section-heading">
+                    <span class="section-number">01</span>
+
+                    <div>
+                        <h2>Complainant information</h2>
+                        <p>Your personal information and contact details.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-field full-width">
+                        <label for="complainantName">
+                            Full name <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="complainantName"
+                            name="complainantName"
+                            maxlength="150"
+                            autocomplete="name"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="complainantContact">
+                            Contact number <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="complainantContact"
+                            name="complainantContact"
+                            maxlength="50"
+                            autocomplete="tel"
+                            placeholder="e.g. 09XXXXXXXXX"
+                            required
+                        >
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- SECTION 2: RESPONDENT -->
+            <section class="form-section">
+
+                <div class="form-section-heading">
+                    <span class="section-number">02</span>
+
+                    <div>
+                        <h2>Respondent information</h2>
+                        <p>Information about the person you are filing against.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-field full-width">
+                        <label for="respondentName">
+                            Respondent's full name <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="respondentName"
+                            name="respondentName"
+                            maxlength="150"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="respondentAddress">
+                            Respondent's address
+                        </label>
+
+                        <textarea
+                            id="respondentAddress"
+                            name="respondentAddress"
+                            maxlength="500"
+                            rows="3"
+                            placeholder="House number, street, purok, or other known address"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="respondentEmail">
+                            Respondent's email (optional)
+                        </label>
+
+                        <input
+                            type="email"
+                            id="respondentEmail"
+                            name="respondentEmail"
+                            maxlength="254"
+                            autocomplete="email"
+                        >
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- SECTION 3: DISPUTE DETAILS -->
+            <section class="form-section">
+
+                <div class="form-section-heading">
+                    <span class="section-number">03</span>
+
+                    <div>
+                        <h2>Dispute details</h2>
+                        <p>Describe what happened and the nature of your concern.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-field full-width">
+                        <label for="disputeType">
+                            Type of dispute <span class="required">*</span>
+                        </label>
+
+                        <select
+                            id="disputeType"
+                            name="disputeType"
+                            required
+                        >
+                            <option value="">Select dispute type</option>
+                            <option value="Neighbor Dispute">Neighbor Dispute</option>
+                            <option value="Noise Complaint">Noise Complaint</option>
+                            <option value="Property Dispute">Property Dispute</option>
+                            <option value="Boundary Dispute">Boundary Dispute</option>
+                            <option value="Debt or Financial Dispute">Debt or Financial Dispute</option>
+                            <option value="Family Dispute">Family Dispute</option>
+                            <option value="Harassment">Harassment</option>
+                            <option value="Physical Injury">Physical Injury</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="incidentDetails">
+                            Incident description <span class="required">*</span>
+                        </label>
+
+                        <textarea
+                            id="incidentDetails"
+                            name="incidentDetails"
+                            maxlength="10000"
+                            rows="7"
+                            placeholder="Describe what happened, when it happened, where it happened, and any relevant details..."
+                            required
+                        ></textarea>
+
+                        <small>
+                            Please provide accurate details. Avoid including unrelated
+                            personal or sensitive information.
+                        </small>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- SECTION 4: RESIDENCE / VENUE -->
+            <section class="form-section">
+
+                <div class="form-section-heading">
+                    <span class="section-number">04</span>
+
+                    <div>
+                        <h2>Residence information</h2>
+                        <p>Where you and the respondent currently reside.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-field">
+                        <label for="complainantMunicipality">
+                            Your city / municipality <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="complainantMunicipality"
+                            name="complainantMunicipality"
+                            maxlength="150"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="complainantBarangay">
+                            Your barangay <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="complainantBarangay"
+                            name="complainantBarangay"
+                            maxlength="150"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="respondentMunicipality">
+                            Respondent's city / municipality <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="respondentMunicipality"
+                            name="respondentMunicipality"
+                            maxlength="150"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-field">
+                        <label for="respondentBarangay">
+                            Respondent's barangay <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="respondentBarangay"
+                            name="respondentBarangay"
+                            maxlength="150"
+                            required
+                        >
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- SECTION 5: PRELIMINARY SCREENING -->
+            <section class="form-section">
+
+                <div class="form-section-heading">
+                    <span class="section-number">05</span>
+
+                    <div>
+                        <h2>Preliminary jurisdiction screening</h2>
+                        <p>
+                            These questions help determine whether your complaint
+                            may be handled through the Barangay Justice System.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="screening-notice">
+                    Please answer to the best of your knowledge. If you are
+                    unsure, choose "Unsure." Barangay personnel will review
+                    your responses.
+                </div>
+
+
+                <!-- GOVERNMENT PARTY -->
+                <div class="form-field full-width">
+                    <label for="governmentParty">
+                        Is one of the parties the government, or a government subdivision or instrumentality?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="governmentParty" name="governmentParty" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+
+                <!-- PUBLIC OFFICIAL -->
+                <div class="form-field full-width">
+                    <label for="publicOfficial">
+                        Does the dispute involve a public officer or employee in relation to their official functions?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="publicOfficial" name="publicOfficial" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+
+                <!-- CRIMINAL OFFENSE -->
+                <div class="form-field full-width">
+                    <label for="criminalOffense">
+                        Does the complaint involve an alleged criminal offense?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="criminalOffense" name="criminalOffense" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+
+                <!-- PENALTY THRESHOLD -->
+                <div class="form-field full-width">
+                    <label for="penaltyThreshold">
+                        Does the offense potentially carry imprisonment exceeding one year or a fine exceeding ₱5,000?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="penaltyThreshold" name="penaltyThreshold" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable</option>
+                    </select>
+                </div>
+
+
+                <!-- PRIVATE OFFENDED PARTY -->
+                <div class="form-field full-width">
+                    <label for="privateOffendedParty">
+                        Is there a private offended party?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="privateOffendedParty" name="privateOffendedParty" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable</option>
+                    </select>
+                </div>
+
+
+                <!-- REAL PROPERTY -->
+                <div class="form-field full-width">
+                    <label for="realPropertyDispute">
+                        Does the dispute involve real property?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="realPropertyDispute" name="realPropertyDispute" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+
+                <!-- PROPERTY LOCATION -->
+                <div class="form-field full-width">
+                    <label for="propertyDifferentCities">
+                        Are the properties involved located in different cities or municipalities?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="propertyDifferentCities" name="propertyDifferentCities" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable</option>
+                    </select>
+                </div>
+
+
+                <!-- PROPERTY AGREEMENT -->
+                <div class="form-field full-width">
+                    <label for="propertyPartiesAgree">
+                        If the properties are in different cities or municipalities, do both parties agree to submit the dispute to an appropriate Lupon?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="propertyPartiesAgree" name="propertyPartiesAgree" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable</option>
+                    </select>
+                </div>
+
+
+                <!-- ADJOINING BARANGAYS -->
+                <div class="form-field full-width">
+                    <label for="barangaysAdjoining">
+                        If you and the respondent live in different cities or municipalities, are your barangays adjoining?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="barangaysAdjoining" name="barangaysAdjoining" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable</option>
+                    </select>
+                </div>
+
+
+                <!-- PARTIES AGREEMENT -->
+                <div class="form-field full-width">
+                    <label for="partiesAgree">
+                        If you and the respondent live in different cities or municipalities with adjoining barangays, do both parties agree to submit the dispute to an appropriate Lupon?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="partiesAgree" name="partiesAgree" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable</option>
+                    </select>
+                </div>
+
+
+                <!-- OTHER EXCEPTIONS -->
+                <div class="form-field full-width">
+                    <label for="otherException">
+                        Are you aware of any other reason this dispute may not be handled by the Barangay Justice System?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="otherException" name="otherException" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+            </section>
+
+
+            <!-- SUBMISSION -->
+            <section class="form-submit-section">
+
+                <p class="form-privacy-note">
+                    By submitting this form, you confirm that the information
+                    provided is accurate to the best of your knowledge and
+                    consent to its use by authorized barangay personnel for
+                    complaint processing.
+                </p>
+
+                <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
+
+                <button type="submit" id="submitComplaintBtn" class="button button-primary">
+                    Submit Complaint
+                </button>
+
+                <a href="index.html" class="cancel-link">
+                    Cancel and return home
+                </a>
+
+            </section>
+
+        </form>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="guest-footer">
+        <a class="brand footer-brand" href="index.html">
+            <span class="brand-mark">LR</span>
+            <span>LuponResolve</span>
+        </a>
+
+        <p>
+            © <span id="currentYear"></span> LuponResolve. Project prototype.
+        </p>
+    </footer>
+
+</body>
+</html>

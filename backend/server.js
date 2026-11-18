@@ -151,7 +151,10 @@ app.use(
 app.get("/", (req, res) => {
     res.sendFile(path.join(PROJECT_ROOT, "index.html"));
 });
-
+// Public guest complaint form.
+app.get("/guest-complaint.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "guest-complaint.html"));
+});
 // Authentication page.
 app.get("/auth.html", (req, res) => {
     res.sendFile(path.join(PROJECT_ROOT, "auth.html"));

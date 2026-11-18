@@ -1,10 +1,11 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Login | LuponResolve</title>
+    <title>Staff Login | LuponResolve</title>
 
     <link rel="stylesheet" href="css/auth.css">
 </head>
@@ -27,18 +28,15 @@
             </div>
         </section>
 
-
         <section class="auth-panel">
 
             <div class="auth-heading">
-                <h2 id="formTitle">Welcome back!</h2>
-                <p id="formDescription">
-                    Sign in to access your account.
-                </p>
+                <h2 id="formTitle">Staff Sign In</h2>
+
+            <p id="formDescription">
+                Authorized Barangay Secretary and Lupon personnel only.
+            </p>
             </div>
-
-
-            <!-- LOGIN FORM -->
 
             <form id="loginForm">
 
@@ -48,7 +46,7 @@
                     <input
                         type="email"
                         id="loginEmail"
-                        placeholder="Enter your email"
+                        placeholder="Enter your staff email"
                         autocomplete="email"
                         required
                     >
@@ -70,96 +68,22 @@
                     Sign In
                 </button>
 
-                <p class="form-switch">
-                    Don't have an account?
-                    <button type="button" id="showRegister">
-                        Create an account
-                    </button>
-                </p>
-
             </form>
 
-
-            <!-- REGISTRATION FORM -->
-
-            <form id="registerForm" class="hidden">
-
-                <div class="form-group">
-                    <label for="registerName">Full name</label>
-
-                    <input
-                        type="text"
-                        id="registerName"
-                        placeholder="Enter your full name"
-                        minlength="2"
-                        maxlength="100"
-                        autocomplete="name"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="registerEmail">Email address</label>
-
-                    <input
-                        type="email"
-                        id="registerEmail"
-                        placeholder="Enter your email"
-                        autocomplete="email"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="registerPassword">Password</label>
-
-                    <input
-                        type="password"
-                        id="registerPassword"
-                        placeholder="At least 8 characters"
-                        minlength="8"
-                        maxlength="72"
-                        autocomplete="new-password"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="confirmPassword">Confirm password</label>
-
-                    <input
-                        type="password"
-                        id="confirmPassword"
-                        placeholder="Enter your password again"
-                        autocomplete="new-password"
-                        required
-                    >
-                </div>
-
-                <button type="submit" id="registerButton">
-                    Create Resident Account
-                </button>
-
-                <p class="form-switch">
-                    Already have an account?
-                    <button type="button" id="showLogin">
-                        Sign in
-                    </button>
-                </p>
-
-                <p class="registration-note">
-                    Public registration is currently available
-                    for residents only.
-                </p>
-
-            </form>
-
-
-            <!-- FEEDBACK MESSAGE -->
-
-            <div id="authMessage" class="auth-message hidden"
-                 role="status" aria-live="polite">
+            <div id="authMessage"
+                 class="auth-message hidden"
+                 role="status"
+                 aria-live="polite">
             </div>
+
+            <p class="form-switch">
+                Need to file a complaint?
+                <a href="guest-complaint.html">Submit without an account</a>
+            </p>
+
+            <p class="form-switch">
+                <a href="index.html">← Back to homepage</a>
+            </p>
 
         </section>
 
@@ -170,3 +94,4 @@
 
 </body>
 </html>
+```

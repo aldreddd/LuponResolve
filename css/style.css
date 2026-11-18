@@ -976,3 +976,178 @@ a.service-card .coming-soon {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ==========================================
+   LUPONRESOLVE — SUCCESS NOTIFICATION CARD
+========================================== */
+
+#formMessage.message.success {
+    display: block;
+    width: 100%;
+    max-width: 760px;
+    margin: 30px auto;
+    padding: 0;
+    background: transparent;
+    color: #1f2937;
+    border: none;
+    box-shadow: none;
+    white-space: normal;
+}
+
+#formMessage .success-card {
+    width: 100%;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #d1e7d8;
+    border-radius: 16px;
+    box-shadow: 0 10px 35px rgba(15, 23, 42, 0.09);
+}
+
+/* HEADER */
+
+#formMessage .success-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 26px 28px;
+    background: #f0fdf4;
+    border-bottom: 1px solid #dcfce7;
+}
+
+#formMessage .success-icon {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #ffffff;
+    font-size: 27px;
+    font-weight: 700;
+}
+
+#formMessage .success-card-header h2 {
+    margin: 0 0 5px;
+    color: #166534;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+#formMessage .success-card-header p {
+    margin: 0;
+    color: #4b6352;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* CARD BODY */
+
+#formMessage .success-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 28px;
+}
+
+/* TRACKING DETAILS */
+
+#formMessage .tracking-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 17px 19px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+#formMessage .tracking-detail span,
+#formMessage .screening-result span {
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+#formMessage .tracking-detail strong {
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+#formMessage .tracking-code-detail strong {
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+/* PRIVACY NOTICE */
+
+#formMessage .privacy-notice {
+    padding: 19px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 4px solid #d97706;
+    border-radius: 10px;
+}
+
+#formMessage .privacy-notice strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #92400e;
+    font-size: 14px;
+}
+
+#formMessage .privacy-notice p {
+    margin: 0;
+    color: #78350f;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* SCREENING RESULT */
+
+#formMessage .screening-result {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 19px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+}
+
+#formMessage .screening-result strong {
+    color: #1e40af;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 600px) {
+
+    #formMessage .success-card-header {
+        padding: 20px;
+        align-items: flex-start;
+    }
+
+    #formMessage .success-card-header h2 {
+        font-size: 18px;
+    }
+
+    #formMessage .success-card-body {
+        padding: 18px;
+        gap: 14px;
+    }
+
+    #formMessage .tracking-detail strong {
+        font-size: 17px;
+    }
+
+    #formMessage .tracking-code-detail strong {
+        font-size: 12px;
+    }
+}
