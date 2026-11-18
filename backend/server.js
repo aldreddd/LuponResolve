@@ -155,6 +155,12 @@ app.get("/", (req, res) => {
 app.get("/guest-complaint.html", (req, res) => {
     res.sendFile(path.join(PROJECT_ROOT, "guest-complaint.html"));
 });
+
+// Public case tracking page.
+app.get("/track-case.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "track-case.html"));
+});
+
 // Authentication page.
 app.get("/auth.html", (req, res) => {
     res.sendFile(path.join(PROJECT_ROOT, "auth.html"));
