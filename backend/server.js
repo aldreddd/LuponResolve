@@ -151,6 +151,11 @@ app.use(
 app.get("/", (req, res) => {
     res.sendFile(path.join(PROJECT_ROOT, "index.html"));
 });
+ // Also serve the homepage through /index.html.
+app.get("/index.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "index.html"));
+});
+
 // Public guest complaint form.
 app.get("/guest-complaint.html", (req, res) => {
     res.sendFile(path.join(PROJECT_ROOT, "guest-complaint.html"));
