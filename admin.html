@@ -1,0 +1,466 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="LuponResolve Administrator Dashboard"
+    >
+
+    <title>Administrator Dashboard | LuponResolve</title>
+
+    <link rel="stylesheet" href="css/admin.css">
+
+    <script src="js/config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/admin.js" defer></script>
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- SIDEBAR -->
+        <aside class="admin-sidebar">
+
+            <div class="sidebar-brand">
+
+                <div class="brand-icon">LR</div>
+
+                <div>
+                    <h2>LuponResolve</h2>
+                    <span>ADMINISTRATION</span>
+                </div>
+
+            </div>
+
+
+            <div class="sidebar-section-label">
+                MAIN MENU
+            </div>
+
+            <nav class="sidebar-navigation">
+
+                <a href="#overview" class="nav-link active">
+                    <span class="nav-icon">▦</span>
+                    Overview
+                </a>
+
+                <a href="#users" class="nav-link">
+                    <span class="nav-icon">♙</span>
+                    User Management
+                </a>
+
+                <a href="#cases" class="nav-link">
+                    <span class="nav-icon">▤</span>
+                    Case Oversight
+                </a>
+
+                <a href="#hearings" class="nav-link">
+                    <span class="nav-icon">▣</span>
+                    Hearing Overview
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-section-label">
+                SYSTEM
+            </div>
+
+            <nav class="sidebar-navigation">
+
+                <a href="#activity" class="nav-link">
+                    <span class="nav-icon">◷</span>
+                    Recent Activity
+                </a>
+
+                <a href="#settings" class="nav-link">
+                    <span class="nav-icon">⚙</span>
+                    System Information
+                </a>
+
+            </nav>
+
+
+            <div class="sidebar-bottom">
+
+                <div class="admin-profile">
+
+                    <div class="profile-avatar">A</div>
+
+                    <div class="profile-details">
+                        <strong id="adminName">Administrator</strong>
+                        <span>System Administrator</span>
+                    </div>
+
+                </div>
+
+                <button
+                    type="button"
+                    id="logoutButton"
+                    class="logout-button"
+                >
+                    ↪ Log Out
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="admin-main">
+
+            <header class="admin-header">
+
+                <div>
+                    <p class="header-eyebrow">
+                        BARANGAY JUSTICE SYSTEM
+                    </p>
+
+                    <h1>Administrator Dashboard</h1>
+
+                    <p class="header-description">
+                        Monitor system operations and manage staff accounts.
+                    </p>
+                </div>
+
+
+                <div class="header-actions">
+
+                    <div class="system-status">
+                        <span class="status-indicator"></span>
+                        System Dashboard
+                    </div>
+
+                    <div class="header-avatar">A</div>
+
+                </div>
+
+            </header>
+
+
+            <!-- OVERVIEW -->
+            <section id="overview" class="dashboard-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <h2>Overview</h2>
+                        <p>Current system statistics and case summary.</p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="refreshButton"
+                        class="secondary-button"
+                    >
+                        ↻ Refresh Data
+                    </button>
+
+                </div>
+
+
+                <div id="dashboardMessage" class="dashboard-message hidden"></div>
+
+
+                <!-- CASE STATISTICS -->
+                <div class="statistics-grid">
+
+                    <article class="stat-card">
+
+                        <div class="stat-card-top">
+                            <span>Total Cases</span>
+                            <span class="stat-icon blue">▤</span>
+                        </div>
+
+                        <strong id="totalCases">—</strong>
+
+                        <small>All submitted complaints</small>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-card-top">
+                            <span>Pending Review</span>
+                            <span class="stat-icon orange">◷</span>
+                        </div>
+
+                        <strong id="pendingCases">—</strong>
+
+                        <small>Awaiting staff review</small>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-card-top">
+                            <span>Active Proceedings</span>
+                            <span class="stat-icon purple">⚖</span>
+                        </div>
+
+                        <strong id="activeCases">—</strong>
+
+                        <small>Mediation, conciliation and arbitration</small>
+
+                    </article>
+
+
+                    <article class="stat-card">
+
+                        <div class="stat-card-top">
+                            <span>Resolved Cases</span>
+                            <span class="stat-icon green">✓</span>
+                        </div>
+
+                        <strong id="resolvedCases">—</strong>
+
+                        <small>Cases marked resolved</small>
+
+                    </article>
+
+                </div>
+
+
+                <!-- STAFF STATISTICS -->
+                <div class="section-heading subsection-heading">
+
+                    <div>
+                        <h2>Staff Accounts</h2>
+                        <p>Registered personnel in the system.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="staff-grid">
+
+                    <article class="staff-card">
+                        <span>Secretaries</span>
+                        <strong id="secretaryCount">—</strong>
+                    </article>
+
+                    <article class="staff-card">
+                        <span>Lupon Members</span>
+                        <strong id="luponCount">—</strong>
+                    </article>
+
+                    <article class="staff-card">
+                        <span>Administrators</span>
+                        <strong id="administratorCount">—</strong>
+                    </article>
+
+                    <article class="staff-card total-staff-card">
+                        <span>Total Staff</span>
+                        <strong id="totalStaff">—</strong>
+                    </article>
+
+                </div>
+
+
+                <!-- ADDITIONAL CASE SUMMARY -->
+                <div class="section-heading subsection-heading">
+
+                    <div>
+                        <h2>Case Distribution</h2>
+                        <p>Additional case workflow statistics.</p>
+                    </div>
+
+                </div>
+
+
+                <div class="distribution-grid">
+
+                    <div class="distribution-item">
+                        <span>Under Review</span>
+                        <strong id="underReviewCases">—</strong>
+                    </div>
+
+                    <div class="distribution-item">
+                        <span>Awaiting Clarification</span>
+                        <strong id="awaitingCases">—</strong>
+                    </div>
+
+                    <div class="distribution-item">
+                        <span>Ready for Lupon</span>
+                        <strong id="readyCases">—</strong>
+                    </div>
+
+                    <div class="distribution-item">
+                        <span>Certificate to File Action</span>
+                        <strong id="certificateCases">—</strong>
+                    </div>
+
+                    <div class="distribution-item">
+                        <span>Closed Cases</span>
+                        <strong id="closedCases">—</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- USER MANAGEMENT -->
+            <section id="users" class="dashboard-section secondary-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>User Management</h2>
+                        <p>Manage authorized Secretary and Lupon accounts.</p>
+                    </div>
+                </div>
+
+                <div class="placeholder-panel">
+                    <span class="placeholder-icon">♙</span>
+                    <h3>Staff Account Management</h3>
+                    <p>
+                        Staff account listing and account creation
+                        will be implemented in the next milestone.
+                    </p>
+                </div>
+
+            </section>
+
+
+            <!-- CASE OVERSIGHT -->
+            <section id="cases" class="dashboard-section secondary-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Case Oversight</h2>
+                        <p>Monitor all registered barangay complaints.</p>
+                    </div>
+                </div>
+
+                <div class="placeholder-panel">
+                    <span class="placeholder-icon">▤</span>
+                    <h3>Case Monitoring</h3>
+                    <p>
+                        Searchable case records and workflow monitoring
+                        will be implemented in the next milestone.
+                    </p>
+                </div>
+
+            </section>
+
+
+            <!-- HEARING OVERVIEW -->
+            <section id="hearings" class="dashboard-section secondary-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Hearing Overview</h2>
+                        <p>Monitor scheduled and upcoming hearings.</p>
+                    </div>
+                </div>
+
+                <div class="placeholder-panel">
+                    <span class="placeholder-icon">▣</span>
+                    <h3>Hearing Monitoring</h3>
+                    <p>
+                        Hearing statistics and schedules will be
+                        connected to the existing hearing API later.
+                    </p>
+                </div>
+
+            </section>
+
+
+            <!-- RECENT ACTIVITY -->
+            <section id="activity" class="dashboard-section secondary-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>Recent Case Activity</h2>
+                        <p>The latest five submitted complaints.</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Case Number</th>
+                                <th>Dispute Type</th>
+                                <th>Status</th>
+                                <th>Case Stage</th>
+                                <th>Date Submitted</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="recentCasesBody">
+
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    Loading recent cases...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+
+            <!-- SYSTEM INFORMATION -->
+            <section id="settings" class="dashboard-section secondary-section">
+
+                <div class="section-heading">
+                    <div>
+                        <h2>System Information</h2>
+                        <p>Application environment information.</p>
+                    </div>
+                </div>
+
+                <div class="system-info-grid">
+
+                    <div class="system-info-card">
+                        <span>Application</span>
+                        <strong>LuponResolve</strong>
+                    </div>
+
+                    <div class="system-info-card">
+                        <span>Backend</span>
+                        <strong>Node.js / Express</strong>
+                    </div>
+
+                    <div class="system-info-card">
+                        <span>Database</span>
+                        <strong>Neon PostgreSQL</strong>
+                    </div>
+
+                    <div class="system-info-card">
+                        <span>Authentication</span>
+                        <strong>Session-based</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <footer class="admin-footer">
+                LuponResolve Administration Portal
+                <span>Barangay Justice System</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+</body>
+</html>

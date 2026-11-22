@@ -38,20 +38,18 @@ function hideMessage() {
 // ROLE-BASED REDIRECTION
 // ======================================
 
+
+// ======================================
+// ROLE-BASED REDIRECTION
+// ======================================
+
 function redirectByRole(role) {
 
     const destinations = {
         secretary: "secretary.html",
-        lupon: "lupon.html"
+        lupon: "lupon.html",
+        admin: "admin.html"
     };
-
-    if (role === "admin") {
-        showMessage(
-            "Login successful, but the Administrator Dashboard has not been built yet.",
-            "success"
-        );
-        return;
-    }
 
     if (role === "resident") {
         showMessage(
@@ -73,6 +71,7 @@ function redirectByRole(role) {
 
     window.location.href = destination;
 }
+
 
 
 // ======================================

@@ -24,6 +24,7 @@ const roleRoutes = require("./routes/roleRoutes");
 const caseRoutes = require("./routes/caseRoutes");
 const hearingRoutes = require("./routes/hearingRoutes");
 const gmailRoutes = require("./routes/gmailRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 
 // ======================================
@@ -124,6 +125,9 @@ app.use("/api/hearings", hearingRoutes);
 
 app.use("/api/gmail", gmailRoutes);
 
+// Administrator dashboard routes.
+app.use("/api/admin", adminRoutes);
+
 
 // ======================================
 // FRONTEND STATIC ASSETS
@@ -189,6 +193,9 @@ app.get("/lupon.html", (req, res) => {
 // Case workflow page.
 app.get("/workflow.html", (req, res) => {
     res.sendFile(path.join(PROJECT_ROOT, "workflow.html"));
+});
+app.get("/admin.html", (req, res) => {
+    res.sendFile(path.join(PROJECT_ROOT, "admin.html"));
 });
 
 

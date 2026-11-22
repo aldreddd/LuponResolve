@@ -11,6 +11,7 @@ const pagePermissions = {
     "workflow.html": ["secretary", "admin"],
     "lupon.html": ["lupon", "admin"],
     "resident.html": ["resident", "admin"],
+    "admin.html": ["admin"]
 };
 
 // Identify the current page
@@ -96,9 +97,10 @@ async function verifyDashboardAccess() {
         if (!allowedRoles.includes(userRole)) {
 
             const roleDestinations = {
-                resident: "resident.html",
+                resident: "guest-complaint.html",
                 secretary: "secretary.html",
-                lupon: "lupon.html"
+                lupon: "lupon.html",
+                admin: "admin.html"
             };
 
             const destination = roleDestinations[userRole];
