@@ -19,6 +19,7 @@ const PgSession = require("connect-pg-simple")(session);
 
 const pool = require("./config/postgres");
 
+const initializePostgresSchema = require("./config/postgresSchema");
 const authRoutes = require("./routes/authRoutes");
 const roleRoutes = require("./routes/roleRoutes");
 const caseRoutes = require("./routes/caseRoutes");
@@ -199,10 +200,34 @@ app.get("/admin.html", (req, res) => {
 });
 
 
+
 // ======================================
 // START SERVER
 // ======================================
 
-app.listen(PORT, () => {
-    console.log(`LuponResolve server running on port ${PORT}`);
-});
+async function startServer() {
+
+    try {
+
+        // Initialize PostgreSQL tables and indexes.
+        await initializePostgresSchema();
+
+        // Start Express only after database initialization succeeds.
+        app.listen(PORT, () => {
+            console.log(`LuponResolve server running on port ${PORT}`);
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Unable to initialize LuponResolve database:",
+            error
+        );
+
+        process.exit(1);
+
+    }
+
+}
+
+startServer();

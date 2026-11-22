@@ -3,15 +3,24 @@
 // LUPONRESOLVE API CONFIGURATION
 // ======================================
 
-// Local development uses the separate Express server.
-// Deployment uses the same domain as the frontend.
+// Detect local development regardless of Live Server port.
+const isLocalDevelopment = [
+    "127.0.0.1",
+    "localhost"
+].includes(window.location.hostname);
 
-window.API_BASE_URL =
-    window.location.port === "5500"
-        ? "http://127.0.0.1:3000"
-        : "";
+// Local development uses the separate Express backend.
+// Production uses the same domain as the frontend.
 
-// API endpoint shortcuts
+window.API_BASE_URL = isLocalDevelopment
+    ? "http://127.0.0.1:3000"
+    : "";
+
+
+// ======================================
+// API ENDPOINT SHORTCUTS
+// ======================================
+
 window.API = {
     auth: `${window.API_BASE_URL}/api/auth`,
     cases: `${window.API_BASE_URL}/api/cases`,

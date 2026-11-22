@@ -1096,4 +1096,114 @@ router.get(
     }
 );
 
+
+ 
+// ======================================
+// ADMINISTRATOR — RECENT ACTIVITY
+// GET /api/admin/activity
+// ADMIN ONLY
+// ======================================
+
+router.get(
+    "/activity",
+    requireAuth,
+    requireAdmin,
+    async (req, res) => {
+
+        try {
+
+            const page = Number.parseInt(req.query.page, 10) || 1;
+            const limit = Number.parseInt(req.query.limit, 10) || 20;
+
+            if (
+                !Number.isInteger(page) ||
+                page < 1 ||
+                !Number.isInteger(limit) ||
+                limit < 1 ||
+                limit > 100
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid pagination settings."
+                });
+            }
+
+            const offset = (page - 1) * limit;
+
+            const countResult = await pool.query(`
+                SELECT COUNT(*) AS total
+                FROM audit_logs
+            `);
+
+            const totalActivities = Number(
+                countResult.rows[0].total
+            );
+
+            const activityResult = await pool.query(
+                `
+                SELECT
+                    id,
+                    actor_user_id,
+                    actor_name,
+                    actor_role,
+                    action,
+                    entity_type,
+                    entity_id,
+                    description,
+                    metadata,
+                    created_at
+                FROM audit_logs
+                ORDER BY created_at DESC, id DESC
+                LIMIT $1
+                OFFSET $2
+                `,
+                [limit, offset]
+            );
+
+            return res.status(200).json({
+
+                success: true,
+
+                pagination: {
+                    currentPage: page,
+                    limit,
+                    totalActivities,
+                    totalPages: Math.ceil(
+                        totalActivities / limit
+                    )
+                },
+
+                activities: activityResult.rows.map(item => ({
+                    id: item.id,
+                    actorUserId: item.actor_user_id,
+                    actorName: item.actor_name,
+                    actorRole: item.actor_role,
+                    action: item.action,
+                    entityType: item.entity_type,
+                    entityId: item.entity_id,
+                    description: item.description,
+                    metadata: item.metadata,
+                    createdAt: item.created_at
+                }))
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Administrator activity log error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message: "Unable to retrieve activity records."
+            });
+
+        }
+
+    }
+);
+
+
 module.exports = router;
