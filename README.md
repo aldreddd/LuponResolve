@@ -1,20 +1,15 @@
 # LuponResolve
 
-# LuponResolve
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46B37B?style=flat)](https://luponresolve.onrender.com/)
+[![Database](https://img.shields.io/badge/Database-Neon%20PostgreSQL-00E699?style=flat)](https://neon.tech/)
+[![Backend](https://img.shields.io/badge/Backend-Node.js%20%7C%20Express-339933?style=flat)](https://nodejs.org/)
+[![Frontend](https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JavaScript-E34F26?style=flat)](https://developer.mozilla.org/)
+[![Evidence Storage](https://img.shields.io/badge/Evidence%20Storage-Supabase-3ECF8E?style=flat)](https://supabase.com/)
+[![Email Notifications](https://img.shields.io/badge/Email-Gmail%20API%20%7C%20OAuth-EA4335?style=flat)](https://developers.google.com/gmail/api)
+[![Deployment](https://img.shields.io/badge/Deployment-Render-46E3B7?style=flat)](https://render.com/)
+[![Version Control](https://img.shields.io/badge/Version%20Control-GitHub-181717?style=flat)](https://github.com/aldreddd/LuponResolve)
 
-<p align="center">
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5">
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript">
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js">
-  <img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white" alt="Express.js">
-  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
-  <img src="https://img.shields.io/badge/Neon-00E599?style=for-the-badge&logo=neon&logoColor=black" alt="Neon">
-  <img src="https://img.shields.io/badge/Supabase_Storage-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase Storage">
-  <img src="https://img.shields.io/badge/Gmail_API-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Gmail API">
-  <img src="https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=black" alt="Render">
-  <img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-</p>
+**Barangay Dispute Resolution and Case Management System**
 
 <p align="center">
   <strong>Barangay Dispute Resolution and Case Management System</strong>
