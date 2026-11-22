@@ -1719,9 +1719,9 @@ router.post(
 // ======================================
 
 router.get(
-    "/cases",
+    "/admin/cases",
     requireAuth,
-    requireAdmin,
+    requireRole("admin"),
     async (req, res) => {
 
         try {
