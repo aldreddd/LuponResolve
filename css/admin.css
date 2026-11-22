@@ -1496,3 +1496,183 @@ tbody tr:last-child td {
     }
 
 }
+
+/* ======================================
+   CASE OVERSIGHT — DESIGN POLISH
+====================================== */
+
+/* SUMMARY CARDS */
+
+.case-summary-card {
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.case-summary-card:hover {
+    border-color: #cbdad2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 16px rgba(25, 55, 43, 0.05);
+}
+
+.case-summary-card strong {
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* FILTER PANEL */
+
+.case-filter-panel {
+    box-shadow: 0 2px 8px rgba(25, 55, 43, 0.025);
+}
+
+.case-search-field input,
+.case-select-field select {
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+}
+
+.case-search-field input:hover,
+.case-select-field select:hover {
+    border-color: #c4d3ca;
+}
+
+.case-search-field input:focus-visible,
+.case-select-field select:focus-visible {
+    outline: 2px solid rgba(23, 72, 63, 0.15);
+    outline-offset: 2px;
+}
+
+/* CLEAR FILTER BUTTON */
+
+#clearCaseFiltersButton {
+    transition: background 0.2s ease,
+                border-color 0.2s ease,
+                color 0.2s ease;
+}
+
+#clearCaseFiltersButton:hover {
+    background: var(--admin-primary-light);
+    border-color: #c7d9cf;
+}
+
+
+/* CASE TABLE */
+
+.case-table-panel {
+    box-shadow: 0 2px 8px rgba(25, 55, 43, 0.025);
+}
+
+.case-oversight-table th {
+    position: relative;
+    padding-top: 17px;
+    padding-bottom: 17px;
+}
+
+.case-oversight-table td {
+    line-height: 1.5;
+}
+
+.case-oversight-table tbody tr:hover td {
+    color: var(--admin-text);
+}
+
+.case-oversight-table tbody tr:hover .case-number {
+    color: #10372f;
+}
+
+
+/* CASE NUMBER EMPHASIS */
+
+.case-oversight-table .case-number {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.15px;
+}
+
+
+/* STATUS BADGES */
+
+.case-oversight-table .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 25px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.1px;
+}
+
+
+/* WORKFLOW BADGES */
+
+.workflow-stage-badge {
+    border: 1px solid rgba(23, 72, 63, 0.08);
+}
+
+
+/* PAGINATION */
+
+.case-pagination {
+    background: #fcfdfc;
+}
+
+.case-pagination > span {
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.case-pagination-actions button {
+    transition: background 0.2s ease,
+                color 0.2s ease,
+                border-color 0.2s ease,
+                opacity 0.2s ease;
+}
+
+.case-pagination-actions button:not(:disabled):hover {
+    background: var(--admin-primary-light);
+    border-color: #c7d9cf;
+    color: var(--admin-primary);
+}
+
+.case-pagination-actions button:focus-visible,
+#refreshCasesButton:focus-visible,
+#clearCaseFiltersButton:focus-visible {
+    outline: 2px solid var(--admin-primary);
+    outline-offset: 3px;
+}
+
+
+/* LOADING AND EMPTY STATES */
+
+.case-oversight-table .empty-state {
+    padding: 45px 20px;
+    line-height: 1.7;
+}
+
+
+/* RESPONSIVE POLISH */
+
+@media (max-width: 760px) {
+
+    .case-oversight-summary {
+        gap: 10px;
+    }
+
+    .case-filter-heading {
+        margin-bottom: 17px;
+    }
+
+    .case-pagination {
+        padding: 16px;
+    }
+
+    .case-pagination-actions {
+        gap: 8px;
+    }
+
+}
