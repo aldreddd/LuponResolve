@@ -671,6 +671,21 @@ function renderComplaintDetails(caseId) {
 
             </div>
 
+            <!-- CASE EVIDENCE -->
+            <div class="detail-card detail-wide evidence-card">
+
+                <h3>Supporting Evidence</h3>
+
+                <p>
+                    Documents and images submitted with this complaint.
+                </p>
+
+                <div id="caseEvidenceList">
+                    <p>Loading evidence attachments...</p>
+                </div>
+
+            </div>
+
         </div>
 
 
@@ -766,7 +781,8 @@ function renderComplaintDetails(caseId) {
 
     `;
 
-
+    // Load evidence attachments for this complaint.
+    loadCaseEvidence(complaint.backendId);        
     // Set current administrative status
     document.getElementById("newCaseStatus").value =
         complaint.status || "Pending Review";
@@ -782,6 +798,102 @@ loadLuponMembers();
 document.getElementById("assignLuponButton")
     .addEventListener("click", assignCaseToLupon);
 }
+
+
+// ======================================
+// LOAD CASE EVIDENCE
+// ======================================
+
+async function loadCaseEvidence(backendCaseId) {
+
+    const evidenceContainer = document.getElementById(
+        "caseEvidenceList"
+    );
+
+    if (!evidenceContainer) {
+        return;
+    }
+
+    evidenceContainer.innerHTML =
+        "<p>Loading evidence attachments...</p>";
+
+    try {
+
+        const response = await fetch(
+            `${window.API.cases}/${backendCaseId}/evidence`,
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(
+                data.message || "Unable to load evidence."
+            );
+        }
+
+        if (!data.evidence || data.evidence.length === 0) {
+
+            evidenceContainer.innerHTML = `
+                <p>No supporting evidence was attached to this complaint.</p>
+            `;
+
+            return;
+        }
+
+        evidenceContainer.innerHTML = data.evidence.map(file => {
+
+            const sizeMB = (
+                Number(file.fileSize) / (1024 * 1024)
+            ).toFixed(2);
+
+            return `
+                <div class="evidence-file-row">
+
+                    <div class="evidence-file-information">
+
+                        <strong>
+                            ${escapeHTML(file.filename)}
+                        </strong>
+
+                        <span>
+                            ${escapeHTML(file.mimeType)}
+                            · ${sizeMB} MB
+                        </span>
+
+                    </div>
+
+                    <a
+                        href="${escapeHTML(file.url)}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="secretary-view-button"
+                    >
+                        Open / Download
+                    </a>
+
+                </div>
+            `;
+
+        }).join("");
+
+    } catch (error) {
+
+        console.error("Case evidence loading error:", error);
+
+        evidenceContainer.innerHTML = `
+            <p class="secretary-action-message error">
+                ${escapeHTML(error.message)}
+            </p>
+        `;
+
+    }
+
+}
+
 
 // ======================================
 // LOAD LUPON MEMBERS

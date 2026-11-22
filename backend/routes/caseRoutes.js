@@ -10,6 +10,18 @@ const {
     requireAuth,
     requireRole
 } = require("../middleware/authMiddleware");
+const {
+    uploadEvidence
+} = require("../middleware/evidenceUpload");
+
+const {
+    validateEvidenceFiles
+} = require("../middleware/evidenceUpload");
+
+const {
+    supabase,
+    supabaseBucket
+} = require("../config/supabase");
 
 // ======================================
 // GUEST COMPLAINT RATE LIMITER
@@ -37,6 +49,42 @@ const publicTrackingLimiter = rateLimit({
         message: "Too many tracking attempts. Please try again later."
     }
 });
+
+// ======================================
+// EVIDENCE UPLOAD ERROR HANDLER
+// ======================================
+
+function handleEvidenceUpload(req, res, next) {
+    uploadEvidence(req, res, (error) => {
+        if (!error) {
+            return next();
+        }
+
+        console.error("Evidence upload validation error:", error.message);
+
+        if (error.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({
+                success: false,
+                message: "Each evidence file must not exceed 5 MB."
+            });
+        }
+
+        if (
+            error.code === "LIMIT_FILE_COUNT" ||
+            error.code === "LIMIT_UNEXPECTED_FILE"
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "You can upload a maximum of 5 evidence files."
+            });
+        }
+
+        return res.status(400).json({
+            success: false,
+            message: error.message || "Invalid evidence upload."
+        });
+    });
+}
 // ======================================
 // HELPER FUNCTIONS
 // ======================================
@@ -109,7 +157,9 @@ function formatCase(row) {
 // Execute multiple database operations as one transaction.
 async function withTransaction(callback) {
     const client = await pool.connect();
-
+    // Keep track of uploaded files so they can be removed
+    // if the database transaction fails.
+    const uploadedStorageKeys = [];
     try {
         await client.query("BEGIN");
 
@@ -294,7 +344,11 @@ router.post("/track", publicTrackingLimiter, async (req, res) => {
         });
     }
 });
-router.post("/guest", guestComplaintLimiter, async (req, res) => {
+router.post(
+    "/guest",
+    guestComplaintLimiter,
+    handleEvidenceUpload,
+    async (req, res) => {
         // Honeypot anti-spam check
     if (req.body.companyWebsite) {
         return res.status(400).json({
@@ -302,16 +356,28 @@ router.post("/guest", guestComplaintLimiter, async (req, res) => {
             message: "Invalid submission."
         });
     }
-    const {
-        complainantName,
-        complainantContact,
-        respondentName,
-        respondentAddress,
-        respondentEmail,
-        disputeType,
-        incidentDetails,
+    let {
+    complainantName,
+    complainantContact,
+    respondentName,
+    respondentAddress,
+    respondentEmail,
+    disputeType,
+    incidentDetails,
         screeningAnswers
     } = req.body;
+
+    // FormData sends screeningAnswers as a JSON string.
+    if (typeof screeningAnswers === "string") {
+        try {
+            screeningAnswers = JSON.parse(screeningAnswers);
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid complaint screening information."
+            });
+        }
+}
 
     // ----------------------------------
     // VALIDATE REQUIRED FIELDS
@@ -451,7 +517,18 @@ router.post("/guest", guestComplaintLimiter, async (req, res) => {
             });
         }
     }
+    // ----------------------------------
+// VALIDATE EVIDENCE FILE CONTENTS
+// ----------------------------------
 
+try {
+    await validateEvidenceFiles(req.files || []);
+} catch (error) {
+    return res.status(400).json({
+        success: false,
+        message: error.message
+    });
+}
     // ----------------------------------
     // SERVER-SIDE SCREENING
     // Never trust screening results from
@@ -468,8 +545,10 @@ router.post("/guest", guestComplaintLimiter, async (req, res) => {
 
     const client = await pool.connect();
 
-    try {
+    // Track uploaded files so we can remove them if submission fails.
+    const uploadedStorageKeys = [];
 
+    try {
         await client.query("BEGIN");
 
         const insertResult = await client.query(
@@ -529,6 +608,137 @@ router.post("/guest", guestComplaintLimiter, async (req, res) => {
             [caseNumber, caseId]
         );
 
+        // ----------------------------------
+        // UPLOAD EVIDENCE TO SUPABASE
+        // ----------------------------------
+
+        const evidenceFiles = req.files || [];
+
+        for (const file of evidenceFiles) {
+
+            // Determine a safe extension from the validated MIME type.
+            const extensionByMimeType = {
+                "image/jpeg": "jpg",
+                "image/png": "png",
+                "application/pdf": "pdf"
+            };
+
+            const extension = extensionByMimeType[file.mimetype];
+
+            if (!extension) {
+                throw new Error("Unsupported evidence file type.");
+            }
+
+            // Generate a unique storage key.
+            const storageKey =
+                `${caseId}/${crypto.randomUUID()}.${extension}`;
+
+            // Upload the actual file to the private Supabase bucket.
+            const { error: storageError } = await supabase.storage
+                .from(supabaseBucket)
+                .upload(storageKey, file.buffer, {
+                    contentType: file.mimetype,
+                    upsert: false
+                });
+
+            if (storageError) {
+                throw storageError;
+            }
+
+            // Record successful uploads for possible cleanup.
+            uploadedStorageKeys.push(storageKey);
+
+            // Sanitize the original filename for display.
+            const originalFilename = file.originalname
+                .replace(/\\/g, "/")
+                .split("/")
+                .pop()
+                .replace(/[\u0000-\u001f\u007f]/g, "")
+                .slice(0, 255) || "evidence";
+
+            // Save file metadata in Neon PostgreSQL.
+            await client.query(
+                `INSERT INTO case_evidence (
+                    case_id,
+                    uploaded_by,
+                    original_filename,
+                    storage_key,
+                    mime_type,
+                    file_size,
+                    uploader_type
+                )
+                VALUES ($1, NULL, $2, $3, $4, $5, 'guest')`,
+                [
+                    caseId,
+                    originalFilename,
+                    storageKey,
+                    file.mimetype,
+                    file.size
+                ]
+            );
+        }
+        // ----------------------------------
+        // UPLOAD EVIDENCE TO SUPABASE
+        // ----------------------------------
+
+        for (const file of req.files || []) {
+            const extensionByMimeType = {
+                "image/jpeg": "jpg",
+                "image/png": "png",
+                "application/pdf": "pdf"
+            };
+
+            const extension = extensionByMimeType[file.mimetype];
+
+            const storageKey =
+                `${caseId}/${crypto.randomUUID()}.${extension}`;
+
+            // Upload actual file to private Supabase Storage.
+            const { error: storageError } = await supabase.storage
+                .from(supabaseBucket)
+                .upload(storageKey, file.buffer, {
+                    contentType: file.mimetype,
+                    upsert: false
+                });
+
+            if (storageError) {
+                throw storageError;
+            }
+
+            // Track uploaded files for cleanup if something fails.
+            uploadedStorageKeys.push(storageKey);
+
+            // Safely store the original filename for display.
+            const originalFilename = file.originalname
+                .replace(/\\/g, "/")
+                .split("/")
+                .pop()
+                .replace(/[\u0000-\u001f\u007f]/g, "")
+                .slice(0, 255);
+
+            // Save file metadata in Neon PostgreSQL.
+            await client.query(
+                `
+                    INSERT INTO case_evidence (
+                        case_id,
+                        uploaded_by,
+                        original_filename,
+                        storage_key,
+                        mime_type,
+                        file_size,
+                        uploader_type
+                    )
+                    VALUES ($1, NULL, $2, $3, $4, $5, 'guest')
+                `,
+                [
+                    caseId,
+                    originalFilename,
+                    storageKey,
+                    file.mimetype,
+                    file.size
+                ]
+            );
+        }
         await client.query("COMMIT");
 
         return res.status(201).json({
@@ -540,20 +750,30 @@ router.post("/guest", guestComplaintLimiter, async (req, res) => {
         });
 
     } catch (error) {
+    await client.query("ROLLBACK");
 
-        await client.query("ROLLBACK");
+    // Remove any files that were uploaded before the failure.
+    if (uploadedStorageKeys.length > 0) {
+        const { error: cleanupError } = await supabase.storage
+            .from(supabaseBucket)
+            .remove(uploadedStorageKeys);
 
-        console.error("Guest complaint submission error:", error);
+        if (cleanupError) {
+            console.error(
+                "Evidence cleanup failed:",
+                cleanupError.message
+            );
+        }
+    }
 
-        return res.status(500).json({
-            success: false,
-            message: "Unable to submit complaint at this time."
-        });
+    console.error("Guest complaint submission error:", error);
 
+    return res.status(500).json({
+        success: false,
+        message: "Failed to submit complaint."
+    });
     } finally {
-
         client.release();
-
     }
 
 });
@@ -1710,5 +1930,118 @@ router.post(
         }
     }
 );
+
+// ======================================
+// GET CASE EVIDENCE
+// Authorized staff only
+// ======================================
+
+router.get("/:id/evidence", requireAuth, async (req, res) => {
+    try {
+        const caseId = Number(req.params.id);
+
+        if (!Number.isInteger(caseId) || caseId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid case ID."
+            });
+        }
+
+        const userId = req.session.user.id;
+        const userRole = req.session.user.role;
+
+        // Confirm that the case exists.
+        const caseResult = await pool.query(
+            `SELECT id FROM cases WHERE id = $1`,
+            [caseId]
+        );
+
+        if (caseResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Case not found."
+            });
+        }
+
+        // Secretaries and admins can access all case evidence.
+        let authorized =
+            userRole === "secretary" ||
+            userRole === "admin";
+
+        // Lupon members can access evidence only for assigned cases.
+        if (userRole === "lupon") {
+            const assignmentResult = await pool.query(
+                `
+                    SELECT id
+                    FROM case_assignments
+                    WHERE case_id = $1
+                    AND lupon_user_id = $2
+                `,
+                [caseId, userId]
+            );
+
+            authorized = assignmentResult.rows.length > 0;
+        }
+
+        if (!authorized) {
+            return res.status(403).json({
+                success: false,
+                message: "You are not authorized to access this evidence."
+            });
+        }
+
+        // Retrieve evidence metadata.
+        const evidenceResult = await pool.query(
+            `
+                SELECT
+                    id,
+                    original_filename,
+                    storage_key,
+                    mime_type,
+                    file_size,
+                    created_at
+                FROM case_evidence
+                WHERE case_id = $1
+                ORDER BY created_at ASC
+            `,
+            [caseId]
+        );
+
+        // Generate temporary signed URLs.
+        const evidence = [];
+
+        for (const file of evidenceResult.rows) {
+            const { data, error } = await supabase.storage
+                .from(supabaseBucket)
+                .createSignedUrl(file.storage_key, 60);
+
+            if (error) {
+                throw error;
+            }
+
+            evidence.push({
+                id: file.id,
+                filename: file.original_filename,
+                mimeType: file.mime_type,
+                fileSize: Number(file.file_size),
+                uploadedAt: file.created_at,
+                url: data.signedUrl
+            });
+        }
+
+        return res.json({
+            success: true,
+            evidence
+        });
+
+    } catch (error) {
+        console.error("Retrieve case evidence error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Failed to retrieve case evidence."
+        });
+    }
+});
 
 module.exports = router;

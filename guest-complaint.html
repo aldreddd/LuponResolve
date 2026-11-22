@@ -228,6 +228,36 @@
                             required
                         ></textarea>
 
+                        <!-- ================================== -->
+                        <!-- EVIDENCE FILE UPLOAD -->
+                        <!-- ================================== -->
+
+                        <div class="form-group evidence-upload-group">
+                            <label for="evidenceFiles">
+                                Supporting Evidence (Optional)
+                            </label>
+
+                            <p class="form-hint">
+                                Attach photos or documents that support your complaint.
+                                Accepted formats: JPG, PNG, and PDF.
+                                Maximum 5 files, 5 MB each.
+                            </p>
+
+                            <input
+                                type="file"
+                                id="evidenceFiles"
+                                name="evidence"
+                                accept=".jpg,.jpeg,.png,.pdf"
+                                multiple
+                            >
+
+                            <div
+                                id="evidenceFileList"
+                                class="evidence-file-list"
+                                aria-live="polite"
+                            ></div>
+                        </div>
+
                         <small>
                             Please provide accurate details. Avoid including unrelated
                             personal or sensitive information.

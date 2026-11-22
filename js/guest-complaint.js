@@ -13,7 +13,80 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Guest complaint form elements could not be found.");
         return;
     }
+    // ======================================
+    // EVIDENCE FILE SELECTION
+    // ======================================
 
+    const evidenceFilesInput = document.getElementById("evidenceFiles");
+    const evidenceFileList = document.getElementById("evidenceFileList");
+
+    const MAX_EVIDENCE_FILES = 5;
+    const MAX_EVIDENCE_FILE_SIZE = 5 * 1024 * 1024;
+
+    const ALLOWED_EVIDENCE_TYPES = [
+        "image/jpeg",
+        "image/png",
+        "application/pdf"
+    ];
+
+    if (evidenceFilesInput) {
+        evidenceFilesInput.addEventListener("change", () => {
+            const files = Array.from(evidenceFilesInput.files);
+
+            evidenceFileList.innerHTML = "";
+
+            if (files.length > MAX_EVIDENCE_FILES) {
+                showMessage(
+                    "You can upload a maximum of 5 evidence files.",
+                    "error"
+                );
+
+                evidenceFilesInput.value = "";
+                return;
+            }
+
+            for (const file of files) {
+                if (!ALLOWED_EVIDENCE_TYPES.includes(file.type)) {
+                    showMessage(
+                        `${file.name} is not an allowed file type.`,
+                        "error"
+                    );
+
+                    evidenceFilesInput.value = "";
+                    evidenceFileList.innerHTML = "";
+                    return;
+                }
+
+                if (file.size > MAX_EVIDENCE_FILE_SIZE) {
+                    showMessage(
+                        `${file.name} exceeds the 5 MB file size limit.`,
+                        "error"
+                    );
+
+                    evidenceFilesInput.value = "";
+                    evidenceFileList.innerHTML = "";
+                    return;
+                }
+            }
+
+            if (files.length === 0) {
+                return;
+            }
+
+            clearMessage();
+
+            files.forEach((file) => {
+                const item = document.createElement("div");
+                item.className = "evidence-file-item";
+
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+
+                item.textContent = `${file.name} (${sizeMB} MB)`;
+
+                evidenceFileList.appendChild(item);
+            });
+        });
+    }
     // ======================================
     // MESSAGE HELPERS
     // ======================================
@@ -141,86 +214,75 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        
         // ==================================
         // COLLECT FORM VALUES
         // ==================================
 
         const formData = new FormData(form);
 
-        const payload = {
+        const screeningAnswers = {
+            complainantMunicipality: formData.get("complainantMunicipality"),
+            complainantBarangay: formData.get("complainantBarangay"),
 
-            complainantName:
-                formData.get("complainantName")?.trim(),
+            respondentMunicipality: formData.get("respondentMunicipality"),
+            respondentBarangay: formData.get("respondentBarangay"),
 
-            complainantContact:
-                formData.get("complainantContact")?.trim(),
+            governmentParty: formData.get("governmentParty"),
+            publicOfficial: formData.get("publicOfficial"),
+            criminalOffense: formData.get("criminalOffense"),
+            penaltyThreshold: formData.get("penaltyThreshold"),
+            privateOffendedParty: formData.get("privateOffendedParty"),
 
-            respondentName:
-                formData.get("respondentName")?.trim(),
+            realPropertyDispute: formData.get("realPropertyDispute"),
+            propertyDifferentCities: formData.get("propertyDifferentCities"),
+            propertyPartiesAgree: formData.get("propertyPartiesAgree"),
 
-            respondentAddress:
-                formData.get("respondentAddress")?.trim(),
-
-            respondentEmail:
-                formData.get("respondentEmail")?.trim(),
-
-            disputeType:
-                formData.get("disputeType"),
-
-            incidentDetails:
-                formData.get("incidentDetails")?.trim(),
-
-            screeningAnswers: {
-
-                complainantMunicipality:
-                    formData.get("complainantMunicipality"),
-
-                complainantBarangay:
-                    formData.get("complainantBarangay"),
-
-                respondentMunicipality:
-                    formData.get("respondentMunicipality"),
-
-                respondentBarangay:
-                    formData.get("respondentBarangay"),
-
-                governmentParty:
-                    formData.get("governmentParty"),
-
-                publicOfficial:
-                    formData.get("publicOfficial"),
-
-                criminalOffense:
-                    formData.get("criminalOffense"),
-
-                penaltyThreshold:
-                    formData.get("penaltyThreshold"),
-
-                privateOffendedParty:
-                    formData.get("privateOffendedParty"),
-
-                realPropertyDispute:
-                    formData.get("realPropertyDispute"),
-
-                propertyDifferentCities:
-                    formData.get("propertyDifferentCities"),
-
-                propertyPartiesAgree:
-                    formData.get("propertyPartiesAgree"),
-
-                barangaysAdjoining:
-                    formData.get("barangaysAdjoining"),
-
-                partiesAgree:
-                    formData.get("partiesAgree"),
-
-                otherException:
-                    formData.get("otherException")
-            },
-
-            companyWebsite:
-                formData.get("companyWebsite") || ""
+            barangaysAdjoining: formData.get("barangaysAdjoining"),
+            partiesAgree: formData.get("partiesAgree"),
+            otherException: formData.get("otherException")
         };
+
+        // Convert screening answers into JSON text.
+        formData.set(
+            "screeningAnswers",
+            JSON.stringify(screeningAnswers)
+        );
+
+        // Trim text fields.
+        [
+            "complainantName",
+            "complainantContact",
+            "respondentName",
+            "respondentAddress",
+            "respondentEmail",
+            "disputeType",
+            "incidentDetails"
+        ].forEach((field) => {
+            const value = formData.get(field);
+
+            if (typeof value === "string") {
+                formData.set(field, value.trim());
+            }
+        });
+
+        // Ensure the honeypot field is included.
+        formData.set(
+            "companyWebsite",
+            formData.get("companyWebsite") || ""
+        );
+
+        // Remove empty file entries and append selected evidence.
+        formData.delete("evidence");
+
+        const selectedEvidenceFiles = evidenceFilesInput
+            ? Array.from(evidenceFilesInput.files)
+            : [];
+
+        selectedEvidenceFiles.forEach((file) => {
+            formData.append("evidence", file);
+        });
+
 
         // ==================================
         // LOADING STATE
@@ -236,16 +298,11 @@ document.addEventListener("DOMContentLoaded", () => {
         // ==================================
 
         try {
-
             const response = await fetch(`${API.cases}/guest`, {
                 method: "POST",
-
-                headers: {
-                    "Content-Type": "application/json"
-                },
-
-                body: JSON.stringify(payload)
+                body: formData
             });
+
 
             const result = await response.json();
 
