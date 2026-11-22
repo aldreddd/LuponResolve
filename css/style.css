@@ -1151,3 +1151,740 @@ a.service-card .coming-soon {
         font-size: 12px;
     }
 }
+
+/* ==========================================
+   LUPONRESOLVE — RESPONSIVE NAVIGATION
+========================================== */
+
+/* HAMBURGER BUTTON: HIDDEN ON DESKTOP */
+
+.menu-toggle {
+    display: none;
+
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 9px;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-toggle span {
+    display: block;
+
+    width: 20px;
+    height: 2px;
+
+    background: var(--text);
+    border-radius: 5px;
+
+    transition:
+        transform 200ms ease,
+        opacity 200ms ease;
+}
+
+/* HAMBURGER ANIMATION */
+
+.menu-toggle.active span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.menu-toggle:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+}
+
+
+/* ==========================================
+   TABLET AND MOBILE NAVIGATION
+========================================== */
+
+@media (max-width: 800px) {
+
+    .site-header {
+        position: relative;
+        z-index: 100;
+
+        width: calc(100% - 40px);
+        min-height: 76px;
+
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 0;
+        padding: 14px 0;
+    }
+
+    /* SHOW HAMBURGER */
+
+    .menu-toggle {
+        display: flex;
+        flex-shrink: 0;
+    }
+
+    /* COLLAPSED NAVIGATION */
+
+    .main-nav {
+        display: none;
+
+        order: 3;
+        flex-basis: 100%;
+        width: 100%;
+
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+
+        gap: 4px;
+
+        margin-top: 14px;
+        padding: 10px;
+
+        background: var(--surface);
+
+        border: 1px solid var(--line);
+        border-radius: 12px;
+
+        box-shadow: var(--shadow);
+    }
+
+    /* OPEN NAVIGATION */
+
+    .main-nav.is-open {
+        display: flex;
+    }
+
+    .main-nav a {
+        display: flex;
+        align-items: center;
+
+        min-height: 46px;
+        padding: 0 14px;
+
+        border-radius: 7px;
+
+        color: var(--text-muted);
+        font-size: 0.9rem;
+
+        transition:
+            background 160ms ease,
+            color 160ms ease;
+    }
+
+    .main-nav a:hover {
+        background: var(--surface-soft);
+        color: var(--primary-text);
+    }
+
+    /* REMOVE DESKTOP UNDERLINE EFFECT */
+
+    .main-nav a::after {
+        display: none;
+    }
+
+    .main-nav a:active {
+        background: var(--surface-soft);
+    }
+}
+
+
+/* ==========================================
+   ANDROID PHONE OPTIMIZATION
+========================================== */
+
+@media (max-width: 560px) {
+
+    .site-header {
+        width: calc(100% - 32px);
+        min-height: 70px;
+        padding: 12px 0;
+    }
+
+    .brand {
+        font-size: 1rem;
+    }
+
+    .brand-mark {
+        width: 38px;
+        height: 38px;
+    }
+
+    .menu-toggle {
+        width: 44px;
+        height: 44px;
+    }
+
+    .main-nav {
+        margin-top: 12px;
+        padding: 8px;
+    }
+
+    .main-nav a {
+        min-height: 48px;
+        font-size: 0.88rem;
+    }
+}
+
+
+/* ==========================================
+   SMALL ANDROID SCREENS
+========================================== */
+
+@media (max-width: 380px) {
+
+    .site-header {
+        width: calc(100% - 24px);
+    }
+
+    .brand {
+        font-size: 0.92rem;
+        gap: 8px;
+    }
+
+    .brand-mark {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .menu-toggle span,
+    .main-nav,
+    .main-nav a {
+        transition: none !important;
+    }
+}
+
+/* =====================================================
+   LUPONRESOLVE — RESPONSIVE ADAPTIVE DESIGN SYSTEM
+   Desktop → Tablet → Android Mobile
+===================================================== */
+
+/* FLUID TYPOGRAPHY AND ELEMENT SIZING */
+
+body {
+    font-size: clamp(14px, 0.35vw + 13px, 16px);
+}
+
+.hero h1 {
+    font-size: clamp(2.3rem, 5.5vw, 4.3rem);
+}
+
+.hero-description {
+    font-size: clamp(0.9rem, 1.2vw, 1.02rem);
+}
+
+.hero-panel h2 {
+    font-size: clamp(1.4rem, 2vw, 1.7rem);
+}
+
+.intro-section h2,
+.section-heading h2 {
+    font-size: clamp(1.75rem, 3.5vw, 2.8rem);
+}
+
+.intro-section > p:last-child,
+.section-heading > p {
+    font-size: clamp(0.88rem, 1.1vw, 1rem);
+}
+
+.service-card h3 {
+    font-size: clamp(1.12rem, 1.5vw, 1.3rem);
+}
+
+.service-card p {
+    font-size: clamp(0.85rem, 1vw, 0.92rem);
+}
+
+
+/* =====================================================
+   TABLET — 801px TO 1100px
+===================================================== */
+
+@media (max-width: 1100px) {
+
+    .hero {
+        padding: clamp(30px, 5vw, 55px);
+        gap: clamp(25px, 4vw, 45px);
+    }
+
+    .service-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .service-card {
+        padding: clamp(20px, 3vw, 28px);
+    }
+
+}
+
+
+/* =====================================================
+   TABLET / SMALL LAPTOP
+===================================================== */
+
+@media (max-width: 800px) {
+
+    .site-header {
+        width: calc(100% - 40px);
+    }
+
+    .hero {
+        min-height: auto;
+        grid-template-columns: 1fr;
+        padding: clamp(28px, 5vw, 44px);
+        gap: 30px;
+    }
+
+    .hero-content {
+        max-width: 100%;
+    }
+
+    .hero-panel {
+        max-width: 100%;
+    }
+
+    .hero h1 {
+        max-width: 600px;
+        font-size: clamp(2.1rem, 6vw, 3.2rem);
+    }
+
+    .intro-section,
+    .services-section {
+        width: calc(100% - 40px);
+        margin: clamp(55px, 9vw, 80px) auto;
+    }
+
+    .service-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =====================================================
+   ANDROID / MOBILE LAYOUT
+===================================================== */
+
+@media (max-width: 560px) {
+
+    /* PAGE FOUNDATION */
+
+    body {
+        font-size: 14px;
+        line-height: 1.65;
+    }
+
+    html {
+        scroll-padding-top: 16px;
+    }
+
+
+    /* HEADER */
+
+    .site-header {
+        width: calc(100% - 32px);
+        min-height: 68px;
+        padding: 10px 0;
+    }
+
+    .brand {
+        font-size: clamp(0.9rem, 4vw, 1.05rem);
+        gap: 9px;
+    }
+
+    .brand-mark {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        font-size: 0.78rem;
+    }
+
+
+    /* HAMBURGER NAVIGATION */
+
+    .menu-toggle {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    .main-nav {
+        margin-top: 12px;
+        padding: 8px;
+        border-radius: 14px;
+    }
+
+    .main-nav a {
+        min-height: 48px;
+        padding: 0 15px;
+        font-size: 0.9rem;
+    }
+
+
+    /* HERO — MOBILE FIRST LAYOUT */
+
+    .hero {
+        width: calc(100% - 28px);
+        min-height: auto;
+
+        margin: 10px auto 0;
+        padding: clamp(22px, 6vw, 32px) clamp(18px, 5vw, 26px);
+
+        grid-template-columns: minmax(0, 1fr);
+        gap: 26px;
+
+        border-radius: 16px;
+    }
+
+    .eyebrow {
+        font-size: clamp(0.62rem, 2.5vw, 0.72rem);
+        letter-spacing: 0.1em;
+        margin-bottom: 12px;
+    }
+
+    .hero h1 {
+        font-size: clamp(1.9rem, 7.2vw, 2.6rem);
+        line-height: 1.12;
+        letter-spacing: -0.04em;
+        overflow-wrap: break-word;
+    }
+
+    .hero-description {
+        margin: 17px 0 22px;
+        font-size: clamp(0.88rem, 3.5vw, 0.96rem);
+        line-height: 1.75;
+    }
+
+
+    /* MOBILE BUTTONS */
+
+    .hero-actions {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .hero-actions .button {
+        width: 100%;
+        min-height: 48px;
+        justify-content: center;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+
+    .hero-actions .button-text {
+        justify-content: center;
+    }
+
+
+    /* HERO INFORMATION PANEL */
+
+    .hero-panel {
+        width: 100%;
+        padding: clamp(20px, 5vw, 26px);
+        border-radius: 14px;
+    }
+
+    .panel-topline {
+        font-size: 0.62rem;
+        line-height: 1.5;
+    }
+
+    .panel-icon {
+        width: 58px;
+        height: 58px;
+        margin: 25px 0 17px;
+        border-radius: 14px;
+        font-size: 2rem;
+    }
+
+    .hero-panel h2 {
+        font-size: clamp(1.3rem, 5vw, 1.55rem);
+        line-height: 1.25;
+    }
+
+    .hero-panel p {
+        font-size: 0.88rem;
+        line-height: 1.7;
+    }
+
+    .panel-footer {
+        margin-top: 20px;
+        padding-top: 15px;
+        font-size: 0.68rem;
+    }
+
+
+    /* INTRODUCTION */
+
+    .intro-section,
+    .services-section {
+        width: calc(100% - 36px);
+        margin: 58px auto;
+    }
+
+    .intro-section h2,
+    .section-heading h2 {
+        font-size: clamp(1.65rem, 6vw, 2rem);
+        line-height: 1.22;
+    }
+
+    .intro-section > p:last-child {
+        margin-top: 14px;
+        font-size: 0.9rem;
+        line-height: 1.8;
+    }
+
+
+    /* SERVICES */
+
+    .section-heading {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 9px;
+        margin-bottom: 20px;
+    }
+
+    .section-heading > p {
+        font-size: 0.88rem;
+        line-height: 1.7;
+    }
+
+    .service-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .service-card {
+        min-height: auto;
+        padding: 22px;
+        border-radius: 14px;
+    }
+
+    .service-number {
+        font-size: 0.7rem;
+    }
+
+    .service-card h3 {
+        margin: 16px 0 7px;
+        font-size: 1.2rem;
+    }
+
+    .service-card p {
+        margin-bottom: 12px;
+        font-size: 0.88rem;
+        line-height: 1.7;
+    }
+
+    .service-action {
+        min-height: 42px;
+        margin-top: 12px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+    }
+
+
+    /* FOOTER */
+
+    .site-footer {
+        min-height: auto;
+        padding: 24px 20px;
+        gap: 12px;
+    }
+
+    .footer-brand {
+        font-size: 0.9rem;
+    }
+
+    .site-footer p {
+        font-size: 0.74rem;
+        line-height: 1.6;
+    }
+
+
+    /* SUCCESS MESSAGE */
+
+    #formMessage.message.success {
+        width: calc(100% - 28px);
+        margin: 20px auto;
+    }
+
+    #formMessage .success-card {
+        border-radius: 14px;
+    }
+
+    #formMessage .success-card-header {
+        gap: 12px;
+        padding: 18px;
+    }
+
+    #formMessage .success-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+    }
+
+    #formMessage .success-card-header h2 {
+        font-size: clamp(1rem, 4.5vw, 1.15rem);
+    }
+
+    #formMessage .success-card-header p {
+        font-size: 0.82rem;
+    }
+
+    #formMessage .success-card-body {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    #formMessage .tracking-detail,
+    #formMessage .privacy-notice,
+    #formMessage .screening-result {
+        padding: 15px;
+    }
+
+}
+
+
+/* =====================================================
+   SMALL ANDROID PHONES
+   Example: 320px — 380px
+===================================================== */
+
+@media (max-width: 380px) {
+
+    .site-header {
+        width: calc(100% - 24px);
+    }
+
+    .hero {
+        width: calc(100% - 20px);
+        padding: 22px 17px;
+    }
+
+    .hero h1 {
+        font-size: clamp(1.75rem, 7.5vw, 2.1rem);
+    }
+
+    .hero-description {
+        font-size: 0.86rem;
+    }
+
+    .intro-section,
+    .services-section {
+        width: calc(100% - 28px);
+    }
+
+    .intro-section h2,
+    .section-heading h2 {
+        font-size: clamp(1.5rem, 6.5vw, 1.8rem);
+    }
+
+    .service-card {
+        padding: 19px;
+    }
+
+    .hero-panel {
+        padding: 19px;
+    }
+
+}
+
+
+/* =====================================================
+   VERY NARROW SCREENS
+===================================================== */
+
+@media (max-width: 340px) {
+
+    .brand {
+        font-size: 0.85rem;
+        gap: 7px;
+    }
+
+    .brand-mark {
+        width: 33px;
+        height: 33px;
+    }
+
+    .menu-toggle {
+        width: 42px;
+        height: 42px;
+    }
+
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .hero-actions .button {
+        font-size: 0.84rem;
+    }
+
+}
+
+
+/* =====================================================
+   TOUCH DEVICE BEHAVIOR
+===================================================== */
+
+@media (hover: none) and (pointer: coarse) {
+
+    .button,
+    .service-action,
+    .main-nav a {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .button:hover,
+    .service-card:hover,
+    .service-action:hover {
+        transform: none;
+    }
+
+    .service-card {
+        transition: border-color 160ms ease;
+    }
+
+}
+
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+
+    .menu-toggle span,
+    .main-nav,
+    .main-nav a,
+    .button,
+    .service-card {
+        transition: none !important;
+    }
+
+}

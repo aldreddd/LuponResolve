@@ -9,19 +9,42 @@
     <script src="js/app.js" defer></script>
   </head>
   <body>
-    <header class="site-header">
+    
+  <header class="site-header">
+
+      <!-- BRAND -->
       <a class="brand" href="index.html" aria-label="LuponResolve home">
-        <span class="brand-mark">LR</span>
-        <span>LuponResolve</span>
+          <span class="brand-mark">LR</span>
+          <span>LuponResolve</span>
       </a>
 
-      <nav class="main-nav" aria-label="Main navigation">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#services">Services</a>
+      <!-- MOBILE MENU BUTTON -->
+      <button
+          class="menu-toggle"
+          id="menuToggle"
+          type="button"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+          aria-controls="mainNavigation"
+      >
+          <span></span>
+          <span></span>
+          <span></span>
+      </button>
+
+      <!-- NAVIGATION -->
+      <nav
+          class="main-nav"
+          id="mainNavigation"
+          aria-label="Main navigation"
+      >
+          <a href="#home">Home</a>
+          <a href="#about">About</a>
+          <a href="#services">Services</a>
       </nav>
 
-    </header>
+  </header>
+
 
     <main>
       <section class="hero" id="home">
