@@ -332,3 +332,502 @@ refreshButton.addEventListener("click", loadAdminOverview);
 
 loadAdminProfile();
 loadAdminOverview();
+
+// ======================================
+// ADMINISTRATOR — USER MANAGEMENT
+// ======================================
+
+// HTML ELEMENTS
+
+const usersTableBody = document.getElementById("usersTableBody");
+
+const usersMessage = document.getElementById("usersMessage");
+
+const userCount = document.getElementById("userCount");
+
+const userSearchInput = document.getElementById("userSearchInput");
+
+const userRoleFilter = document.getElementById("userRoleFilter");
+
+const refreshUsersButton = document.getElementById("refreshUsersButton");
+
+const showCreateUserButton = document.getElementById("showCreateUserButton");
+
+const cancelCreateUserButton = document.getElementById("cancelCreateUserButton");
+
+const resetCreateUserButton = document.getElementById("resetCreateUserButton");
+
+const createUserPanel = document.getElementById("createUserPanel");
+
+const createUserForm = document.getElementById("createUserForm");
+
+const createUserSubmitButton = document.getElementById("createUserSubmitButton");
+
+
+// STAFF ACCOUNT DATA
+
+let staffUsers = [];
+
+
+// ======================================
+// DISPLAY USER MANAGEMENT MESSAGE
+// ======================================
+
+function showUsersMessage(message, type = "success") {
+
+    usersMessage.textContent = message;
+
+    usersMessage.className = `dashboard-message ${type}`;
+
+    usersMessage.classList.remove("hidden");
+
+}
+
+
+function hideUsersMessage() {
+
+    usersMessage.textContent = "";
+
+    usersMessage.classList.add("hidden");
+
+}
+
+
+// ======================================
+// FORMAT STAFF ROLE
+// ======================================
+
+function formatStaffRole(role) {
+
+    if (role === "secretary") {
+        return "Secretary";
+    }
+
+    if (role === "lupon") {
+        return "Lupon Member";
+    }
+
+    return role;
+}
+
+
+// ======================================
+// FORMAT REGISTRATION DATE
+// ======================================
+
+function formatUserRegistrationDate(date) {
+
+    if (!date) {
+        return "Not available";
+    }
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "Not available";
+    }
+
+    return parsedDate.toLocaleDateString("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+    });
+
+}
+
+
+// ======================================
+// RENDER STAFF ACCOUNTS
+// ======================================
+
+function renderStaffUsers() {
+
+    const searchTerm = userSearchInput.value
+        .trim()
+        .toLowerCase();
+
+    const selectedRole = userRoleFilter.value;
+
+    const filteredUsers = staffUsers.filter(user => {
+
+        const matchesSearch =
+            user.fullName.toLowerCase().includes(searchTerm) ||
+            user.email.toLowerCase().includes(searchTerm);
+
+        const matchesRole =
+            selectedRole === "all" ||
+            user.role === selectedRole;
+
+        return matchesSearch && matchesRole;
+
+    });
+
+    userCount.textContent = filteredUsers.length;
+
+    usersTableBody.innerHTML = "";
+
+    if (filteredUsers.length === 0) {
+
+        const row = document.createElement("tr");
+
+        const cell = document.createElement("td");
+
+        cell.colSpan = 4;
+
+        cell.textContent = staffUsers.length === 0
+            ? "No staff accounts found."
+            : "No matching staff accounts.";
+
+        row.appendChild(cell);
+
+        usersTableBody.appendChild(row);
+
+        return;
+
+    }
+
+    filteredUsers.forEach(user => {
+
+        const row = document.createElement("tr");
+
+        const nameCell = document.createElement("td");
+
+        const emailCell = document.createElement("td");
+
+        const roleCell = document.createElement("td");
+
+        const dateCell = document.createElement("td");
+
+
+        nameCell.textContent = user.fullName;
+
+        emailCell.textContent = user.email;
+
+        const roleBadge = document.createElement("span");
+
+        roleBadge.className = `user-role-badge ${user.role}`;
+
+        roleBadge.textContent = formatStaffRole(user.role);
+
+        roleCell.appendChild(roleBadge);
+
+        dateCell.textContent = formatUserRegistrationDate(
+            user.createdAt
+        );
+
+
+        row.appendChild(nameCell);
+
+        row.appendChild(emailCell);
+
+        row.appendChild(roleCell);
+
+        row.appendChild(dateCell);
+
+        usersTableBody.appendChild(row);
+
+    });
+
+}
+
+
+// ======================================
+// LOAD STAFF ACCOUNTS
+// GET /api/admin/users
+// ======================================
+
+async function loadStaffUsers() {
+
+    try {
+
+        usersTableBody.innerHTML = `
+            <tr>
+                <td colspan="4">Loading staff accounts...</td>
+            </tr>
+        `;
+
+        const response = await fetch(
+            `${ADMIN_API}/users`,
+            {
+                method: "GET",
+                credentials: "include",
+                cache: "no-store"
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401 || response.status === 403) {
+
+            window.location.href = "auth.html";
+
+            return;
+
+        }
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message || "Unable to load staff accounts."
+            );
+
+        }
+
+        staffUsers = data.users.map(user => ({
+            ...user,
+            fullName: user.fullName || "",
+            email: user.email || ""
+        }));
+
+        renderStaffUsers();
+
+    } catch (error) {
+
+        console.error(
+            "Staff account loading error:",
+            error
+        );
+
+        usersTableBody.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    Unable to load staff accounts.
+                </td>
+            </tr>
+        `;
+
+        showUsersMessage(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+// ======================================
+// SHOW CREATE ACCOUNT FORM
+// ======================================
+
+showCreateUserButton.addEventListener("click", () => {
+
+    createUserPanel.classList.remove("hidden");
+
+    hideUsersMessage();
+
+    createUserPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+});
+
+
+// ======================================
+// HIDE CREATE ACCOUNT FORM
+// ======================================
+
+cancelCreateUserButton.addEventListener("click", () => {
+
+    createUserForm.reset();
+
+    createUserPanel.classList.add("hidden");
+
+    hideUsersMessage();
+
+});
+
+
+resetCreateUserButton.addEventListener("click", () => {
+
+    createUserForm.reset();
+
+    hideUsersMessage();
+
+});
+
+
+// ======================================
+// SEARCH STAFF
+// ======================================
+
+userSearchInput.addEventListener("input", () => {
+
+    renderStaffUsers();
+
+});
+
+
+// ======================================
+// FILTER STAFF BY ROLE
+// ======================================
+
+userRoleFilter.addEventListener("change", () => {
+
+    renderStaffUsers();
+
+});
+
+
+// ======================================
+// REFRESH STAFF DIRECTORY
+// ======================================
+
+refreshUsersButton.addEventListener("click", () => {
+
+    hideUsersMessage();
+
+    loadStaffUsers();
+
+});
+
+
+// ======================================
+// CREATE STAFF ACCOUNT
+// POST /api/admin/users
+// ======================================
+
+createUserForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    hideUsersMessage();
+
+
+    const fullName = document
+        .getElementById("newUserFullName")
+        .value
+        .trim();
+
+    const email = document
+        .getElementById("newUserEmail")
+        .value
+        .trim();
+
+    const role = document
+        .getElementById("newUserRole")
+        .value;
+
+    const password = document
+        .getElementById("newUserPassword")
+        .value;
+
+    const confirmPassword = document
+        .getElementById("confirmUserPassword")
+        .value;
+
+
+    // ----------------------------------
+    // PASSWORD CONFIRMATION
+    // ----------------------------------
+
+    if (password !== confirmPassword) {
+
+        showUsersMessage(
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    // ----------------------------------
+    // DISABLE SUBMIT BUTTON
+    // ----------------------------------
+
+    createUserSubmitButton.disabled = true;
+
+    createUserSubmitButton.textContent = "Creating Account...";
+
+
+    try {
+
+        const response = await fetch(
+            `${ADMIN_API}/users`,
+            {
+                method: "POST",
+
+                credentials: "include",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    fullName,
+                    email,
+                    password,
+                    role
+                })
+
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if (response.status === 401 || response.status === 403) {
+
+            window.location.href = "auth.html";
+
+            return;
+
+        }
+
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message || "Unable to create staff account."
+            );
+
+        }
+
+
+        // ----------------------------------
+        // SUCCESS
+        // ----------------------------------
+
+        createUserForm.reset();
+
+        createUserPanel.classList.add("hidden");
+
+        showUsersMessage(
+            data.message || "Staff account created successfully.",
+            "success"
+        );
+
+        await loadStaffUsers();
+
+    } catch (error) {
+
+        console.error(
+            "Staff account creation error:",
+            error
+        );
+
+        showUsersMessage(
+            error.message,
+            "error"
+        );
+
+    } finally {
+
+        createUserSubmitButton.disabled = false;
+
+        createUserSubmitButton.textContent = "Create Account";
+
+    }
+
+});
+
+
+// ======================================
+// INITIALIZE USER MANAGEMENT
+// ======================================
+
+loadStaffUsers();

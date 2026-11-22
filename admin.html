@@ -310,6 +310,7 @@
 
 
             <!-- USER MANAGEMENT -->
+            
             <section id="users" class="dashboard-section secondary-section">
 
                 <div class="section-heading">
@@ -317,18 +318,215 @@
                         <h2>User Management</h2>
                         <p>Manage authorized Secretary and Lupon accounts.</p>
                     </div>
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        id="showCreateUserButton"
+                    >
+                        + Create Staff Account
+                    </button>
                 </div>
 
-                <div class="placeholder-panel">
-                    <span class="placeholder-icon">♙</span>
-                    <h3>Staff Account Management</h3>
-                    <p>
-                        Staff account listing and account creation
-                        will be implemented in the next milestone.
-                    </p>
+                <!-- USER MANAGEMENT MESSAGE -->
+                <div
+                    id="usersMessage"
+                    class="dashboard-message hidden"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+                <!-- CREATE STAFF ACCOUNT FORM -->
+                <div
+                    id="createUserPanel"
+                    class="dashboard-card hidden"
+                >
+
+                    <div class="section-heading">
+                        <div>
+                            <h3>Create Staff Account</h3>
+                            <p>Create a login account for a Secretary or Lupon member.</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelCreateUserButton"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+
+                    <form id="createUserForm">
+
+                        <div class="form-group">
+                            <label for="newUserFullName">Full Name</label>
+
+                            <input
+                                type="text"
+                                id="newUserFullName"
+                                name="fullName"
+                                placeholder="Enter full name"
+                                minlength="2"
+                                maxlength="100"
+                                autocomplete="name"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newUserEmail">Email Address</label>
+
+                            <input
+                                type="email"
+                                id="newUserEmail"
+                                name="email"
+                                placeholder="Enter email address"
+                                maxlength="254"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newUserRole">Account Role</label>
+
+                            <select
+                                id="newUserRole"
+                                name="role"
+                                required
+                            >
+                                <option value="">Select a role</option>
+                                <option value="secretary">Secretary</option>
+                                <option value="lupon">Lupon Member</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newUserPassword">Temporary Password</label>
+
+                            <input
+                                type="password"
+                                id="newUserPassword"
+                                name="password"
+                                placeholder="At least 8 characters"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmUserPassword">Confirm Password</label>
+
+                            <input
+                                type="password"
+                                id="confirmUserPassword"
+                                name="confirmPassword"
+                                placeholder="Re-enter password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-actions">
+                            <button
+                                type="submit"
+                                class="primary-button"
+                                id="createUserSubmitButton"
+                            >
+                                Create Account
+                            </button>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="resetCreateUserButton"
+                            >
+                                Reset
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <!-- STAFF DIRECTORY -->
+                <div class="dashboard-card">
+
+                    <div class="section-heading">
+                        <div>
+                            <h3>Staff Directory</h3>
+                            <p>
+                                <span id="userCount">0</span> staff accounts
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="refreshUsersButton"
+                        >
+                            Refresh
+                        </button>
+                    </div>
+
+                    <!-- SEARCH AND FILTER -->
+                    <div class="user-management-toolbar">
+
+                        <div class="form-group">
+                            <label for="userSearchInput">Search Staff</label>
+
+                            <input
+                                type="search"
+                                id="userSearchInput"
+                                placeholder="Search name or email..."
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="userRoleFilter">Filter by Role</label>
+
+                            <select id="userRoleFilter">
+                                <option value="all">All Staff</option>
+                                <option value="secretary">Secretary</option>
+                                <option value="lupon">Lupon</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <!-- STAFF TABLE -->
+                    <div class="table-container">
+
+                        <table class="data-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Staff Member</th>
+                                    <th>Email Address</th>
+                                    <th>Role</th>
+                                    <th>Registration Date</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="4">
+                                        Loading staff accounts...
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
                 </div>
 
             </section>
+
 
 
             <!-- CASE OVERSIGHT -->

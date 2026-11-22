@@ -51,8 +51,32 @@ function requireRole(...allowedRoles) {
 }
 
 
-// Export middleware functions
+// ======================================
+// ADMINISTRATOR-ONLY AUTHORIZATION
+// ======================================
+
+function requireAdmin(req, res, next) {
+
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({
+            success: false,
+            message: "Authentication required. Please log in."
+        });
+    }
+
+    if (req.session.user.role !== "admin") {
+        return res.status(403).json({
+            success: false,
+            message: "Administrator access required."
+        });
+    }
+
+    next();
+}
+
+
 module.exports = {
     requireAuth,
-    requireRole
+    requireRole,
+    requireAdmin
 };

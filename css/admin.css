@@ -841,3 +841,269 @@ tbody tr:last-child td {
     }
 
 }
+
+/* ======================================
+   USER MANAGEMENT
+====================================== */
+
+/* General hidden utility */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ======================================
+   DASHBOARD CARDS
+====================================== */
+
+.dashboard-card {
+    margin-bottom: 22px;
+    padding: 24px;
+
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: 10px;
+}
+
+.dashboard-card h3 {
+    font-size: 15px;
+    letter-spacing: -0.3px;
+}
+
+
+/* ======================================
+   PRIMARY BUTTON
+====================================== */
+
+.primary-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 11px 16px;
+
+    border: 1px solid var(--admin-primary);
+    border-radius: 7px;
+
+    background: var(--admin-primary);
+    color: white;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition: 0.2s ease;
+}
+
+.primary-button:hover {
+    background: var(--admin-primary-dark);
+    border-color: var(--admin-primary-dark);
+}
+
+.primary-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* ======================================
+   USER MANAGEMENT FORM
+====================================== */
+
+#createUserPanel {
+    scroll-margin-top: 25px;
+}
+
+#createUserForm {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    min-width: 0;
+}
+
+.form-group label {
+    color: var(--admin-text);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    min-height: 42px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--admin-border);
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #ffffff;
+    color: var(--admin-text);
+
+    font-family: inherit;
+    font-size: 12px;
+
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+    color: #a3ada7;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--admin-primary);
+
+    box-shadow: 0 0 0 3px rgba(23, 72, 63, 0.08);
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    grid-column: 1 / -1;
+
+    padding-top: 5px;
+}
+
+
+/* ======================================
+   USER MANAGEMENT TOOLBAR
+====================================== */
+
+.user-management-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(180px, 1fr);
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.user-management-toolbar .form-group {
+    gap: 7px;
+}
+
+
+/* ======================================
+   USER DIRECTORY TABLE
+====================================== */
+
+#usersTableBody td {
+    vertical-align: middle;
+}
+
+#usersTableBody td:first-child {
+    color: var(--admin-text);
+    font-weight: 700;
+}
+
+#usersTableBody td:nth-child(2) {
+    color: #68766f;
+}
+
+#usersTableBody td[colspan] {
+    padding: 30px 15px;
+
+    color: var(--admin-muted);
+    text-align: center;
+    font-weight: 500;
+}
+
+
+/* ======================================
+   USER ROLE BADGES
+====================================== */
+
+.user-role-badge {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.user-role-badge.secretary {
+    background: var(--admin-blue);
+    color: #4779bd;
+}
+
+.user-role-badge.lupon {
+    background: var(--admin-green);
+    color: #398b61;
+}
+
+
+/* ======================================
+   USER MANAGEMENT MESSAGES
+====================================== */
+
+.dashboard-message.success {
+    background: #eaf6ee;
+    border-color: #cce8d4;
+    color: #287246;
+}
+
+.dashboard-message.error {
+    background: #fff3f1;
+    border-color: #f0d4d0;
+    color: #a43b30;
+}
+
+
+/* ======================================
+   USER MANAGEMENT RESPONSIVE
+====================================== */
+
+@media (max-width: 760px) {
+
+    .dashboard-card {
+        padding: 17px;
+    }
+
+    #createUserForm {
+        grid-template-columns: 1fr;
+    }
+
+    .user-management-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-wrap: wrap;
+    }
+
+    .form-actions button {
+        flex: 1;
+    }
+
+}
+
+@media (max-width: 390px) {
+
+    .dashboard-card {
+        padding: 13px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+}
