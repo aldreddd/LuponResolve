@@ -1719,7 +1719,7 @@ router.post(
 // ======================================
 
 router.get(
-    "/admin/cases",
+    "/cases",
     requireAuth,
     requireRole("admin"),
     async (req, res) => {
