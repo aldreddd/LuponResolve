@@ -1163,3 +1163,336 @@ tbody tr:last-child td {
     }
 
 }
+
+/* ======================================
+   CASE OVERSIGHT
+====================================== */
+
+/* CASE SUMMARY */
+
+.case-oversight-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 22px;
+}
+
+.case-summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    min-width: 0;
+    padding: 20px;
+
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: 10px;
+}
+
+.summary-label {
+    color: var(--admin-muted);
+    font-size: 11px;
+    font-weight: 650;
+}
+
+.case-summary-card strong {
+    color: var(--admin-primary);
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -0.7px;
+}
+
+.summary-description {
+    color: var(--admin-muted);
+    font-size: 10px;
+}
+
+
+/* CASE FILTER PANEL */
+
+.case-filter-panel {
+    margin-bottom: 20px;
+    padding: 22px;
+
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: 10px;
+}
+
+.case-filter-heading {
+    margin-bottom: 20px;
+}
+
+.case-filter-heading h3 {
+    font-size: 14px;
+    font-weight: 750;
+}
+
+.case-filter-heading p {
+    margin-top: 6px;
+    color: var(--admin-muted);
+    font-size: 11px;
+}
+
+.case-filter-controls {
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) repeat(2, minmax(150px, 1fr)) auto;
+    align-items: end;
+    gap: 13px;
+}
+
+.case-search-field,
+.case-select-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.case-search-field label,
+.case-select-field label {
+    color: var(--admin-text);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.case-search-field input,
+.case-select-field select {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+
+    border: 1px solid var(--admin-border);
+    border-radius: 7px;
+    outline: none;
+
+    background: #ffffff;
+    color: var(--admin-text);
+
+    font-family: inherit;
+    font-size: 11px;
+
+    transition: border-color 0.2s ease,
+                box-shadow 0.2s ease;
+}
+
+.case-search-field input::placeholder {
+    color: #a3ada7;
+}
+
+.case-search-field input:focus,
+.case-select-field select:focus {
+    border-color: var(--admin-primary);
+    box-shadow: 0 0 0 3px rgba(23, 72, 63, 0.08);
+}
+
+.case-filter-controls > button {
+    min-height: 42px;
+    white-space: nowrap;
+}
+
+
+/* CASE TABLE PANEL */
+
+.case-table-panel {
+    overflow: hidden;
+
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-border);
+    border-radius: 10px;
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.case-oversight-table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: collapse;
+}
+
+.case-oversight-table th {
+    padding: 15px 16px;
+
+    background: #f8faf9;
+    border-bottom: 1px solid var(--admin-border);
+
+    color: #738078;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+}
+
+.case-oversight-table td {
+    padding: 16px;
+
+    border-bottom: 1px solid #edf0ee;
+
+    color: #526159;
+    font-size: 11px;
+    vertical-align: middle;
+}
+
+.case-oversight-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.case-oversight-table tbody tr:hover {
+    background: #fafcfb;
+}
+
+.case-oversight-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.case-oversight-table .case-number {
+    font-weight: 750;
+    color: var(--admin-primary);
+}
+
+.case-oversight-table .empty-state {
+    padding: 35px 20px;
+    color: var(--admin-muted);
+    text-align: center;
+    white-space: normal;
+}
+
+
+/* CASE STATUS BADGES */
+
+.case-oversight-table .status-badge {
+    white-space: nowrap;
+}
+
+.status-badge.warning {
+    background: #fff2df;
+    color: #9b681d;
+}
+
+.status-badge.info {
+    background: #e9efff;
+    color: #4868a8;
+}
+
+.status-badge.success {
+    background: #e4f4e9;
+    color: #36734e;
+}
+
+
+/* WORKFLOW STAGE BADGES */
+
+.workflow-stage-badge {
+    display: inline-block;
+    max-width: 190px;
+    padding: 6px 9px;
+
+    border-radius: 6px;
+
+    background: var(--admin-primary-light);
+    color: var(--admin-primary);
+
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.4;
+    white-space: normal;
+}
+
+
+/* CASE PAGINATION */
+
+.case-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    padding: 17px 20px;
+
+    border-top: 1px solid var(--admin-border);
+}
+
+.case-pagination > span {
+    color: var(--admin-muted);
+    font-size: 11px;
+}
+
+.case-pagination-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.case-pagination-actions button {
+    min-width: 105px;
+}
+
+.case-pagination-actions button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+/* CASE OVERSIGHT RESPONSIVE */
+
+@media (max-width: 1100px) {
+
+    .case-filter-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .case-filter-controls > button {
+        width: 100%;
+    }
+
+}
+
+@media (max-width: 760px) {
+
+    .case-oversight-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .case-summary-card {
+        padding: 16px;
+    }
+
+    .case-filter-panel {
+        padding: 17px;
+    }
+
+    .case-filter-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .case-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .case-pagination-actions {
+        width: 100%;
+    }
+
+    .case-pagination-actions button {
+        flex: 1;
+    }
+
+}
+
+@media (max-width: 390px) {
+
+    .case-pagination-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .case-pagination-actions button {
+        width: 100%;
+    }
+
+}

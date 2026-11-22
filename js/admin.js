@@ -1241,3 +1241,615 @@ resetPasswordForm.addEventListener("submit", async (event) => {
 
 
 loadStaffUsers();
+
+
+// ======================================
+// ADMINISTRATOR — CASE OVERSIGHT
+// ======================================
+
+
+// ======================================
+// CASE OVERSIGHT HTML ELEMENTS
+// ======================================
+
+const adminCasesTableBody = document.getElementById(
+    "adminCasesTableBody"
+);
+
+const casesMessage = document.getElementById(
+    "casesMessage"
+);
+
+const caseSearchInput = document.getElementById(
+    "caseSearchInput"
+);
+
+const caseStatusFilter = document.getElementById(
+    "caseStatusFilter"
+);
+
+const caseStageFilter = document.getElementById(
+    "caseStageFilter"
+);
+
+const refreshCasesButton = document.getElementById(
+    "refreshCasesButton"
+);
+
+const clearCaseFiltersButton = document.getElementById(
+    "clearCaseFiltersButton"
+);
+
+const caseRecordCount = document.getElementById(
+    "caseRecordCount"
+);
+
+const caseCurrentPage = document.getElementById(
+    "caseCurrentPage"
+);
+
+const caseTotalPages = document.getElementById(
+    "caseTotalPages"
+);
+
+const casePaginationInfo = document.getElementById(
+    "casePaginationInfo"
+);
+
+const previousCasesPageButton = document.getElementById(
+    "previousCasesPageButton"
+);
+
+const nextCasesPageButton = document.getElementById(
+    "nextCasesPageButton"
+);
+
+
+// ======================================
+// CASE OVERSIGHT STATE
+// ======================================
+
+let currentCasePage = 1;
+
+const CASES_PER_PAGE = 10;
+
+let totalCasePages = 1;
+
+let caseSearchTimeout = null;
+
+
+// ======================================
+// DISPLAY CASE MESSAGE
+// ======================================
+
+function showCasesMessage(message, type = "error") {
+
+    casesMessage.textContent = message;
+
+    casesMessage.className = `dashboard-message ${type}`;
+
+    casesMessage.classList.remove("hidden");
+
+}
+
+
+function hideCasesMessage() {
+
+    casesMessage.textContent = "";
+
+    casesMessage.classList.add("hidden");
+
+}
+
+
+// ======================================
+// FORMAT CASE STATUS CLASS
+// ======================================
+
+function getCaseStatusBadgeClass(status) {
+
+    if (
+        status === "Resolved" ||
+        status === "Closed"
+    ) {
+        return "resolved";
+    }
+
+    if (
+        status === "Pending Review" ||
+        status === "Awaiting Clarification"
+    ) {
+        return "pending";
+    }
+
+    return "active";
+
+}
+
+
+// ======================================
+// FORMAT CASE DATE
+// ======================================
+
+function formatCaseSubmissionDate(dateValue) {
+
+    if (!dateValue) {
+        return "—";
+    }
+
+    const date = new Date(dateValue);
+
+    if (Number.isNaN(date.getTime())) {
+        return "—";
+    }
+
+    return date.toLocaleDateString("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+    });
+
+}
+
+
+// ======================================
+// CREATE TABLE CELL
+// ======================================
+
+function createCaseTableCell(value, className = "") {
+
+    const cell = document.createElement("td");
+
+    cell.textContent = value || "—";
+
+    if (className) {
+        cell.className = className;
+    }
+
+    return cell;
+
+}
+
+
+// ======================================
+// RENDER CASE RECORDS
+// ======================================
+
+function renderAdminCases(cases) {
+
+    adminCasesTableBody.replaceChildren();
+
+    if (!cases || cases.length === 0) {
+
+        const row = document.createElement("tr");
+
+        const cell = document.createElement("td");
+
+        cell.colSpan = 7;
+
+        cell.className = "empty-state";
+
+        cell.textContent = "No matching case records found.";
+
+        row.appendChild(cell);
+
+        adminCasesTableBody.appendChild(row);
+
+        return;
+
+    }
+
+
+    cases.forEach(item => {
+
+        const row = document.createElement("tr");
+
+
+        // CASE NUMBER
+
+        const caseNumberCell = createCaseTableCell(
+            item.caseNumber,
+            "case-number"
+        );
+
+
+        // COMPLAINANT
+
+        const complainantCell = createCaseTableCell(
+            item.complainantName
+        );
+
+
+        // RESPONDENT
+
+        const respondentCell = createCaseTableCell(
+            item.respondentName
+        );
+
+
+        // DISPUTE TYPE
+
+        const disputeCell = createCaseTableCell(
+            item.disputeType
+        );
+
+
+        // CASE STATUS BADGE
+
+        const statusCell = document.createElement("td");
+
+        const statusBadge = document.createElement("span");
+
+        statusBadge.className =
+            `status-badge ${getCaseStatusBadgeClass(item.status)}`;
+
+        statusBadge.textContent = item.status || "Unknown";
+
+        statusCell.appendChild(statusBadge);
+
+
+        // WORKFLOW STAGE
+
+        const stageCell = document.createElement("td");
+
+        const stageBadge = document.createElement("span");
+
+        stageBadge.className = "workflow-stage-badge";
+
+        stageBadge.textContent = item.caseStage || "Not assigned";
+
+        stageCell.appendChild(stageBadge);
+
+
+        // SUBMISSION DATE
+
+        const dateCell = createCaseTableCell(
+            formatCaseSubmissionDate(item.createdAt)
+        );
+
+
+        // ASSEMBLE ROW
+
+        row.appendChild(caseNumberCell);
+        row.appendChild(complainantCell);
+        row.appendChild(respondentCell);
+        row.appendChild(disputeCell);
+        row.appendChild(statusCell);
+        row.appendChild(stageCell);
+        row.appendChild(dateCell);
+
+        adminCasesTableBody.appendChild(row);
+
+    });
+
+}
+
+
+// ======================================
+// UPDATE CASE PAGINATION
+// ======================================
+
+function updateCasePagination(pagination) {
+
+    const totalCases = Number(pagination.totalCases) || 0;
+
+    currentCasePage = Number(pagination.currentPage) || 1;
+
+    totalCasePages = Math.max(
+        1,
+        Number(pagination.totalPages) || 1
+    );
+
+
+    caseRecordCount.textContent = totalCases;
+
+    caseCurrentPage.textContent = currentCasePage;
+
+    caseTotalPages.textContent = totalCasePages;
+
+
+    // RECORD RANGE
+
+    const startRecord = totalCases === 0
+        ? 0
+        : ((currentCasePage - 1) * CASES_PER_PAGE) + 1;
+
+    const endRecord = Math.min(
+        currentCasePage * CASES_PER_PAGE,
+        totalCases
+    );
+
+    casePaginationInfo.textContent =
+        `Showing ${startRecord}–${endRecord} of ${totalCases} cases`;
+
+
+    // BUTTON STATES
+
+    previousCasesPageButton.disabled =
+        currentCasePage <= 1;
+
+    nextCasesPageButton.disabled =
+        currentCasePage >= totalCasePages;
+
+}
+
+
+// ======================================
+// LOAD ADMINISTRATOR CASE RECORDS
+// GET /api/admin/cases
+// ======================================
+
+async function loadAdminCases() {
+
+    hideCasesMessage();
+
+    refreshCasesButton.disabled = true;
+
+    refreshCasesButton.textContent = "Loading...";
+
+
+    adminCasesTableBody.innerHTML = `
+        <tr>
+            <td colspan="7" class="empty-state">
+                Loading case records...
+            </td>
+        </tr>
+    `;
+
+
+    try {
+
+        // ----------------------------------
+        // BUILD QUERY PARAMETERS
+        // ----------------------------------
+
+        const params = new URLSearchParams({
+
+            page: currentCasePage,
+
+            limit: CASES_PER_PAGE
+
+        });
+
+
+        const search = caseSearchInput.value.trim();
+
+        const status = caseStatusFilter.value;
+
+        const caseStage = caseStageFilter.value;
+
+
+        if (search) {
+            params.set("search", search);
+        }
+
+        if (status) {
+            params.set("status", status);
+        }
+
+        if (caseStage) {
+            params.set("caseStage", caseStage);
+        }
+
+
+        // ----------------------------------
+        // SEND REQUEST
+        // ----------------------------------
+
+        const response = await fetch(
+            `${ADMIN_API}/cases?${params.toString()}`,
+            {
+                method: "GET",
+
+                credentials: "include",
+
+                cache: "no-store"
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        // ----------------------------------
+        // AUTHENTICATION CHECK
+        // ----------------------------------
+
+        if (
+            response.status === 401 ||
+            response.status === 403
+        ) {
+
+            window.location.replace("auth.html");
+
+            return;
+
+        }
+
+
+        // ----------------------------------
+        // ERROR CHECK
+        // ----------------------------------
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message || "Unable to load case records."
+            );
+
+        }
+
+
+        // ----------------------------------
+        // UPDATE INTERFACE
+        // ----------------------------------
+
+        renderAdminCases(data.cases);
+
+        updateCasePagination(data.pagination);
+
+
+    } catch (error) {
+
+        console.error(
+            "Administrator case oversight error:",
+            error
+        );
+
+
+        adminCasesTableBody.innerHTML = `
+            <tr>
+                <td colspan="7" class="empty-state">
+                    Unable to load case records.
+                </td>
+            </tr>
+        `;
+
+
+        showCasesMessage(
+            error.message || "Unable to load case records.",
+            "error"
+        );
+
+
+    } finally {
+
+        refreshCasesButton.disabled = false;
+
+        refreshCasesButton.textContent = "↻ Refresh Cases";
+
+    }
+
+}
+
+
+// ======================================
+// SEARCH CASE RECORDS
+// ======================================
+
+caseSearchInput.addEventListener("input", () => {
+
+    clearTimeout(caseSearchTimeout);
+
+    caseSearchTimeout = setTimeout(() => {
+
+        currentCasePage = 1;
+
+        loadAdminCases();
+
+    }, 350);
+
+});
+
+
+// ======================================
+// FILTER CASE STATUS
+// ======================================
+
+caseStatusFilter.addEventListener("change", () => {
+
+    currentCasePage = 1;
+
+    loadAdminCases();
+
+});
+
+
+// ======================================
+// FILTER WORKFLOW STAGE
+// ======================================
+
+caseStageFilter.addEventListener("change", () => {
+
+    currentCasePage = 1;
+
+    loadAdminCases();
+
+});
+
+
+// ======================================
+// CLEAR CASE FILTERS
+// ======================================
+
+clearCaseFiltersButton.addEventListener("click", () => {
+
+    caseSearchInput.value = "";
+
+    caseStatusFilter.value = "";
+
+    caseStageFilter.value = "";
+
+    currentCasePage = 1;
+
+    loadAdminCases();
+
+});
+
+
+// ======================================
+// REFRESH CASE RECORDS
+// ======================================
+
+refreshCasesButton.addEventListener("click", () => {
+
+    loadAdminCases();
+
+});
+
+
+// ======================================
+// PREVIOUS PAGE
+// ======================================
+
+previousCasesPageButton.addEventListener("click", () => {
+
+    if (currentCasePage <= 1) return;
+
+    currentCasePage--;
+
+    loadAdminCases();
+
+});
+
+
+// ======================================
+// NEXT PAGE
+// ======================================
+
+nextCasesPageButton.addEventListener("click", () => {
+
+    if (currentCasePage >= totalCasePages) return;
+
+    currentCasePage++;
+
+    loadAdminCases();
+
+});
+
+
+// ======================================
+// INITIALIZE CASE OVERSIGHT
+// ======================================
+
+let casesLoadedOnce = false;
+
+document.querySelectorAll('.nav-link').forEach(link => {
+
+    link.addEventListener("click", () => {
+
+        if (link.getAttribute("href") === "#cases") {
+
+            if (!casesLoadedOnce) {
+
+                casesLoadedOnce = true;
+
+                loadAdminCases();
+
+            }
+
+        }
+
+    });
+
+});

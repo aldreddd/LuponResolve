@@ -675,26 +675,187 @@
 
 
 
+            
             <!-- CASE OVERSIGHT -->
             <section id="cases" class="dashboard-section secondary-section">
 
                 <div class="section-heading">
                     <div>
                         <h2>Case Oversight</h2>
-                        <p>Monitor all registered barangay complaints.</p>
+                        <p>Monitor and review all registered barangay complaints.</p>
                     </div>
+
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        id="refreshCasesButton"
+                    >
+                        ↻ Refresh Cases
+                    </button>
                 </div>
 
-                <div class="placeholder-panel">
-                    <span class="placeholder-icon">▤</span>
-                    <h3>Case Monitoring</h3>
-                    <p>
-                        Searchable case records and workflow monitoring
-                        will be implemented in the next milestone.
-                    </p>
+                <!-- CASE MESSAGE -->
+                <div
+                    id="casesMessage"
+                    class="dashboard-message hidden"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+                <!-- CASE SUMMARY -->
+                <div class="case-oversight-summary">
+
+                    <div class="case-summary-card">
+                        <span class="summary-label">Matching Records</span>
+                        <strong id="caseRecordCount">0</strong>
+                        <span class="summary-description">Cases found</span>
+                    </div>
+
+                    <div class="case-summary-card">
+                        <span class="summary-label">Current Page</span>
+                        <strong id="caseCurrentPage">1</strong>
+                        <span class="summary-description">Page number</span>
+                    </div>
+
+                    <div class="case-summary-card">
+                        <span class="summary-label">Total Pages</span>
+                        <strong id="caseTotalPages">1</strong>
+                        <span class="summary-description">Available pages</span>
+                    </div>
+
+                </div>
+
+                <!-- CASE FILTERS -->
+                <div class="case-filter-panel">
+
+                    <div class="case-filter-heading">
+                        <div>
+                            <h3>Case Records</h3>
+                            <p>Search and filter registered complaints.</p>
+                        </div>
+                    </div>
+
+                    <div class="case-filter-controls">
+
+                        <div class="case-search-field">
+                            <label for="caseSearchInput">Search cases</label>
+
+                            <input
+                                type="search"
+                                id="caseSearchInput"
+                                placeholder="Case number, complainant, respondent..."
+                                maxlength="100"
+                            >
+                        </div>
+
+                        <div class="case-select-field">
+                            <label for="caseStatusFilter">Case Status</label>
+
+                            <select id="caseStatusFilter">
+                                <option value="">All Statuses</option>
+                                <option value="Pending Review">Pending Review</option>
+                                <option value="Under Review">Under Review</option>
+                                <option value="Awaiting Clarification">Awaiting Clarification</option>
+                                <option value="Ready for Lupon Assessment">Ready for Lupon Assessment</option>
+                            </select>
+                        </div>
+
+                        <div class="case-select-field">
+                            <label for="caseStageFilter">Workflow Stage</label>
+
+                            <select id="caseStageFilter">
+                                <option value="">All Workflow Stages</option>
+                                <option value="Secretary Review">Secretary Review</option>
+                                <option value="For Lupon Assessment">For Lupon Assessment</option>
+                                <option value="Mediation">Mediation</option>
+                                <option value="Conciliation">Conciliation</option>
+                                <option value="Arbitration">Arbitration</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Certificate to File Action">Certificate to File Action</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="clearCaseFiltersButton"
+                        >
+                            Clear Filters
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- CASE TABLE -->
+                <div class="case-table-panel">
+
+                    <div class="table-responsive">
+
+                        <table class="data-table case-oversight-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Case Number</th>
+                                    <th>Complainant</th>
+                                    <th>Respondent</th>
+                                    <th>Dispute Type</th>
+                                    <th>Case Status</th>
+                                    <th>Workflow Stage</th>
+                                    <th>Date Submitted</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="adminCasesTableBody">
+
+                                <tr>
+                                    <td colspan="7" class="empty-state">
+                                        Loading case records...
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <!-- PAGINATION -->
+                    <div class="case-pagination">
+
+                        <span id="casePaginationInfo">
+                            Showing 0 records
+                        </span>
+
+                        <div class="case-pagination-actions">
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="previousCasesPageButton"
+                                disabled
+                            >
+                                ← Previous
+                            </button>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="nextCasesPageButton"
+                                disabled
+                            >
+                                Next →
+                            </button>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
             </section>
+
 
 
             <!-- HEARING OVERVIEW -->
