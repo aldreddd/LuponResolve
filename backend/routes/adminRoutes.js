@@ -441,4 +441,418 @@ router.post(
 );
 
 
+// ======================================
+// ADMINISTRATOR — UPDATE STAFF ACCOUNT
+// PUT /api/admin/users/:id
+// ADMIN ONLY
+// ======================================
+
+router.put(
+    "/users/:id",
+    requireAuth,
+    requireAdmin,
+    async (req, res) => {
+
+        let client;
+
+        try {
+
+            const userId = Number(req.params.id);
+
+            const {
+                fullName,
+                email,
+                role
+            } = req.body || {};
+
+
+            // ----------------------------------
+            // VALIDATE USER ID
+            // ----------------------------------
+
+            if (
+                !Number.isSafeInteger(userId) ||
+                userId <= 0
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid staff account ID."
+                });
+            }
+
+
+            // ----------------------------------
+            // VALIDATE FULL NAME
+            // ----------------------------------
+
+            if (
+                typeof fullName !== "string" ||
+                fullName.trim().length < 2 ||
+                fullName.trim().length > 100
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Full name must be between 2 and 100 characters."
+                });
+            }
+
+
+            // ----------------------------------
+            // VALIDATE EMAIL
+            // ----------------------------------
+
+            if (typeof email !== "string") {
+                return res.status(400).json({
+                    success: false,
+                    message: "A valid email address is required."
+                });
+            }
+
+            const normalizedEmail = email.trim().toLowerCase();
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (
+                normalizedEmail.length > 254 ||
+                !emailRegex.test(normalizedEmail)
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Please provide a valid email address."
+                });
+            }
+
+
+            // ----------------------------------
+            // VALIDATE ROLE
+            // ----------------------------------
+
+            if (!["secretary", "lupon"].includes(role)) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Only Secretary and Lupon roles are allowed."
+                });
+            }
+
+
+            // ----------------------------------
+            // BEGIN DATABASE TRANSACTION
+            // ----------------------------------
+
+            client = await pool.connect();
+
+            await client.query("BEGIN");
+
+
+            // ----------------------------------
+            // CHECK DUPLICATE EMAIL
+            // ----------------------------------
+
+            const existingEmail = await client.query(
+                `
+                SELECT id
+                FROM users
+                WHERE email = $1
+                AND id <> $2
+                LIMIT 1
+                `,
+                [normalizedEmail, userId]
+            );
+
+            if (existingEmail.rows.length > 0) {
+
+                await client.query("ROLLBACK");
+
+                return res.status(409).json({
+                    success: false,
+                    message: "Another account already uses this email address."
+                });
+
+            }
+
+
+            // ----------------------------------
+            // UPDATE STAFF ACCOUNT
+            // ----------------------------------
+
+            const result = await client.query(
+                `
+                UPDATE users
+                SET
+                    full_name = $1,
+                    email = $2,
+                    role = $3
+                WHERE
+                    id = $4
+                    AND role IN ('secretary', 'lupon')
+                RETURNING
+                    id,
+                    full_name,
+                    email,
+                    role,
+                    created_at
+                `,
+                [
+                    fullName.trim(),
+                    normalizedEmail,
+                    role,
+                    userId
+                ]
+            );
+
+            if (result.rows.length === 0) {
+
+                await client.query("ROLLBACK");
+
+                return res.status(404).json({
+                    success: false,
+                    message: "Staff account not found."
+                });
+
+            }
+
+
+            // ----------------------------------
+            // INVALIDATE EXISTING STAFF SESSIONS
+            // ----------------------------------
+
+            await client.query(
+                `
+                DELETE FROM sessions
+                WHERE sess->'user'->>'id' = $1
+                `,
+                [String(userId)]
+            );
+
+
+            // ----------------------------------
+            // COMMIT TRANSACTION
+            // ----------------------------------
+
+            await client.query("COMMIT");
+
+            const updatedUser = result.rows[0];
+
+            return res.status(200).json({
+
+                success: true,
+
+                message: "Staff account updated successfully. The staff member must log in again.",
+
+                user: {
+                    id: updatedUser.id,
+                    fullName: updatedUser.full_name,
+                    email: updatedUser.email,
+                    role: updatedUser.role,
+                    createdAt: updatedUser.created_at
+                }
+
+            });
+
+        } catch (error) {
+
+            if (client) {
+                await client.query("ROLLBACK").catch(() => {});
+            }
+
+            if (error.code === "23505") {
+                return res.status(409).json({
+                    success: false,
+                    message: "Another account already uses this email address."
+                });
+            }
+
+            console.error(
+                "Admin staff account update error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message: "Unable to update staff account."
+            });
+
+        } finally {
+
+            if (client) {
+                client.release();
+            }
+
+        }
+
+    }
+);
+
+
+// ======================================
+// ADMINISTRATOR — RESET STAFF PASSWORD
+// PATCH /api/admin/users/:id/password
+// ADMIN ONLY
+// ======================================
+
+router.patch(
+    "/users/:id/password",
+    requireAuth,
+    requireAdmin,
+    async (req, res) => {
+
+        let client;
+
+        try {
+
+            const userId = Number(req.params.id);
+
+            const { password } = req.body || {};
+
+
+            // ----------------------------------
+            // VALIDATE USER ID
+            // ----------------------------------
+
+            if (
+                !Number.isSafeInteger(userId) ||
+                userId <= 0
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid staff account ID."
+                });
+            }
+
+
+            // ----------------------------------
+            // VALIDATE NEW PASSWORD
+            // ----------------------------------
+
+            if (
+                typeof password !== "string" ||
+                password.length < 8 ||
+                Buffer.byteLength(password, "utf8") > 72
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Password must contain at least 8 characters and must not exceed 72 bytes."
+                });
+            }
+
+
+            // ----------------------------------
+            // HASH NEW PASSWORD
+            // ----------------------------------
+
+            const hashedPassword = await bcrypt.hash(
+                password,
+                12
+            );
+
+
+            // ----------------------------------
+            // BEGIN DATABASE TRANSACTION
+            // ----------------------------------
+
+            client = await pool.connect();
+
+            await client.query("BEGIN");
+
+
+            // ----------------------------------
+            // CHECK STAFF ACCOUNT
+            // ----------------------------------
+
+            const staffResult = await client.query(
+                `
+                SELECT id
+                FROM users
+                WHERE id = $1
+                AND role IN ('secretary', 'lupon')
+                LIMIT 1
+                `,
+                [userId]
+            );
+
+            if (staffResult.rows.length === 0) {
+
+                await client.query("ROLLBACK");
+
+                return res.status(404).json({
+                    success: false,
+                    message: "Staff account not found."
+                });
+
+            }
+
+
+            // ----------------------------------
+            // UPDATE PASSWORD
+            // ----------------------------------
+
+            await client.query(
+                `
+                UPDATE users
+                SET password = $1
+                WHERE id = $2
+                AND role IN ('secretary', 'lupon')
+                `,
+                [
+                    hashedPassword,
+                    userId
+                ]
+            );
+
+
+            // ----------------------------------
+            // INVALIDATE EXISTING STAFF SESSIONS
+            // ----------------------------------
+
+            await client.query(
+                `
+                DELETE FROM sessions
+                WHERE sess->'user'->>'id' = $1
+                `,
+                [String(userId)]
+            );
+
+
+            // ----------------------------------
+            // COMMIT TRANSACTION
+            // ----------------------------------
+
+            await client.query("COMMIT");
+
+            return res.status(200).json({
+
+                success: true,
+
+                message: "Staff password reset successfully. The staff member must log in again."
+
+            });
+
+        } catch (error) {
+
+            if (client) {
+                await client.query("ROLLBACK").catch(() => {});
+            }
+
+            console.error(
+                "Admin staff password reset error:",
+                error
+            );
+
+            return res.status(500).json({
+                success: false,
+                message: "Unable to reset staff password."
+            });
+
+        } finally {
+
+            if (client) {
+                client.release();
+            }
+
+        }
+
+    }
+);
+
+
 module.exports = router;

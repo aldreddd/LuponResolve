@@ -364,6 +364,43 @@ const createUserForm = document.getElementById("createUserForm");
 const createUserSubmitButton = document.getElementById("createUserSubmitButton");
 
 
+// EDIT STAFF ACCOUNT ELEMENTS
+
+const editUserPanel = document.getElementById("editUserPanel");
+const editUserForm = document.getElementById("editUserForm");
+
+const editUserFullName = document.getElementById("editUserFullName");
+const editUserEmail = document.getElementById("editUserEmail");
+const editUserRole = document.getElementById("editUserRole");
+
+const editUserSubmitButton = document.getElementById("editUserSubmitButton");
+
+const cancelEditUserButton = document.getElementById("cancelEditUserButton");
+const cancelEditUserFormButton = document.getElementById("cancelEditUserFormButton");
+
+
+// RESET PASSWORD ELEMENTS
+
+const resetPasswordPanel = document.getElementById("resetPasswordPanel");
+const resetPasswordForm = document.getElementById("resetPasswordForm");
+
+const resetPasswordDescription = document.getElementById("resetPasswordDescription");
+
+const resetNewPassword = document.getElementById("resetNewPassword");
+const resetConfirmPassword = document.getElementById("resetConfirmPassword");
+
+const resetPasswordSubmitButton = document.getElementById("resetPasswordSubmitButton");
+
+const cancelResetPasswordButton = document.getElementById("cancelResetPasswordButton");
+const cancelResetPasswordFormButton = document.getElementById("cancelResetPasswordFormButton");
+
+
+// SELECTED STAFF ACCOUNT IDs
+
+let editingUserId = null;
+let resettingUserId = null;
+
+
 // STAFF ACCOUNT DATA
 
 let staffUsers = [];
@@ -435,7 +472,6 @@ function formatUserRegistrationDate(date) {
 
 }
 
-
 // ======================================
 // RENDER STAFF ACCOUNTS
 // ======================================
@@ -464,22 +500,20 @@ function renderStaffUsers() {
 
     userCount.textContent = filteredUsers.length;
 
-    usersTableBody.innerHTML = "";
+    usersTableBody.replaceChildren();
 
     if (filteredUsers.length === 0) {
 
         const row = document.createElement("tr");
-
         const cell = document.createElement("td");
 
-        cell.colSpan = 4;
+        cell.colSpan = 5;
 
         cell.textContent = staffUsers.length === 0
             ? "No staff accounts found."
             : "No matching staff accounts.";
 
         row.appendChild(cell);
-
         usersTableBody.appendChild(row);
 
         return;
@@ -491,44 +525,76 @@ function renderStaffUsers() {
         const row = document.createElement("tr");
 
         const nameCell = document.createElement("td");
-
         const emailCell = document.createElement("td");
-
         const roleCell = document.createElement("td");
-
         const dateCell = document.createElement("td");
+        const actionsCell = document.createElement("td");
 
-
+        // Staff name
         nameCell.textContent = user.fullName;
 
+        // Staff email
         emailCell.textContent = user.email;
 
+        // Role badge
         const roleBadge = document.createElement("span");
 
         roleBadge.className = `user-role-badge ${user.role}`;
-
         roleBadge.textContent = formatStaffRole(user.role);
 
         roleCell.appendChild(roleBadge);
 
+        // Registration date
         dateCell.textContent = formatUserRegistrationDate(
             user.createdAt
         );
 
+        // Edit button
+        const editButton = document.createElement("button");
 
+        editButton.type = "button";
+        editButton.className = "secondary-button staff-action-button";
+        editButton.textContent = "Edit";
+        editButton.dataset.action = "edit";
+        editButton.dataset.userId = user.id;
+
+        editButton.setAttribute(
+            "aria-label",
+            `Edit ${user.fullName}`
+        );
+
+        // Reset password button
+        const passwordButton = document.createElement("button");
+
+        passwordButton.type = "button";
+        passwordButton.className = "primary-button staff-action-button";
+        passwordButton.textContent = "Reset Password";
+        passwordButton.dataset.action = "reset-password";
+        passwordButton.dataset.userId = user.id;
+
+        passwordButton.setAttribute(
+            "aria-label",
+            `Reset password for ${user.fullName}`
+        );
+
+        actionsCell.className = "staff-actions-cell";
+
+        actionsCell.appendChild(editButton);
+        actionsCell.appendChild(passwordButton);
+
+        // Assemble row
         row.appendChild(nameCell);
-
         row.appendChild(emailCell);
-
         row.appendChild(roleCell);
-
         row.appendChild(dateCell);
+        row.appendChild(actionsCell);
 
         usersTableBody.appendChild(row);
 
     });
 
 }
+
 
 
 // ======================================
@@ -542,7 +608,7 @@ async function loadStaffUsers() {
 
         usersTableBody.innerHTML = `
             <tr>
-                <td colspan="4">Loading staff accounts...</td>
+                <td colspan="5">Loading staff accounts...</td>
             </tr>
         `;
 
@@ -590,7 +656,7 @@ async function loadStaffUsers() {
 
         usersTableBody.innerHTML = `
             <tr>
-                <td colspan="4">
+                <td colspan="5">
                     Unable to load staff accounts.
                 </td>
             </tr>
@@ -829,5 +895,349 @@ createUserForm.addEventListener("submit", async (event) => {
 // ======================================
 // INITIALIZE USER MANAGEMENT
 // ======================================
+
+// ======================================
+// STAFF ACCOUNT ACTIONS
+// ======================================
+
+
+// ======================================
+// CLOSE EDIT PANEL
+// ======================================
+
+function closeEditUserPanel() {
+
+    editUserForm.reset();
+
+    editUserPanel.classList.add("hidden");
+
+    editingUserId = null;
+
+}
+
+
+// ======================================
+// CLOSE RESET PASSWORD PANEL
+// ======================================
+
+function closeResetPasswordPanel() {
+
+    resetPasswordForm.reset();
+
+    resetPasswordPanel.classList.add("hidden");
+
+    resettingUserId = null;
+
+}
+
+
+// ======================================
+// SHOW EDIT STAFF ACCOUNT PANEL
+// ======================================
+
+function openEditUserPanel(user) {
+
+    closeResetPasswordPanel();
+
+    editingUserId = user.id;
+
+    editUserFullName.value = user.fullName;
+    editUserEmail.value = user.email;
+    editUserRole.value = user.role;
+
+    editUserPanel.classList.remove("hidden");
+
+    hideUsersMessage();
+
+    editUserPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+}
+
+
+// ======================================
+// SHOW RESET PASSWORD PANEL
+// ======================================
+
+function openResetPasswordPanel(user) {
+
+    closeEditUserPanel();
+
+    resettingUserId = user.id;
+
+    resetPasswordForm.reset();
+
+    resetPasswordDescription.textContent =
+        `Set a new password for ${user.fullName}.`;
+
+    resetPasswordPanel.classList.remove("hidden");
+
+    hideUsersMessage();
+
+    resetPasswordPanel.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+}
+
+
+// ======================================
+// STAFF DIRECTORY ACTION HANDLER
+// ======================================
+
+usersTableBody.addEventListener("click", (event) => {
+
+    const button = event.target.closest("button[data-action]");
+
+    if (!button) return;
+
+    const userId = button.dataset.userId;
+
+    const selectedUser = staffUsers.find(
+        user => String(user.id) === String(userId)
+    );
+
+    if (!selectedUser) {
+
+        showUsersMessage(
+            "The selected staff account could not be found.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (button.dataset.action === "edit") {
+
+        openEditUserPanel(selectedUser);
+
+    }
+
+    if (button.dataset.action === "reset-password") {
+
+        openResetPasswordPanel(selectedUser);
+
+    }
+
+});
+
+
+// ======================================
+// CANCEL EDIT
+// ======================================
+
+cancelEditUserButton.addEventListener("click", closeEditUserPanel);
+
+cancelEditUserFormButton.addEventListener("click", closeEditUserPanel);
+
+
+// ======================================
+// CANCEL PASSWORD RESET
+// ======================================
+
+cancelResetPasswordButton.addEventListener(
+    "click",
+    closeResetPasswordPanel
+);
+
+cancelResetPasswordFormButton.addEventListener(
+    "click",
+    closeResetPasswordPanel
+);
+
+
+// ======================================
+// UPDATE STAFF ACCOUNT
+// PUT /api/admin/users/:id
+// ======================================
+
+editUserForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    if (!editingUserId) return;
+
+    hideUsersMessage();
+
+    const fullName = editUserFullName.value.trim();
+    const email = editUserEmail.value.trim();
+    const role = editUserRole.value;
+
+    editUserSubmitButton.disabled = true;
+    editUserSubmitButton.textContent = "Saving Changes...";
+
+    try {
+
+        const response = await fetch(
+            `${ADMIN_API}/users/${encodeURIComponent(editingUserId)}`,
+            {
+                method: "PUT",
+
+                credentials: "include",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    fullName,
+                    email,
+                    role
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401 || response.status === 403) {
+
+            window.location.href = "auth.html";
+            return;
+
+        }
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message || "Unable to update staff account."
+            );
+
+        }
+
+        closeEditUserPanel();
+
+        await loadStaffUsers();
+
+        showUsersMessage(
+            data.message || "Staff account updated successfully.",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error("Staff account update error:", error);
+
+        showUsersMessage(
+            error.message || "Unable to update staff account.",
+            "error"
+        );
+
+    } finally {
+
+        editUserSubmitButton.disabled = false;
+        editUserSubmitButton.textContent = "Save Changes";
+
+    }
+
+});
+
+
+// ======================================
+// RESET STAFF PASSWORD
+// PATCH /api/admin/users/:id/password
+// ======================================
+
+resetPasswordForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    if (!resettingUserId) return;
+
+    hideUsersMessage();
+
+    const password = resetNewPassword.value;
+    const confirmPassword = resetConfirmPassword.value;
+
+    // Check password confirmation
+    if (password !== confirmPassword) {
+
+        showUsersMessage(
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    if (password.length < 8) {
+
+        showUsersMessage(
+            "Password must contain at least 8 characters.",
+            "error"
+        );
+
+        return;
+
+    }
+
+    resetPasswordSubmitButton.disabled = true;
+    resetPasswordSubmitButton.textContent = "Resetting Password...";
+
+    try {
+
+        const response = await fetch(
+            `${ADMIN_API}/users/${encodeURIComponent(resettingUserId)}/password`,
+            {
+                method: "PATCH",
+
+                credentials: "include",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    password
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.status === 401 || response.status === 403) {
+
+            window.location.href = "auth.html";
+            return;
+
+        }
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message || "Unable to reset staff password."
+            );
+
+        }
+
+        closeResetPasswordPanel();
+
+        showUsersMessage(
+            data.message || "Staff password reset successfully.",
+            "success"
+        );
+
+    } catch (error) {
+
+        console.error("Staff password reset error:", error);
+
+        showUsersMessage(
+            error.message || "Unable to reset staff password.",
+            "error"
+        );
+
+    } finally {
+
+        resetPasswordSubmitButton.disabled = false;
+        resetPasswordSubmitButton.textContent = "Reset Password";
+
+    }
+
+});
+
 
 loadStaffUsers();

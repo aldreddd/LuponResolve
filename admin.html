@@ -452,6 +452,149 @@
 
                 </div>
 
+
+                <!-- EDIT STAFF ACCOUNT PANEL -->
+                <div
+                    id="editUserPanel"
+                    class="dashboard-card hidden"
+                >
+                    <div class="section-heading">
+                        <div>
+                            <h3>Edit Staff Account</h3>
+                            <p>Update the selected staff member's account details.</p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelEditUserButton"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+
+                    <form id="editUserForm">
+
+                        <div class="form-group">
+                            <label for="editUserFullName">Full Name</label>
+                            <input
+                                type="text"
+                                id="editUserFullName"
+                                minlength="2"
+                                maxlength="100"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editUserEmail">Email Address</label>
+                            <input
+                                type="email"
+                                id="editUserEmail"
+                                maxlength="254"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editUserRole">Account Role</label>
+                            <select id="editUserRole" required>
+                                <option value="secretary">Secretary</option>
+                                <option value="lupon">Lupon Member</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions">
+                            <button
+                                type="submit"
+                                class="primary-button"
+                                id="editUserSubmitButton"
+                            >
+                                Save Changes
+                            </button>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="cancelEditUserFormButton"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+
+                <!-- RESET STAFF PASSWORD PANEL -->
+                <div
+                    id="resetPasswordPanel"
+                    class="dashboard-card hidden"
+                >
+                    <div class="section-heading">
+                        <div>
+                            <h3>Reset Staff Password</h3>
+                            <p id="resetPasswordDescription">
+                                Set a new password for the selected staff member.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="secondary-button"
+                            id="cancelResetPasswordButton"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+
+                    <form id="resetPasswordForm">
+
+                        <div class="form-group">
+                            <label for="resetNewPassword">New Password</label>
+                            <input
+                                type="password"
+                                id="resetNewPassword"
+                                minlength="8"
+                                autocomplete="new-password"
+                                placeholder="Enter new password"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-group">
+                            <label for="resetConfirmPassword">Confirm New Password</label>
+                            <input
+                                type="password"
+                                id="resetConfirmPassword"
+                                minlength="8"
+                                autocomplete="new-password"
+                                placeholder="Re-enter new password"
+                                required
+                            >
+                        </div>
+
+                        <div class="form-actions">
+                            <button
+                                type="submit"
+                                class="primary-button"
+                                id="resetPasswordSubmitButton"
+                            >
+                                Reset Password
+                            </button>
+
+                            <button
+                                type="button"
+                                class="secondary-button"
+                                id="cancelResetPasswordFormButton"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
                 <!-- STAFF DIRECTORY -->
                 <div class="dashboard-card">
 
@@ -502,14 +645,17 @@
 
                         <table class="data-table">
 
-                            <thead>
-                                <tr>
-                                    <th>Staff Member</th>
-                                    <th>Email Address</th>
-                                    <th>Role</th>
-                                    <th>Registration Date</th>
-                                </tr>
-                            </thead>
+                            
+                        <thead>
+                            <tr>
+                                <th>Staff Member</th>
+                                <th>Email Address</th>
+                                <th>Role</th>
+                                <th>Registration Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
 
                             <tbody id="usersTableBody">
                                 <tr>

@@ -1107,3 +1107,59 @@ tbody tr:last-child td {
     }
 
 }
+
+/* ======================================
+   STAFF ACCOUNT MANAGEMENT ACTIONS
+====================================== */
+
+.staff-actions-cell {
+    min-width: 190px;
+    white-space: nowrap;
+}
+
+.staff-action-button {
+    display: inline-block;
+    margin: 3px 4px 3px 0;
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+#editUserPanel,
+#resetPasswordPanel {
+    margin-bottom: 20px;
+}
+
+#editUserForm,
+#resetPasswordForm {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+#editUserForm .form-actions,
+#resetPasswordForm .form-actions {
+    grid-column: 1 / -1;
+}
+
+#editUserForm .form-group,
+#resetPasswordForm .form-group {
+    min-width: 0;
+}
+
+@media (max-width: 650px) {
+
+    #editUserForm,
+    #resetPasswordForm {
+        grid-template-columns: 1fr;
+    }
+
+    #editUserForm .form-actions,
+    #resetPasswordForm .form-actions {
+        grid-column: auto;
+    }
+
+    .staff-actions-cell {
+        min-width: 160px;
+    }
+
+}
