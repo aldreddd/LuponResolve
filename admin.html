@@ -25,7 +25,7 @@
     <div class="admin-layout">
 
         <!-- SIDEBAR -->
-        <aside class="admin-sidebar">
+        <aside class="admin-sidebar" id="adminSidebar" aria-label="Administrator navigation">
 
             <div class="sidebar-brand">
 
@@ -118,7 +118,19 @@
 
             <header class="admin-header">
 
-                <div>
+                <button
+                    type="button"
+                    class="mobile-menu-toggle"
+                    id="mobileMenuToggle"
+                    aria-controls="adminSidebar"
+                    aria-expanded="false"
+                    aria-label="Open navigation menu"
+                >
+                    <span aria-hidden="true">☰</span>
+                    <span class="mobile-menu-label">Menu</span>
+                </button>
+
+                <div class="header-title-group">
                     <p class="header-eyebrow">
                         BARANGAY JUSTICE SYSTEM
                     </p>
@@ -659,7 +671,7 @@
 
                             <tbody id="usersTableBody">
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="5" class="empty-state">
                                         Loading staff accounts...
                                     </td>
                                 </tr>
@@ -906,6 +918,56 @@
         </main>
 
     </div>
+
+    <script>
+        (function () {
+            "use strict";
+
+            const toggle = document.getElementById("mobileMenuToggle");
+            const sidebar = document.getElementById("adminSidebar");
+            const navLinks = sidebar ? sidebar.querySelectorAll(".nav-link") : [];
+
+            if (!toggle || !sidebar) return;
+
+            function setMenuOpen(isOpen) {
+                document.body.classList.toggle("mobile-menu-open", isOpen);
+                toggle.setAttribute("aria-expanded", String(isOpen));
+                toggle.setAttribute(
+                    "aria-label",
+                    isOpen ? "Close navigation menu" : "Open navigation menu"
+                );
+                toggle.querySelector("span").textContent = isOpen ? "×" : "☰";
+            }
+
+            toggle.addEventListener("click", function () {
+                setMenuOpen(toggle.getAttribute("aria-expanded") !== "true");
+            });
+
+            navLinks.forEach(function (link) {
+                link.addEventListener("click", function () {
+                    setMenuOpen(false);
+                });
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") setMenuOpen(false);
+            });
+
+            document.addEventListener("click", function (event) {
+                if (
+                    document.body.classList.contains("mobile-menu-open") &&
+                    !sidebar.contains(event.target) &&
+                    !toggle.contains(event.target)
+                ) {
+                    setMenuOpen(false);
+                }
+            });
+
+            window.addEventListener("resize", function () {
+                if (window.innerWidth > 760) setMenuOpen(false);
+            });
+        })();
+    </script>
 
 </body>
 </html>

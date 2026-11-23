@@ -1,263 +1,280 @@
 
-const express = require("express");
-const crypto = require("crypto");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const {
-    requireAuth,
-    requireRole
-} = require("../middleware/authMiddleware");
+    <title>Secretary Dashboard | LuponResolve</title>
 
-const {
-    getOAuthClient,
-    saveRefreshToken,
-    getRefreshToken,
-    sendGmailMessage,
-    disconnectGmail
-} = require("../services/gmailService");
+    <link rel="stylesheet" href="css/secretary.css">
+</head>
+<body>
 
-const router = express.Router();
+    <!-- SIDEBAR -->
+    <aside class="secretary-sidebar">
 
-// Gmail sending permission only.
-const GMAIL_SCOPES = [
-    "https://www.googleapis.com/auth/gmail.send"
-];
+        <div class="secretary-brand">
+            <div class="brand-icon">LR</div>
+            <div>
+                <h2>LuponResolve</h2>
+                <p>Administration Portal</p>
+            </div>
+        </div>
 
-// ======================================
-// ADMIN ACCESS
-// ======================================
+        <div class="sidebar-heading">WORKSPACE</div>
 
-const requireAdmin = [
-    requireAuth,
-    requireRole("admin")
-];
+        <nav class="secretary-navigation">
+            <a href="#overview" class="secretary-nav-link active" data-page="overview">
+                <span>⌂</span>
+                Overview
+            </a>
 
-// ======================================
-// START GMAIL CONNECTION
-// ======================================
+            <a href="#complaints" class="secretary-nav-link" data-page="complaints">
+                <span>▤</span>
+                Complaints
+            </a>
 
-router.get("/connect", requireAdmin, async (req, res) => {
-    try {
-        const oauth2Client = getOAuthClient();
+            <a href="workflow.html" class="secretary-nav-link">
+                <span>↗</span>
+                Case Workflow
+            </a>
+        </nav>
 
-        const state = crypto.randomBytes(32).toString("hex");
+        <div class="secretary-sidebar-footer">
+            <div class="secretary-avatar">S</div>
+            <div>
+                <strong>Secretary Account</strong>
+                <small>Barangay Secretary</small>
+            </div>
+        </div>
 
-        req.session.gmailOAuthState = state;
+            <button type="button" class="secretary-nav-link logout-button" id="logoutButton">
+                <span>↪</span>
+                Log Out
+            </button>
 
-        const authorizationUrl = oauth2Client.generateAuthUrl({
-            access_type: "offline",
-            prompt: "consent",
-            scope: GMAIL_SCOPES,
-            state
-        });
-
-        req.session.save(error => {
-            if (error) {
-                console.error("Gmail session save failed:", error);
-                return res.status(500).send("Unable to start Gmail authorization.");
-            }
-
-            res.redirect(authorizationUrl);
-        });
-
-    } catch (error) {
-        console.error("Gmail connection initialization failed:", error.message);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to initialize Gmail connection."
-        });
-    }
-});
-
-// ======================================
-// GOOGLE OAUTH CALLBACK
-// ======================================
-
-router.get("/callback", requireAdmin, async (req, res) => {
-    try {
-        const { code, state, error: googleError } = req.query;
-
-        if (googleError) {
-            delete req.session.gmailOAuthState;
-
-            return res.status(400).send(
-                "Gmail authorization was not completed. You may close this page."
-            );
-        }
-
-        const savedState = req.session.gmailOAuthState;
-
-        if (
-            typeof state !== "string" ||
-            typeof savedState !== "string"
-        ) {
-            return res.status(403).send("Invalid Gmail authorization state.");
-        }
-
-        const receivedState = Buffer.from(state);
-        const expectedState = Buffer.from(savedState);
-
-        if (
-            receivedState.length !== expectedState.length ||
-            !crypto.timingSafeEqual(receivedState, expectedState)
-        ) {
-            return res.status(403).send("Gmail authorization state verification failed.");
-        }
-
-        delete req.session.gmailOAuthState;
-
-        await new Promise((resolve, reject) => {
-            req.session.save(error => {
-                if (error) reject(error);
-                else resolve();
-            });
-        });
-
-        if (typeof code !== "string" || !code) {
-            return res.status(400).send("Google did not return an authorization code.");
-        }
-
-        const oauth2Client = getOAuthClient();
-
-        const { tokens } = await oauth2Client.getToken(code);
-
-        if (tokens.refresh_token) {
-            await saveRefreshToken(tokens.refresh_token);
-        } else {
-            const existingToken = await getRefreshToken();
-
-            if (!existingToken) {
-                return res.status(400).send(
-                    "Google did not provide a refresh token. Please restart Gmail authorization."
-                );
-            }
-        }
-
-        res.send(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Gmail Connected - LuponResolve</title>
-            </head>
-            <body style="font-family: Arial, sans-serif; max-width: 560px; margin: 80px auto; padding: 24px; text-align: center; color: #243447;">
-                <h1>Gmail Connected</h1>
-                <p>Your LuponResolve Gmail account has been authorized successfully.</p>
-                <p>You may close this page and return to LuponResolve.</p>
-            </body>
-            </html>
-        `);
-
-    } catch (error) {
-        console.error("Gmail OAuth callback failed:", error.message);
-
-        res.status(500).send(
-            "Gmail authorization failed. Please check the backend logs."
-        );
-    }
-});
-
-// ======================================
-// CHECK GMAIL CONNECTION
-// ======================================
-
-router.get("/status", requireAdmin, async (req, res) => {
-    try {
-        const refreshToken = await getRefreshToken();
-
-        res.json({
-            success: true,
-            connected: Boolean(refreshToken)
-        });
-
-    } catch (error) {
-        console.error("Gmail status check failed:", error.message);
-
-        res.status(500).json({
-            success: false,
-            message: "Unable to check Gmail connection."
-        });
-    }
-});
+    </aside>
 
 
-// ======================================
-// TEST GMAIL EMAIL DELIVERY
-// ======================================
+    <!-- MAIN CONTENT -->
+    <main class="secretary-main">
 
-router.post("/test-send", requireAdmin, async (req, res) => {
-    try {
-        // Always send to the currently logged-in admin.
-        const recipient =
-            process.env.EMAIL_TEST_RECIPIENT || req.session.user.email;
+        <!-- TOPBAR -->
+        <header class="secretary-topbar">
 
-        const result = await sendGmailMessage({
-            to: recipient,
-            subject: "LuponResolve Gmail Integration Test",
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; color: #243447;">
-                    <h2>Gmail Integration Test</h2>
+            <div>
+                <p class="secretary-breadcrumb">
+                    Administration / <span id="secretaryBreadcrumb">Overview</span>
+                </p>
 
-                    <p>Hello!</p>
+                <h1 id="secretaryPageTitle">Overview</h1>
+            </div>
 
+            <div class="secretary-topbar-actions">
+                <span class="online-dot"></span>
+                <span>Secretary Portal</span>
+            </div>
+
+        </header>
+
+
+        <!-- OVERVIEW PAGE -->
+        <section id="overview" class="secretary-page active">
+
+            <div class="secretary-welcome">
+                <div>
+                    <span class="eyebrow">BARANGAY ADMINISTRATION</span>
+                    <h2>Welcome, Secretary</h2>
                     <p>
-                        This is a test email from LuponResolve.
+                        Review resident complaints, inspect preliminary
+                        screening results, and manage administrative records.
                     </p>
-
-                    <p>
-                        Your Gmail API integration is successfully sending emails.
-                    </p>
-
-                    <p>
-                        This is only a test. No hearing notifications were triggered.
-                    </p>
-
-                    <p>LuponResolve System</p>
                 </div>
-            `
-        });
 
-        res.json({
-            success: true,
-            message: "Test email sent successfully through Gmail.",
-            recipient,
-            emailId: result.emailId
-        });
-
-    } catch (error) {
-        console.error("Gmail test email failed:", error);
-
-        res.status(500).json({
-            success: false,
-            message: "Gmail test email failed.",
-            error: error.message
-        });
-    }
-});
+                <div class="welcome-symbol">⚖</div>
+            </div>
 
 
-// ======================================
-// DISCONNECT GMAIL
-// ======================================
+            <!-- STATISTICS -->
+            <div class="secretary-section-heading">
+                <div>
+                    <h2>Complaint Overview</h2>
+                    <p>Summary of complaints stored in this browser.</p>
+                </div>
+            </div>
 
-router.post("/disconnect", requireAdmin, async (req, res) => {
-    try {
-        await disconnectGmail();
+            <div class="secretary-stats">
 
-        res.json({
-            success: true,
-            message: "Gmail account disconnected from LuponResolve."
-        });
+                <article class="secretary-stat-card">
+                    <div class="secretary-stat-icon blue">▤</div>
+                    <p>Total Complaints</p>
+                    <h3 id="secretaryTotal">0</h3>
+                </article>
 
-    } catch (error) {
-        console.error("Gmail disconnection failed:", error.message);
+                <article class="secretary-stat-card">
+                    <div class="secretary-stat-icon orange">◷</div>
+                    <p>Pending Review</p>
+                    <h3 id="secretaryPending">0</h3>
+                </article>
 
-        res.status(500).json({
-            success: false,
-            message: "Unable to disconnect Gmail."
-        });
-    }
-});
+                <article class="secretary-stat-card">
+                    <div class="secretary-stat-icon purple">◉</div>
+                    <p>Under Review</p>
+                    <h3 id="secretaryUnderReview">0</h3>
+                </article>
 
-module.exports = router;
+                <article class="secretary-stat-card">
+                    <div class="secretary-stat-icon green">✓</div>
+                    <p>Ready for Lupon Assessment</p>
+                    <h3 id="secretaryReady">0</h3>
+                </article>
+
+            </div>
+
+
+            <!-- RECENT COMPLAINTS -->
+            <div class="secretary-panel">
+
+                <div class="secretary-panel-heading">
+                    <div>
+                        <h2>Recent Complaints</h2>
+                        <p>Recently submitted resident complaints.</p>
+                    </div>
+
+                    <button class="secretary-text-button" data-secretary-page="complaints">
+                        View All
+                    </button>
+                </div>
+
+                <div id="secretaryRecentList">
+                    <div class="secretary-empty">
+                        <div class="empty-symbol">▤</div>
+                        <h3>No complaints yet</h3>
+                        <p>Resident submissions will appear here.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- COMPLAINTS PAGE -->
+        <section id="complaints" class="secretary-page">
+
+            <div class="secretary-section-heading">
+                <div>
+                    <h2>Complaint Records</h2>
+                    <p>Search, inspect, and manage submitted complaints.</p>
+                </div>
+            </div>
+
+
+            <!-- SEARCH AND FILTER -->
+            <div class="secretary-toolbar">
+
+                <div class="secretary-search">
+                    <span>⌕</span>
+
+                    <input
+                        type="search"
+                        id="complaintSearch"
+                        placeholder="Search case ID, complainant, or respondent..."
+                    >
+                </div>
+
+                <select id="statusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="Pending Review">Pending Review</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="Awaiting Clarification">Awaiting Clarification</option>
+                    <option value="Ready for Lupon Assessment">Ready for Lupon Assessment</option>
+                </select>
+
+            </div>
+
+
+            <!-- COMPLAINT RECORDS -->
+            <div class="secretary-panel">
+
+                <div class="secretary-panel-heading">
+                    <div>
+                        <h2>All Complaints</h2>
+                        <p id="complaintCount">0 complaints</p>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table class="complaint-table">
+
+                        <thead>
+                            <tr>
+                                <th>CASE ID</th>
+                                <th>COMPLAINANT</th>
+                                <th>DISPUTE TYPE</th>
+                                <th>SCREENING</th>
+                                <th>STATUS</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="complaintTableBody">
+
+                            <tr>
+                                <td colspan="6" class="table-empty">
+                                    No complaints found.
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- COMPLAINT DETAILS PAGE -->
+        <section id="details" class="secretary-page">
+
+            <div class="secretary-section-heading">
+                <div>
+                    <h2>Complaint Details</h2>
+                    <p>Inspect the submitted complaint and its screening information.</p>
+                </div>
+
+                <button class="secretary-secondary-button" id="backToComplaints">
+                    ← Back to Complaints
+                </button>
+            </div>
+
+
+            <div id="complaintDetailsContent">
+
+                <div class="secretary-empty">
+                    <h3>No complaint selected</h3>
+                    <p>Select a complaint from the records page.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <footer class="secretary-footer">
+            LuponResolve &copy; 2026. Barangay Administration Portal.
+        </footer>
+
+    </main>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/secretary.js"></script>
+
+</body>
+</html>
