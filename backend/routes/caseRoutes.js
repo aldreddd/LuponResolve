@@ -4,19 +4,17 @@ const router = express.Router();
 const crypto = require("crypto");
 const { rateLimit } = require("express-rate-limit");
 const screenComplaint = require("../utils/complaintScreening");
-
+const {
+    sendRespondentComplaintNotification,
+    sendComplainantComplaintNotification
+} = require("../services/emailService");
 const pool = require("../config/postgres");
 const {
     requireAuth,
     requireRole
 } = require("../middleware/authMiddleware");
-const {
-    uploadEvidence
-} = require("../middleware/evidenceUpload");
-
-const {
-    validateEvidenceFiles
-} = require("../middleware/evidenceUpload");
+const {uploadEvidence} = require("../middleware/evidenceUpload");
+const {validateEvidenceFiles} = require("../middleware/evidenceUpload");
 
 const {
     supabase,
@@ -359,6 +357,7 @@ router.post(
     let {
     complainantName,
     complainantContact,
+    complainantEmail,
     respondentName,
     respondentAddress,
     respondentEmail,
@@ -402,22 +401,44 @@ router.post(
     // NORMALIZE OPTIONAL FIELDS
     // ----------------------------------
 
+    // ----------------------------------
+// NORMALIZE AND VALIDATE EMAIL FIELDS
+// ----------------------------------
+
     if (
+        typeof complainantEmail !== "string" ||
         (respondentAddress != null && typeof respondentAddress !== "string") ||
         (respondentEmail != null && typeof respondentEmail !== "string")
     ) {
         return res.status(400).json({
             success: false,
-            message: "Invalid respondent contact information."
+            message: "Invalid email or respondent contact information."
         });
     }
 
+    const cleanComplainantEmail = complainantEmail.trim().toLowerCase();
     const cleanRespondentAddress = (respondentAddress || "").trim();
     const cleanRespondentEmail = (respondentEmail || "").trim().toLowerCase();
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (
+        !cleanComplainantEmail ||
+        cleanComplainantEmail.length > 254 ||
+        !emailRegex.test(cleanComplainantEmail)
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: "Please provide a valid complainant email address."
+        });
+    }
+
     if (
         cleanRespondentEmail &&
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanRespondentEmail)
+        (
+            cleanRespondentEmail.length > 254 ||
+            !emailRegex.test(cleanRespondentEmail)
+        )
     ) {
         return res.status(400).json({
             success: false,
@@ -557,6 +578,7 @@ try {
                 resident_id,
                 complainant_name,
                 complainant_contact,
+                complainant_email,
                 respondent_name,
                 respondent_address,
                 respondent_email,
@@ -572,9 +594,9 @@ try {
             )
             VALUES (
                 NULL,
-                $1, $2, $3, $4, $5, $6, $7,
+                $1, $2, $3, $4, $5, $6, $7, $8,
                 'Pending Review',
-                $8, $9, $10, $11, $12,
+                $9, $10, $11, $12, $13,
                 'Secretary Review'
             )
             RETURNING id
@@ -582,6 +604,7 @@ try {
             [
                 complainantName.trim(),
                 complainantContact.trim(),
+                cleanComplainantEmail,
                 respondentName.trim(),
                 cleanRespondentAddress || null,
                 cleanRespondentEmail || null,
@@ -677,69 +700,83 @@ try {
                 ]
             );
         }
-        // ----------------------------------
-        // UPLOAD EVIDENCE TO SUPABASE
-        // ----------------------------------
+        await client.query("COMMIT");
 
-        for (const file of req.files || []) {
-            const extensionByMimeType = {
-                "image/jpeg": "jpg",
-                "image/png": "png",
-                "application/pdf": "pdf"
-            };
+        // ======================================
+        // SEND RESPONDENT EMAIL NOTIFICATION
+        // ======================================
 
-            const extension = extensionByMimeType[file.mimetype];
+        // This happens AFTER the complaint is saved.
+        // Email failure must not affect complaint submission.
 
-            const storageKey =
-                `${caseId}/${crypto.randomUUID()}.${extension}`;
+        
+        // ======================================
+        // SEND COMPLAINANT EMAIL CONFIRMATION
+        // ======================================
 
-            // Upload actual file to private Supabase Storage.
-            const { error: storageError } = await supabase.storage
-                .from(supabaseBucket)
-                .upload(storageKey, file.buffer, {
-                    contentType: file.mimetype,
-                    upsert: false
-                });
+        // The complaint is already committed.
+        // Email failures must never undo the submission.
 
-            if (storageError) {
-                throw storageError;
+        try {
+            const emailResult = await sendComplainantComplaintNotification({
+                to: cleanComplainantEmail,
+                complainantName: complainantName.trim(),
+                caseNumber,
+                trackingCode
+            });
+
+            if (emailResult.success) {
+                console.log(
+                    `Complainant confirmation sent for ${caseNumber}.`
+                );
+            } else {
+                console.log(
+                    `Complainant confirmation skipped for ${caseNumber}:`,
+                    emailResult.reason
+                );
             }
 
-            // Track uploaded files for cleanup if something fails.
-            uploadedStorageKeys.push(storageKey);
-
-            // Safely store the original filename for display.
-            const originalFilename = file.originalname
-                .replace(/\\/g, "/")
-                .split("/")
-                .pop()
-                .replace(/[\u0000-\u001f\u007f]/g, "")
-                .slice(0, 255);
-
-            // Save file metadata in Neon PostgreSQL.
-            await client.query(
-                `
-                    INSERT INTO case_evidence (
-                        case_id,
-                        uploaded_by,
-                        original_filename,
-                        storage_key,
-                        mime_type,
-                        file_size,
-                        uploader_type
-                    )
-                    VALUES ($1, NULL, $2, $3, $4, $5, 'guest')
-                `,
-                [
-                    caseId,
-                    originalFilename,
-                    storageKey,
-                    file.mimetype,
-                    file.size
-                ]
+        } catch (emailError) {
+            console.error(
+                `Complainant confirmation failed for ${caseNumber}:`,
+                emailError.message
             );
         }
-        await client.query("COMMIT");
+
+        // ======================================
+        // SEND RESPONDENT EMAIL NOTIFICATION
+        // ======================================
+
+        // The respondent receives the case number only.
+        // Never pass the complainant's private tracking code.
+
+        if (cleanRespondentEmail) {
+            try {
+                const emailResult = await sendRespondentComplaintNotification({
+                    to: cleanRespondentEmail,
+                    respondentName: respondentName.trim(),
+                    caseNumber
+                });
+
+                if (emailResult.success) {
+                    console.log(
+                        `Respondent notification sent for ${caseNumber}.`
+                    );
+                } else {
+                    console.log(
+                        `Respondent notification skipped for ${caseNumber}:`,
+                        emailResult.reason
+                    );
+                }
+
+            } catch (emailError) {
+                console.error(
+                    `Respondent notification failed for ${caseNumber}:`,
+                    emailError.message
+                );
+            }
+        }
+
 
         return res.status(201).json({
             success: true,

@@ -253,6 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
         [
             "complainantName",
             "complainantContact",
+            "complainantEmail",
             "respondentName",
             "respondentAddress",
             "respondentEmail",

@@ -189,22 +189,33 @@ router.get("/status", requireAdmin, async (req, res) => {
 router.post("/test-send", requireAdmin, async (req, res) => {
     try {
         // Always send to the currently logged-in admin.
-        const recipient = req.session.user.email;
+        const recipient =
+            process.env.EMAIL_TEST_RECIPIENT || req.session.user.email;
 
         const result = await sendGmailMessage({
             to: recipient,
             subject: "LuponResolve Gmail Integration Test",
-            text: [
-                "Hello!",
-                "",
-                "This is a test email from LuponResolve.",
-                "",
-                "Your Gmail API integration is successfully sending emails.",
-                "",
-                "This is only a test. No hearing notifications were triggered.",
-                "",
-                "LuponResolve System"
-            ].join("\n")
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 24px; color: #243447;">
+                    <h2>Gmail Integration Test</h2>
+
+                    <p>Hello!</p>
+
+                    <p>
+                        This is a test email from LuponResolve.
+                    </p>
+
+                    <p>
+                        Your Gmail API integration is successfully sending emails.
+                    </p>
+
+                    <p>
+                        This is only a test. No hearing notifications were triggered.
+                    </p>
+
+                    <p>LuponResolve System</p>
+                </div>
+            `
         });
 
         res.json({

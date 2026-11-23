@@ -822,6 +822,9 @@ complaintForm.addEventListener("submit", async function(event) {
     const complainantName =
         document.getElementById("complainantName").value.trim();
 
+    const complainantEmail =
+        document.getElementById("complainantEmail").value.trim();
+
     const complainantContact =
         document.getElementById("complainantContact").value.trim();
 
@@ -851,14 +854,14 @@ complaintForm.addEventListener("submit", async function(event) {
     const requiredScreeningAnswers = Object.values(screeningAnswers);
 
     if (
-        !complainantName ||
-        !complainantContact ||
-        !respondentName ||
-        !disputeType ||
-        !incidentDetails ||
-        requiredScreeningAnswers.some(answer => !answer)
-    ) {
-
+            !complainantName ||
+            !complainantContact ||
+            !complainantEmail ||
+            !respondentName ||
+            !disputeType ||
+            !incidentDetails ||
+            requiredScreeningAnswers.some(answer => !answer)
+        ) {
         formMessage.textContent =
             "Please complete all required complaint and screening fields.";
 
@@ -927,6 +930,8 @@ complaintForm.addEventListener("submit", async function(event) {
 
         complainantContact: complainantContact,
 
+        complainantEmail: complainantEmail,
+
         respondentName: respondentName,
 
         respondentAddress: respondentAddress,
@@ -974,6 +979,7 @@ complaintForm.addEventListener("submit", async function(event) {
 
                 body: JSON.stringify({
                     complainantName: complaint.complainantName,
+                    complainantEmail: complaint.complainantEmail,
                     respondentName: complaint.respondentName,
                     respondentAddress: complaint.respondentAddress,
                     respondentEmail: complaint.respondentEmail,
