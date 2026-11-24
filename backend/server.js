@@ -146,7 +146,10 @@ app.use(
     "/js",
     express.static(path.join(PROJECT_ROOT, "js"))
 );
-
+app.use(
+    "/assets",
+    express.static(path.join(PROJECT_ROOT, "assets"))
+);
 
 // ======================================
 // FRONTEND HTML PAGES

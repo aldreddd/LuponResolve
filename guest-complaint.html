@@ -10,6 +10,14 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon.png?v=4">       
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/guest-complaint.css">
+    <style>
+        .guest-header-actions { display:flex; align-items:center; gap:12px; }
+        .language-toggle { white-space:nowrap; cursor:pointer; }
+        @media (max-width: 600px) {
+            .guest-header { flex-wrap:wrap; gap:12px; }
+            .guest-header-actions { width:100%; justify-content:space-between; }
+        }
+    </style>
     <script src="js/config.js" defer></script>
     <script src="js/guest-complaint.js" defer></script>
 </head>
@@ -23,9 +31,15 @@
             <span>LuponResolve</span>
         </a>
 
-        <a href="index.html" class="back-link">
-            ← Back to Home
-        </a>
+        <div class="guest-header-actions">
+            <button type="button" id="languageToggleBtn" class="button button-secondary language-toggle"
+                    aria-label="Switch language to Cebuano" aria-pressed="false">
+                Cebuano
+            </button>
+            <a href="index.html" class="back-link">
+                ← Back to Home
+            </a>
+        </div>
     </header>
 
 
@@ -69,7 +83,135 @@
             </div>
 
 
-            <!-- SECTION 1: COMPLAINANT -->
+            <!-- SECTION 5: PRELIMINARY SCREENING -->
+            <section class="form-section" id="screeningSection">
+
+                <div class="form-section-heading">
+                    <span class="section-number">05</span>
+
+                    <div>
+                        <h2>Preliminary jurisdiction screening</h2>
+                        <p>
+                            These questions help determine whether your complaint
+                            may be handled through the Barangay Justice System.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="screening-notice">
+                    Please answer to the best of your knowledge. If you are
+                    unsure, choose "Unsure." Barangay personnel will review
+                    your responses.
+                </div>
+
+
+                <!-- GOVERNMENT PARTY -->
+                <div class="form-field full-width">
+                    <label for="governmentParty">
+                        1. Is one of the parties the government, or a government subdivision or instrumentality?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="governmentParty" name="governmentParty" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+
+                <!-- PUBLIC OFFICIAL -->
+                <div class="form-field full-width">
+                    <label for="publicOfficial">
+                        2. Does the dispute involve a public officer or employee in relation to their official functions?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="publicOfficial" name="publicOfficial" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+                <!-- PENALTY THRESHOLD -->
+                <div class="form-field full-width">
+                    <label for="penaltyThreshold">
+                        3. Does the offense potentially carry imprisonment exceeding one (1) year or a fine exceeding ₱5,000?
+                        <span class="required">*</span>
+                    </label>
+                    <select id="penaltyThreshold" name="penaltyThreshold" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable (no criminal offense)</option>
+                    </select>
+                </div>
+
+
+                <!-- PRIVATE OFFENDED PARTY -->
+                <div class="form-field full-width">
+                    <label for="privateOffendedParty">
+                        4. Is there a private offended party?
+                        <span class="required">*</span>
+                    </label>
+                    <select id="privateOffendedParty" name="privateOffendedParty" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                        <option value="not_applicable">Not applicable</option>
+                    </select>
+                </div>
+
+
+                <!-- REAL PROPERTY -->
+                <div class="form-field full-width">
+                    <label for="realPropertyException">
+                        5. If the dispute involves real property, are the properties located in different cities or municipalities without agreement to submit to this Lupon?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="realPropertyException" name="realPropertyException" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+
+                <!-- ADJOINING BARANGAYS -->
+                <div class="form-field full-width">
+                    <label for="differentMunicipalitiesException">
+                        6. Do the complainant and respondent live in different cities or municipalities where their barangays are not adjoining, or, if adjoining, do they not both agree to submit the dispute to this Lupon?
+                        <span class="required">*</span>
+                    </label>
+
+                    <select id="differentMunicipalitiesException" name="differentMunicipalitiesException" required>
+                        <option value="">Select an answer</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                        <option value="unsure">Unsure</option>
+                    </select>
+                </div>
+            </section>
+
+            <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
+
+            <div class="form-submit-section screening-continue-section" id="screeningContinueSection">
+                <p class="form-privacy-note">
+                    Complete the preliminary screening to continue to the complaint information.
+                </p>
+                <button type="button" id="continueToComplaintBtn" class="button button-primary">
+                    Continue to Complaint Information
+                </button>
+            </div>
+
+<div id="complaintDetailsSection" hidden>
+<!-- SECTION 1: COMPLAINANT -->
             <section class="form-section">
 
                 <div class="form-section-heading">
@@ -347,131 +489,6 @@
             </section>
 
 
-            <!-- SECTION 5: PRELIMINARY SCREENING -->
-            <section class="form-section">
-
-                <div class="form-section-heading">
-                    <span class="section-number">05</span>
-
-                    <div>
-                        <h2>Preliminary jurisdiction screening</h2>
-                        <p>
-                            These questions help determine whether your complaint
-                            may be handled through the Barangay Justice System.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="screening-notice">
-                    Please answer to the best of your knowledge. If you are
-                    unsure, choose "Unsure." Barangay personnel will review
-                    your responses.
-                </div>
-
-
-                <!-- GOVERNMENT PARTY -->
-                <div class="form-field full-width">
-                    <label for="governmentParty">
-                        1. Is one of the parties the government, or a government subdivision or instrumentality?
-                        <span class="required">*</span>
-                    </label>
-
-                    <small class="screening-help">
-                        Examples include the Philippine National Police (PNP), Armed Forces
-                        of the Philippines (AFP), Department of Education (DepEd),
-                        Department of Health (DOH), Department of Social Welfare and
-                        Development (DSWD), and city or municipal governments.
-
-                        Answer Yes only when the government entity itself is a party
-                        to the dispute, not merely because a government employee is involved.
-                    </small>
-
-                    <select id="governmentParty" name="governmentParty" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                    </select>
-                </div>
-
-
-                <!-- PUBLIC OFFICIAL -->
-                <div class="form-field full-width">
-                    <label for="publicOfficial">
-                        2. Does the dispute involve a public officer or employee in relation to their official functions?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="publicOfficial" name="publicOfficial" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                    </select>
-                </div>
-
-                <!-- PENALTY THRESHOLD -->
-                <div class="form-field full-width">
-                    <label for="penaltyThreshold">
-                        3. Does the offense potentially carry imprisonment exceeding one (1) year or a fine exceeding ₱5,000?
-                        <span class="required">*</span>
-                    </label>
-                    <select id="penaltyThreshold" name="penaltyThreshold" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                        <option value="not_applicable">Not applicable (no criminal offense)</option>
-                    </select>
-                </div>
-
-
-                <!-- PRIVATE OFFENDED PARTY -->
-                <div class="form-field full-width">
-                    <label for="privateOffendedParty">
-                        4. Is there a private offended party?
-                        <span class="required">*</span>
-                    </label>
-                    <select id="privateOffendedParty" name="privateOffendedParty" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                        <option value="not_applicable">Not applicable</option>
-                    </select>
-                </div>
-
-
-                <!-- REAL PROPERTY -->
-                <div class="form-field full-width">
-                    <label for="realPropertyException">
-                        5. If the dispute involves real property, are the properties located in different cities or municipalities without agreement to submit to this Lupon?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="realPropertyException" name="realPropertyException" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                    </select>
-                </div>
-
-                <!-- ADJOINING BARANGAYS -->
-                <div class="form-field full-width">
-                    <label for="differentMunicipalitiesException">
-                        6. Do the complainant and respondent live in different cities or municipalities where their barangays are not adjoining, or, if adjoining, do they not both agree to submit the dispute to this Lupon?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="differentMunicipalitiesException" name="differentMunicipalitiesException" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                    </select>
-                </div>
-
             <!-- SUBMISSION -->
             <section class="form-submit-section">
 
@@ -481,8 +498,6 @@
                     consent to its use by authorized barangay personnel for
                     complaint processing.
                 </p>
-
-                <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
 
                 <button type="submit" id="submitComplaintBtn" class="button button-primary">
                     Submit Complaint
@@ -494,7 +509,9 @@
 
             </section>
 
-        </form>
+</div>
+
+</form>
 
     </main>
 

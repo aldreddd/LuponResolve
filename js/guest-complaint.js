@@ -1,4 +1,3 @@
-
 /* ==========================================
    LUPONRESOLVE — GUEST COMPLAINT FORM
 ========================================== */
@@ -13,6 +12,191 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("Guest complaint form elements could not be found.");
         return;
     }
+
+
+    // ======================================
+    // ENGLISH / CEBUANO LANGUAGE TOGGLE
+    // ======================================
+
+    const languageToggleButton = document.getElementById("languageToggleBtn");
+
+    const cebuanTranslations = {
+        "Back to Home": "Balik sa Panid sa Puy-anan",
+        "← Back to Home": "← Balik sa Panid sa Puy-anan",
+        "PUBLIC COMPLAINT FILING": "PAGPASAKA OG REKLAMO SA PUBLIKO",
+        "File a complaint": "Pagpasaka og Reklamo",
+        "Provide the details of your concern so barangay personnel can conduct an initial review. You do not need a resident account to submit this form.":
+            "Ihatag ang mga detalye sa imong reklamo aron masusi kini sa mga kawani sa barangay. Dili kinahanglan nga adunay resident account aron mapasa kini nga porma.",
+        "Important:": "Importante:",
+        "Submitting this form does not guarantee that your complaint will be accepted for Barangay Justice System proceedings. Your submission will be reviewed by authorized barangay personnel.":
+            "Ang pagpasa niini nga porma dili garantiya nga dawaton ang imong reklamo alang sa proseso sa Barangay Justice System. Susihon kini sa awtorisadong mga kawani sa barangay.",
+        "Preliminary jurisdiction screening": "Inisyal nga Pagsusi sa Hurisdiksyon",
+        "These questions help determine whether your complaint may be handled through the Barangay Justice System.":
+            "Kini nga mga pangutana makatabang sa pagtino kung ang imong reklamo mahimong dumalahon pinaagi sa Barangay Justice System.",
+        "Please answer to the best of your knowledge. If you are unsure, choose \"Unsure.\" Barangay personnel will review your responses.":
+            "Tubaga sumala sa imong nahibaloan. Kung dili ka sigurado, pilia ang \"Dili Sigurado.\" Susihon sa mga kawani sa barangay ang imong mga tubag.",
+        "1. Is one of the parties the government, or a government subdivision or instrumentality?":
+            "1. Usa ba sa mga partido ang gobyerno o usa ka departamento o ahensya niini?",
+        "Examples include the Philippine National Police (PNP), Armed Forces of the Philippines (AFP), Department of Education (DepEd), Department of Health (DOH), Department of Social Welfare and Development (DSWD), and city or municipal governments. Answer Yes only when the government entity itself is a party to the dispute, not merely because a government employee is involved.":
+            "Mga pananglitan niini ang Philippine National Police (PNP), Armed Forces of the Philippines (AFP), Department of Education (DepEd), Department of Health (DOH), Department of Social Welfare and Development (DSWD), ug mga lokal nga gobyerno. Tubaga og Oo lamang kung ang ahensya mismo kabahin sa panaglalis, dili tungod lang kay adunay empleyado sa gobyerno nga nalambigit.",
+        "2. Does the dispute involve a public officer or employee in relation to their official functions?":
+            "2. May kalabotan ba ang panaglalis sa usa ka opisyal o empleyado sa gobyerno ug sa iyang opisyal nga katungdanan?",
+        "3. Does the offense potentially carry imprisonment exceeding one (1) year or a fine exceeding ₱5,000?":
+            "3. Posible bang silotan ang kalapasan og kapin sa usa (1) ka tuig nga pagkabilanggo o multa nga molapas sa ₱5,000?",
+        "4. Is there a private offended party?": "4. Aduna bay pribadong tawo nga naapektuhan o nabiktima?",
+        "5. If the dispute involves real property, are the properties located in different cities or municipalities without agreement to submit to this Lupon?":
+            "5. Kung ang panaglalis mahitungod sa yuta o propiedad, naa ba kini sa lain-laing siyudad o munisipyo nga walay kasabotan nga isumite ang panaglalis niini nga Lupon?",
+        "6. Do the complainant and respondent live in different cities or municipalities where their barangays are not adjoining, or, if adjoining, do they not both agree to submit the dispute to this Lupon?":
+            "6. Nagpuyo ba ang moreklamo ug ang gireklamohan sa lain-laing siyudad o munisipyo nga dili magkasikbit ang ilang mga barangay, o kung magkasikbit man, wala ba sila magkauyon nga isumite ang panaglalis niini nga Lupon?",
+        "Select an answer": "Pagpili og tubag",
+        "Yes": "Oo",
+        "No": "Dili",
+        "Unsure": "Dili Sigurado",
+        "Not applicable (no criminal offense)": "Dili angay (walay kriminal nga kalapasan)",
+        "Not applicable": "Dili angay",
+        "Complete the preliminary screening to continue to the complaint information.":
+            "Kompletoha ang inisyal nga pagsusi aron mopadayon sa impormasyon sa reklamo.",
+        "Continue to Complaint Information": "Padayon sa Impormasyon sa Reklamo",
+        "Complainant information": "Impormasyon sa Moreklamo",
+        "Your personal information and contact details.": "Imong personal nga impormasyon ug mga detalye sa pagkontak.",
+        "Full name": "Tibuok nga Ngalan",
+        "Contact number": "Numero sa Kontak",
+        "Email address": "Email Address",
+        "Your case number and private tracking code will be sent to this email.":
+            "Ipadala sa kini nga email ang imong numero sa kaso ug pribadong tracking code.",
+        "Respondent information": "Impormasyon sa Gireklamohan",
+        "Information about the person you are filing against.": "Impormasyon bahin sa tawo nga imong gireklamohan.",
+        "Respondent's full name": "Tibuok nga Ngalan sa Gireklamohan",
+        "Respondent's address": "Adres sa Gireklamohan",
+        "House number, street, purok, or other known address": "Numero sa balay, dalan, purok, o laing nahibal-an nga adres",
+        "Dispute details": "Mga Detalye sa Panaglalis",
+        "Describe what happened and the nature of your concern.": "Ihulagway ang nahitabo ug ang kinaiya sa imong reklamo.",
+        "Type of dispute": "Klase sa Panaglalis",
+        "Select dispute type": "Pilia ang klase sa panaglalis",
+        "Neighbor Dispute": "Panaglalis sa Silingan",
+        "Noise Complaint": "Reklamo sa Kasaba",
+        "Property Dispute": "Panaglalis sa Propiedad",
+        "Boundary Dispute": "Panaglalis sa Utlanan sa Yuta",
+        "Debt or Financial Dispute": "Panaglalis sa Utang o Kuwarta",
+        "Family Dispute": "Panaglalis sa Pamilya",
+        "Harassment": "Panghasi o Pagpanghadlok",
+        "Physical Injury": "Pisikal nga Pagpasakit",
+        "Other": "Uban pa",
+        "Incident description": "Paghulagway sa Insidente",
+        "Describe what happened, when it happened, where it happened, and any relevant details...":
+            "Ihulagway kung unsay nahitabo, kanus-a ug asa kini nahitabo, ug uban pang importanteng detalye...",
+        "Supporting Evidence (Optional)": "Mga Ebidensya nga Mosuporta (Opsyonal)",
+        "Attach photos or documents that support your complaint. Accepted formats: JPG, PNG, and PDF. Maximum 5 files, 5 MB each.":
+            "Idugang ang mga litrato o dokumento nga mosuporta sa imong reklamo. Gidawat nga format: JPG, PNG, ug PDF. Kutob sa 5 ka file, 5 MB matag usa.",
+        "Please provide accurate details. Avoid including unrelated personal or sensitive information.":
+            "Paghatag og tukmang mga detalye. Likayi ang paglakip og personal o sensitibong impormasyon nga walay kalabotan.",
+        "Residence information": "Impormasyon sa Puloy-anan",
+        "Where you and the respondent currently reside.": "Asa nagpuyo karon ikaw ug ang gireklamohan.",
+        "Your city / municipality": "Imong Siyudad / Munisipyo",
+        "Your barangay": "Imong Barangay",
+        "Respondent's city / municipality": "Siyudad / Munisipyo sa Gireklamohan",
+        "Respondent's barangay": "Barangay sa Gireklamohan",
+        "By submitting this form, you confirm that the information provided is accurate to the best of your knowledge and consent to its use by authorized barangay personnel for complaint processing.":
+            "Pinaagi sa pagpasa niini nga porma, imong gipamatud-an nga tukma ang impormasyon sumala sa imong nahibaloan ug mouyon ka nga gamiton kini sa awtorisadong mga kawani sa barangay alang sa pagproseso sa reklamo.",
+        "Submit Complaint": "Ipasa ang Reklamo",
+        "Cancel and return home": "Kanselahon ug Balik sa Panid sa Puy-anan",
+        "Leave this field empty": "Pasagdi nga walay sulod kini nga bahin"
+    };
+
+    let currentLanguage = "en";
+    const originalTextNodes = new Map();
+    const originalAttributes = new Map();
+
+    function applyPageLanguage(language) {
+        const useCebuano = language === "ceb";
+        const walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            {
+                acceptNode(node) {
+                    if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+                    if (node.parentElement?.closest("script, style")) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            }
+        );
+
+        let node;
+        while ((node = walker.nextNode())) {
+            if (!originalTextNodes.has(node)) {
+                originalTextNodes.set(node, node.nodeValue);
+            }
+
+            const original = originalTextNodes.get(node);
+            const key = original.trim();
+
+            if (useCebuano && cebuanTranslations[key]) {
+                const leading = original.match(/^\s*/)?.[0] || "";
+                const trailing = original.match(/\s*$/)?.[0] || "";
+                node.nodeValue = leading + cebuanTranslations[key] + trailing;
+            } else {
+                node.nodeValue = original;
+            }
+        }
+
+        const attributeNames = ["placeholder", "aria-label", "title"];
+
+        document.querySelectorAll("input, textarea, button, a").forEach((element) => {
+            attributeNames.forEach((attribute) => {
+                if (!element.hasAttribute(attribute)) return;
+
+                const mapKey = `${attribute}`;
+
+                if (!originalAttributes.has(element)) {
+                    originalAttributes.set(element, {});
+                }
+
+                if (!(mapKey in originalAttributes.get(element))) {
+                    originalAttributes.get(element)[mapKey] = element.getAttribute(attribute);
+                }
+
+                const original = originalAttributes.get(element)[mapKey];
+
+                if (useCebuano && cebuanTranslations[original]) {
+                    element.setAttribute(attribute, cebuanTranslations[original]);
+                } else {
+                    element.setAttribute(attribute, original);
+                }
+            });
+        });
+
+        // Translate select options while preserving their submitted values.
+        document.querySelectorAll("select option").forEach((option) => {
+            if (!option.dataset.originalLabel) {
+                option.dataset.originalLabel = option.textContent;
+            }
+
+            const original = option.dataset.originalLabel.trim();
+
+            option.textContent = useCebuano && cebuanTranslations[original]
+                ? cebuanTranslations[original]
+                : option.dataset.originalLabel;
+        });
+
+        if (languageToggleButton) {
+            languageToggleButton.textContent = useCebuano ? "English" : "Cebuano";
+            languageToggleButton.setAttribute("aria-pressed", String(useCebuano));
+            languageToggleButton.setAttribute(
+                "aria-label",
+                useCebuano ? "Switch language to English" : "Switch language to Cebuano"
+            );
+        }
+
+        currentLanguage = language;
+    }
+
+    if (languageToggleButton) {
+        languageToggleButton.addEventListener("click", () => {
+            applyPageLanguage(currentLanguage === "en" ? "ceb" : "en");
+        });
+    }
+
+
     // ======================================
     // EVIDENCE FILE SELECTION
     // ======================================
@@ -87,11 +271,27 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
+
     // ======================================
     // MESSAGE HELPERS
     // ======================================
 
     function showMessage(message, type) {
+        if (currentLanguage === "ceb") {
+            const dynamicTranslations = {
+                "You can upload a maximum of 5 evidence files.": "Kutob ra sa 5 ka ebidensya nga file ang mahimong i-upload.",
+                "is not an allowed file type.": "dili tugot nga klase sa file.",
+                "exceeds the 5 MB file size limit.": "milapas sa limit nga 5 MB.",
+                "Unable to connect to the LuponResolve server. Please check your internet connection and try again.":
+                    "Dili makakonekta sa server sa LuponResolve. Susiha ang imong internet connection ug sulayi pag-usab.",
+                "Your complaint could not be submitted. Please review your information and try again.":
+                    "Dili mapasa ang imong reklamo. Susiha ang imong impormasyon ug sulayi pag-usab."
+            };
+
+            message = dynamicTranslations[message] || message;
+        }
+
         messageBox.textContent = message;
         messageBox.className = `message ${type}`;
         messageBox.style.whiteSpace = "pre-line";
@@ -102,12 +302,13 @@ document.addEventListener("DOMContentLoaded", () => {
         messageBox.className = "";
         messageBox.style.whiteSpace = "";
     }
+
+
     // ======================================
     // PRELIMINARY JURISDICTION BLOCKER
     // ======================================
 
-    
-    function getScreeningBlockReason() {
+    function getScreeningBlockReason(includeResidenceCheck = true) {
 
         const answers = {
             governmentParty: form.elements.governmentParty.value,
@@ -153,7 +354,7 @@ document.addEventListener("DOMContentLoaded", () => {
             answers.penaltyThreshold === "not_applicable" &&
             answers.privateOffendedParty !== "not_applicable"
         ) {
-            return null; // Backend will classify this for staff review.
+            return null;
         }
 
         if (
@@ -176,6 +377,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (
+            includeResidenceCheck &&
             answers.differentMunicipalitiesException === "yes" &&
             complainantMunicipality !== respondentMunicipality
         ) {
@@ -204,7 +406,9 @@ document.addEventListener("DOMContentLoaded", () => {
         warning.className = "jurisdiction-warning";
 
         const heading = document.createElement("h3");
-        heading.textContent = "Complaint Cannot Proceed";
+        heading.textContent = currentLanguage === "ceb"
+            ? "Dili Makapadayon ang Reklamo"
+            : "Complaint Cannot Proceed";
 
         const description = document.createElement("p");
         description.textContent = blockReason.reason;
@@ -220,7 +424,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const reviewButton = document.createElement("button");
         reviewButton.type = "button";
         reviewButton.className = "button button-secondary";
-        reviewButton.textContent = "Review My Answers";
+
+        reviewButton.textContent = currentLanguage === "ceb"
+            ? "Usisaa ang Akong mga Tubag"
+            : "Review My Answers";
 
         reviewButton.addEventListener("click", () => {
             const field = document.getElementById(blockReason.field);
@@ -250,6 +457,73 @@ document.addEventListener("DOMContentLoaded", () => {
             block: "center"
         });
     }
+
+
+    // ======================================
+    // SCREENING-FIRST FLOW
+    // ======================================
+
+    const screeningSection = document.getElementById("screeningSection");
+    const screeningContinueSection = document.getElementById("screeningContinueSection");
+    const continueToComplaintButton = document.getElementById("continueToComplaintBtn");
+    const complaintDetailsSection = document.getElementById("complaintDetailsSection");
+
+    if (
+        screeningSection &&
+        screeningContinueSection &&
+        continueToComplaintButton &&
+        complaintDetailsSection
+    ) {
+        continueToComplaintButton.addEventListener("click", () => {
+            clearMessage();
+
+            // Validate only the screening questions at this stage.
+            const screeningFieldNames = [
+                "governmentParty",
+                "publicOfficial",
+                "penaltyThreshold",
+                "privateOffendedParty",
+                "realPropertyException",
+                "differentMunicipalitiesException"
+            ];
+
+            for (const fieldName of screeningFieldNames) {
+                const field = form.elements[fieldName];
+
+                if (field && !field.checkValidity()) {
+                    field.reportValidity();
+                    field.focus();
+                    return;
+                }
+            }
+
+            // Municipality details are collected in the next step,
+            // so territorial screening is deferred until final submission.
+            const screeningBlock = getScreeningBlockReason(false);
+
+            if (screeningBlock) {
+                showJurisdictionWarning(screeningBlock);
+                return;
+            }
+
+            screeningSection.hidden = true;
+            screeningContinueSection.hidden = true;
+            continueToComplaintButton.remove();
+            complaintDetailsSection.hidden = false;
+
+            const firstDetailsSection =
+                complaintDetailsSection.querySelector(".form-section");
+
+            if (firstDetailsSection) {
+                firstDetailsSection.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+            }
+        });
+    }
+
+
     // ======================================
     // SUCCESS CARD
     // ======================================
@@ -342,6 +616,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+
     // ======================================
     // FORM SUBMISSION
     // ======================================
@@ -360,6 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
             form.reportValidity();
             return;
         }
+
         // ==================================
         // CHECK PRELIMINARY JURISDICTION
         // ==================================
@@ -370,7 +646,7 @@ document.addEventListener("DOMContentLoaded", () => {
             showJurisdictionWarning(screeningBlock);
             return;
         }
-        
+
         // ==================================
         // COLLECT FORM VALUES
         // ==================================
@@ -438,7 +714,6 @@ document.addEventListener("DOMContentLoaded", () => {
             formData.append("evidence", file);
         });
 
-
         // ==================================
         // LOADING STATE
         // ==================================
@@ -446,7 +721,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const originalButtonText = submitButton.textContent;
 
         submitButton.disabled = true;
-        submitButton.textContent = "Submitting complaint...";
+        submitButton.textContent = currentLanguage === "ceb"
+            ? "Gipasa ang reklamo..."
+            : "Submitting complaint...";
 
         // ==================================
         // SEND TO BACKEND
@@ -457,7 +734,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 method: "POST",
                 body: formData
             });
-
 
             const result = await response.json();
 
@@ -504,6 +780,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 "Requires Barangay Staff Review";
 
             form.reset();
+
+            if (evidenceFileList) {
+                evidenceFileList.innerHTML = "";
+            }
 
             showSuccessCard(
                 caseNumber,
