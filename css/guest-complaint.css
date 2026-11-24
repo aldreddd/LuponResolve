@@ -1512,3 +1512,95 @@
         min-width: 0;
     }
 }
+/* =========================================
+   OFFICIAL BARANGAY FOOTER
+========================================= */
+
+.guest-complaint-page .home-footer {
+    position: relative;
+    width: 100%;
+    min-height: 190px;
+    padding: 38px 24px 30px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    overflow: hidden;
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(226, 189, 105, 0.10),
+            transparent 55%
+        ),
+        linear-gradient(
+            135deg,
+            #07152d,
+            var(--gc-navy)
+        ) !important;
+
+    border-top: 3px solid var(--gc-gold);
+}
+
+/* Decorative gold accent */
+.guest-complaint-page .home-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 110px;
+    height: 2px;
+    transform: translateX(-50%);
+    background: var(--gc-gold);
+}
+
+.guest-complaint-page .home-footer p {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 0.82rem;
+    line-height: 1.7;
+}
+
+.guest-complaint-page .home-footer .footer-organization {
+    margin-bottom: 3px;
+    color: #fff;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.guest-complaint-page .home-footer .footer-legal {
+    width: min(100%, 580px);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.13);
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.72rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+    .guest-complaint-page .home-footer {
+        min-height: 180px;
+        padding: 30px 16px 24px;
+    }
+
+    .guest-complaint-page .home-footer .footer-organization {
+        font-size: 1.05rem;
+    }
+
+    .guest-complaint-page .home-footer p {
+        font-size: 0.75rem;
+    }
+
+    .guest-complaint-page .home-footer .footer-legal {
+        font-size: 0.68rem;
+    }
+}
