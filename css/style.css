@@ -744,42 +744,112 @@
     background: #edf2fa;
 }
 
-/* Footer */
+
+/* =========================================
+   OFFICIAL BARANGAY FOOTER
+========================================= */
+
 .home-page .home-footer {
+    position: relative;
     width: 100%;
-    min-height: 92px;
-    padding: 20px max(32px, calc((100% - 1220px) / 2));
+    min-height: 190px;
+    padding: 38px 24px 30px;
+
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-    border-top: 1px solid var(--home-line);
-    background: #fff;
+    justify-content: center;
+    gap: 7px;
+
+    overflow: hidden;
+    text-align: center;
+
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(224, 189, 106, 0.10),
+            transparent 55%
+        ),
+        linear-gradient(
+            135deg,
+            var(--home-navy-deep),
+            var(--home-navy)
+        );
+
+    border-top: 3px solid var(--home-gold);
 }
 
-.home-page .footer-brand {
-    font-size: .92rem;
-}
-
-.home-page .footer-brand .brand-mark {
-    width: 35px;
-    height: 35px;
-    border-radius: 9px;
-    font-size: .72rem;
+/* Subtle decorative accent */
+.home-page .home-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 110px;
+    height: 2px;
+    transform: translateX(-50%);
+    background: var(--home-gold);
 }
 
 .home-page .home-footer p {
+    position: relative;
+    z-index: 1;
     margin: 0;
-    color: #718098;
-    font-size: .73rem;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 0.82rem;
+    line-height: 1.7;
 }
 
-.home-page .footer-caption {
-    color: #8794a8;
-    font-size: .57rem;
-    font-weight: 750;
-    letter-spacing: .1em;
-    text-align: right;
+.home-page .home-footer .footer-organization {
+    margin-bottom: 3px;
+    color: #ffffff;
+    font-family: var(--home-serif);
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.home-page .home-footer .footer-legal {
+    margin-top: 12px;
+    padding-top: 12px;
+    width: min(100%, 580px);
+    border-top: 1px solid rgba(255, 255, 255, 0.13);
+    color: rgba(255, 255, 255, 0.52);
+    font-size: 0.72rem;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .home-page .home-footer {
+        min-height: 180px;
+        padding: 34px 24px 27px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .home-page .home-footer {
+        min-height: 0;
+        padding: 32px 20px 25px;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .home-page .home-footer .footer-organization {
+        max-width: 320px;
+        font-size: 1.08rem;
+        line-height: 1.4;
+    }
+
+    .home-page .home-footer p {
+        max-width: 340px;
+        font-size: 0.76rem;
+    }
+
+    .home-page .home-footer .footer-legal {
+        margin-top: 9px;
+        font-size: 0.68rem;
+    }
 }
 
 /* Tablet */
