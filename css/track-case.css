@@ -770,3 +770,84 @@
         transition-duration: .01ms !important;
     }
 }
+/* =========================================
+   OFFICIAL BARANGAY TRACKING FOOTER
+========================================= */
+
+.track-case-page .home-footer {
+    position: relative;
+    width: 100%;
+    min-height: 190px;
+    padding: 38px 24px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    overflow: hidden;
+    text-align: center;
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(224, 189, 106, .10),
+            transparent 55%
+        ),
+        linear-gradient(135deg, #07152d, var(--lr-navy));
+    border-top: 3px solid var(--lr-gold);
+}
+
+.track-case-page .home-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 110px;
+    height: 2px;
+    transform: translateX(-50%);
+    background: var(--lr-gold);
+}
+
+.track-case-page .home-footer p {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    color: rgba(255, 255, 255, .76);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.track-case-page .home-footer .footer-organization {
+    margin-bottom: 3px;
+    color: #fff;
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.track-case-page .home-footer .footer-legal {
+    width: min(100%, 580px);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, .13);
+    color: rgba(255, 255, 255, .52);
+    font-size: 11px;
+}
+
+@media (max-width: 560px) {
+    .track-case-page .home-footer {
+        min-height: 180px;
+        padding: 30px 16px 24px;
+    }
+
+    .track-case-page .home-footer p {
+        font-size: 11px;
+    }
+
+    .track-case-page .home-footer .footer-organization {
+        font-size: 17px;
+    }
+
+    .track-case-page .home-footer .footer-legal {
+        font-size: 10px;
+    }
+}
