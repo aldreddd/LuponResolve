@@ -9,9 +9,7 @@
 [![Deployment](https://img.shields.io/badge/Deployment-Render-46E3B7?style=flat)](https://render.com/)
 [![Version Control](https://img.shields.io/badge/Version%20Control-GitHub-181717?style=flat)](https://github.com/aldreddd/LuponResolve)
 
-<p align="center">
-  <strong>### Barangay Dispute Resolution and Case Management System</strong>
-</p>
+### Barangay Dispute Resolution and Case Management System
 
 LuponResolve is a web-based Barangay Dispute Resolution and Case Management System designed to support the digital handling of community complaints and dispute-resolution proceedings.
 
