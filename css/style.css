@@ -1,3 +1,4 @@
+
 /* =========================================================
    LUPONRESOLVE HOMEPAGE
    Navy • Gold • Public-service visual identity
@@ -22,6 +23,7 @@
     margin: 0;
     min-height: 100vh;
     min-height: 100dvh;
+    padding-top: 108px;
     overflow-x: hidden;
     background: var(--home-paper);
     color: var(--home-ink);
@@ -29,6 +31,7 @@
     font-size: 15px;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+    scroll-padding-top: 115px;
 }
 
 .home-page *,
@@ -52,26 +55,71 @@
     outline-offset: 4px;
 }
 
-/* Header */
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 115px;
+}
+
+.home-page #home,
+.home-page #about,
+.home-page #services {
+    scroll-margin-top: 115px;
+}
+
+
+/* =========================================================
+   FLOATING GLASS NAVBAR
+========================================================= */
+
 .home-page .home-header {
-    position: relative;
-    z-index: 20;
-    width: min(1220px, calc(100% - 64px));
-    min-height: 88px;
-    margin: 0 auto;
-    padding: 0;
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+
+    width: min(1320px, calc(100% - 64px));
+    min-height: 74px;
+    margin: 0;
+    padding: 0 26px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 30px;
-    background: transparent;
+
+    background: rgba(10, 26, 58, 0.92);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-bottom-color: rgba(224, 189, 106, 0.35);
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 30px rgba(7, 19, 41, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    transition:
+        background 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease,
+        backdrop-filter 0.3s ease;
+}
+
+.home-page .home-header.scrolled {
+    background: rgba(10, 26, 58, 0.58);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 28px rgba(7, 19, 41, 0.10);
 }
 
 .home-page .brand {
     display: inline-flex;
     align-items: center;
     gap: 12px;
-    color: var(--home-navy);
+    color: #ffffff;
     font-size: 1.08rem;
     font-weight: 800;
     letter-spacing: -0.035em;
@@ -86,8 +134,8 @@
     flex: 0 0 auto;
     border: 1px solid rgba(255,255,255,.25);
     border-radius: 12px;
-    background: var(--home-navy);
-    color: #fff;
+    background: rgba(255,255,255,.95);
+    color: var(--home-navy);
     box-shadow: inset 0 -4px 0 var(--home-gold);
     font-size: .82rem;
     font-weight: 800;
@@ -98,7 +146,7 @@
     display: flex;
     align-items: center;
     gap: clamp(24px, 3.5vw, 48px);
-    color: #52627b;
+    color: rgba(255,255,255,.88);
     font-size: .86rem;
     font-weight: 650;
 }
@@ -106,6 +154,7 @@
 .home-page .main-nav a {
     position: relative;
     padding: 10px 0;
+    color: rgba(255,255,255,.88);
     transition: color .18s ease;
 }
 
@@ -116,17 +165,19 @@
     bottom: 3px;
     left: 0;
     height: 2px;
-    background: var(--home-gold-deep);
+    background: var(--home-gold);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform .2s ease;
 }
 
-.home-page .main-nav a:hover {
-    color: var(--home-blue);
+.home-page .main-nav a:hover,
+.home-page .main-nav a.active {
+    color: var(--home-gold);
 }
 
-.home-page .main-nav a:hover::after {
+.home-page .main-nav a:hover::after,
+.home-page .main-nav a.active::after {
     transform: scaleX(1);
 }
 
@@ -137,8 +188,9 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    border: 1px solid rgba(10,26,58,.16);
+    border: 1px solid rgba(224,189,106,.7);
     border-radius: 7px;
+    background: rgba(224,189,106,.95);
     color: var(--home-navy);
     font-size: .82rem;
     font-weight: 750;
@@ -146,16 +198,20 @@
 }
 
 .home-page .header-cta:hover {
-    border-color: var(--home-navy);
-    background: var(--home-navy);
-    color: #fff;
+    border-color: #f0d58e;
+    background: #f0d58e;
+    color: var(--home-navy);
 }
 
 .home-page .menu-toggle {
     display: none;
 }
 
-/* Hero */
+
+/* =========================================================
+   HERO SECTION
+========================================================= */
+
 .home-page .home-hero {
     position: relative;
     isolation: isolate;
@@ -237,9 +293,7 @@
     line-height: 1.04;
 }
 
-.home-page .home-hero h1 em,
-.home-page .home-about h2 em,
-.home-page .services-heading h2 em {
+.home-page .home-hero h1 em {
     color: var(--home-gold);
     font-weight: 500;
 }
@@ -461,93 +515,253 @@
     background: rgba(224,189,106,.65);
 }
 
-/* About */
+
+/* =========================================================
+   ABOUT SECTION
+   Matches .about-container HTML structure
+========================================================= */
+
 .home-page .home-about {
-    width: min(1080px, calc(100% - 64px));
-    margin: clamp(82px, 10vw, 140px) auto;
-    display: grid;
-    grid-template-columns: 180px minmax(0, 1fr) minmax(180px, .55fr);
-    align-items: start;
-    gap: clamp(28px, 5vw, 70px);
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 100px 32px;
+    overflow: hidden;
+    background: #ffffff;
 }
 
-.home-page .about-marker {
+.home-page .about-container {
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    align-items: center;
+    gap: 65px;
+}
+
+.home-page .about-visual {
+    min-width: 0;
+}
+
+.home-page .about-visual-card {
+    min-height: 440px;
+    padding: 38px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid rgba(224,189,106,.35);
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 90% 10%, rgba(224,189,106,.17), transparent 16rem),
+        linear-gradient(145deg, #0a1a3a, #102b57 65%, #17417a);
+    box-shadow: 0 20px 45px rgba(10,26,58,.12);
+    color: #ffffff;
+}
+
+.home-page .about-seal {
+    width: 70px;
+    height: 70px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 30px;
+    border: 1px solid rgba(224,189,106,.65);
+    border-radius: 50%;
+    color: var(--home-gold);
+    font-family: var(--home-serif);
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.home-page .about-visual-label {
+    color: #d9bd7d;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.home-page .about-visual-divider {
+    width: 55px;
+    height: 2px;
+    margin: 20px 0;
+    background: var(--home-gold);
+}
+
+.home-page .about-visual-card h3 {
+    max-width: 380px;
+    margin: 0;
+    color: #ffffff;
+    font-family: var(--home-serif);
+    font-size: clamp(25px, 3vw, 33px);
+    line-height: 1.35;
+}
+
+.home-page .about-visual-card > p {
+    max-width: 390px;
+    margin: 18px 0 0;
+    color: rgba(255,255,255,.75);
+    font-size: 13px;
+    line-height: 1.85;
+}
+
+.home-page .about-visual-bottom {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding-top: 7px;
-    color: var(--home-muted);
-    font-size: .62rem;
+    justify-content: space-between;
+    margin-top: 35px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.15);
+}
+
+.home-page .about-visual-bottom span:first-child {
+    color: rgba(255,255,255,.6);
+    font-size: 9px;
     font-weight: 800;
-    letter-spacing: .12em;
+    letter-spacing: 1.2px;
 }
 
-.home-page .marker-number {
+.home-page .about-visual-bottom span:last-child {
+    color: var(--home-gold);
+    font-size: 23px;
+}
+
+.home-page .about-content {
+    min-width: 0;
+}
+
+.home-page .about-content .about-marker {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 25px;
+    padding: 0;
+    color: var(--home-muted);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.home-page .about-content .marker-number {
     color: var(--home-gold-deep);
+    font-size: 11px;
 }
 
-.home-page .marker-line {
-    width: 25px;
+.home-page .about-content .marker-line {
+    width: 34px;
     height: 1px;
-    background: #b8c4d5;
+    background: #d9bd7d;
 }
 
-.home-page .about-content .section-eyebrow,
-.home-page .services-heading .section-eyebrow,
-.home-page .home-closing .section-eyebrow {
-    margin-bottom: 13px;
-    color: var(--home-blue);
+.home-page .about-content .marker-text {
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
 }
 
-.home-page .home-about h2,
-.home-page .services-heading h2 {
+.home-page .about-content .section-eyebrow {
+    margin: 0 0 12px;
+    color: #9b7835;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+}
+
+.home-page .about-content h2 {
     max-width: 610px;
     margin: 0;
     color: var(--home-navy);
     font-family: var(--home-serif);
-    font-size: clamp(2.1rem, 4vw, 3.4rem);
+    font-size: clamp(30px, 4vw, 43px);
     font-weight: 600;
     letter-spacing: -.045em;
-    line-height: 1.12;
+    line-height: 1.2;
 }
 
-.home-page .home-about h2 em,
-.home-page .services-heading h2 em {
+.home-page .about-content h2 em {
     color: var(--home-gold-deep);
+    font-weight: 500;
 }
 
-.home-page .about-content > p:last-child {
+.home-page .about-description {
     max-width: 620px;
-    margin: 21px 0 0;
+    margin: 18px 0 0;
     color: var(--home-muted);
-    font-size: .94rem;
+    font-size: 13px;
     line-height: 1.9;
 }
 
-.home-page .about-side {
-    margin-top: 35px;
-    padding: 18px 0 18px 22px;
-    border-left: 2px solid var(--home-gold);
+.home-page .about-values {
+    display: flex;
+    flex-direction: column;
+    gap: 19px;
+    margin-top: 28px;
 }
 
-.home-page .about-side-mark {
-    display: block;
-    height: 31px;
-    color: var(--home-gold-deep);
-    font-family: var(--home-serif);
-    font-size: 3.2rem;
-    line-height: 1;
+.home-page .about-value {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
 }
 
-.home-page .about-side p {
-    margin: 8px 0 0;
-    color: var(--home-navy);
-    font-family: var(--home-serif);
-    font-size: 1.15rem;
-    line-height: 1.55;
+.home-page .about-value .value-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(224,189,106,.5);
+    border-radius: 9px;
+    background: #fbf8f0;
+    color: #9b7835;
+    font-size: 10px;
+    font-weight: 800;
 }
 
-/* Services */
+.home-page .about-value h3 {
+    margin: 1px 0 5px;
+    color: #17243a;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.home-page .about-value p {
+    margin: 0;
+    color: var(--home-muted);
+    font-size: 11px;
+    line-height: 1.75;
+}
+
+.home-page .about-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 30px;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 1px solid #d9bd7d;
+    background: transparent;
+    color: #173c72;
+    font-size: 12px;
+    font-weight: 800;
+    transition: gap .2s ease, color .2s ease, border-color .2s ease;
+}
+
+.home-page .about-link:hover {
+    gap: 18px;
+    color: #9b7835;
+    border-color: #9b7835;
+}
+
+.home-page .about-link:focus-visible {
+    outline: 2px solid var(--home-gold-deep);
+    outline-offset: 5px;
+}
+
+
+/* =========================================================
+   SERVICES
+========================================================= */
+
 .home-page .home-services {
     padding: clamp(66px, 8vw, 105px) 0 clamp(78px, 9vw, 120px);
     background: #eaf0f8;
@@ -568,6 +782,28 @@
     align-items: end;
     justify-content: space-between;
     gap: 40px;
+}
+
+.home-page .services-heading .section-eyebrow,
+.home-page .home-closing .section-eyebrow {
+    margin-bottom: 13px;
+    color: var(--home-blue);
+}
+
+.home-page .services-heading h2 {
+    max-width: 610px;
+    margin: 0;
+    color: var(--home-navy);
+    font-family: var(--home-serif);
+    font-size: clamp(2.1rem, 4vw, 3.4rem);
+    font-weight: 600;
+    letter-spacing: -.045em;
+    line-height: 1.12;
+}
+
+.home-page .services-heading h2 em {
+    color: var(--home-gold-deep);
+    font-weight: 500;
 }
 
 .home-page .services-marker {
@@ -685,7 +921,11 @@
     background: var(--home-blue);
 }
 
-/* Closing strip */
+
+/* =========================================================
+   CLOSING STRIP
+========================================================= */
+
 .home-page .home-closing {
     width: min(1080px, calc(100% - 64px));
     margin: 0 auto;
@@ -745,41 +985,28 @@
 }
 
 
-/* =========================================
+/* =========================================================
    OFFICIAL BARANGAY FOOTER
-========================================= */
+========================================================= */
 
 .home-page .home-footer {
     position: relative;
     width: 100%;
     min-height: 190px;
     padding: 38px 24px 30px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 7px;
-
     overflow: hidden;
     text-align: center;
-
     background:
-        radial-gradient(
-            circle at 50% 0%,
-            rgba(224, 189, 106, 0.10),
-            transparent 55%
-        ),
-        linear-gradient(
-            135deg,
-            var(--home-navy-deep),
-            var(--home-navy)
-        );
-
+        radial-gradient(circle at 50% 0%, rgba(224,189,106,.10), transparent 55%),
+        linear-gradient(135deg, var(--home-navy-deep), var(--home-navy));
     border-top: 3px solid var(--home-gold);
 }
 
-/* Subtle decorative accent */
 .home-page .home-footer::before {
     content: "";
     position: absolute;
@@ -795,8 +1022,8 @@
     position: relative;
     z-index: 1;
     margin: 0;
-    color: rgba(255, 255, 255, 0.76);
-    font-size: 0.82rem;
+    color: rgba(255,255,255,.76);
+    font-size: .82rem;
     line-height: 1.7;
 }
 
@@ -806,56 +1033,33 @@
     font-family: var(--home-serif);
     font-size: 1.2rem;
     font-weight: 600;
-    letter-spacing: 0.01em;
+    letter-spacing: .01em;
 }
 
 .home-page .home-footer .footer-legal {
+    width: min(100%, 580px);
     margin-top: 12px;
     padding-top: 12px;
-    width: min(100%, 580px);
-    border-top: 1px solid rgba(255, 255, 255, 0.13);
-    color: rgba(255, 255, 255, 0.52);
-    font-size: 0.72rem;
+    border-top: 1px solid rgba(255,255,255,.13);
+    color: rgba(255,255,255,.52);
+    font-size: .72rem;
 }
 
-/* Tablet */
+
+/* =========================================================
+   TABLET RESPONSIVENESS
+========================================================= */
+
 @media (max-width: 900px) {
-    .home-page .home-footer {
-        min-height: 180px;
-        padding: 34px 24px 27px;
-    }
-}
 
-/* Mobile */
-@media (max-width: 700px) {
-    .home-page .home-footer {
-        min-height: 0;
-        padding: 32px 20px 25px;
-        align-items: center;
-        gap: 8px;
+    .home-page {
+        padding-top: 100px;
     }
 
-    .home-page .home-footer .footer-organization {
-        max-width: 320px;
-        font-size: 1.08rem;
-        line-height: 1.4;
-    }
-
-    .home-page .home-footer p {
-        max-width: 340px;
-        font-size: 0.76rem;
-    }
-
-    .home-page .home-footer .footer-legal {
-        margin-top: 9px;
-        font-size: 0.68rem;
-    }
-}
-
-/* Tablet */
-@media (max-width: 900px) {
     .home-page .home-header {
-        width: calc(100% - 48px);
+        width: calc(100% - 40px);
+        min-height: 70px;
+        padding: 0 20px;
     }
 
     .home-page .home-hero {
@@ -873,14 +1077,13 @@
         padding: 27px;
     }
 
-    .home-page .home-about {
-        grid-template-columns: 130px minmax(0, 1fr);
+    .home-page .about-container {
+        gap: 35px;
     }
 
-    .home-page .about-side {
-        grid-column: 2;
-        max-width: 430px;
-        margin-top: 0;
+    .home-page .about-visual-card {
+        min-height: 400px;
+        padding: 28px;
     }
 
     .home-page .service-grid {
@@ -896,19 +1099,40 @@
         min-height: 250px;
     }
 
+    .home-page .home-footer {
+        min-height: 180px;
+        padding: 34px 24px 27px;
+    }
+
     .home-page .footer-caption {
         display: none;
     }
 }
 
-/* Mobile navigation and layout */
+
+/* =========================================================
+   MOBILE NAVIGATION AND LAYOUT
+========================================================= */
+
 @media (max-width: 700px) {
+
+    .home-page {
+        padding-top: 90px;
+    }
+
     .home-page .home-header {
-        width: calc(100% - 36px);
-        min-height: 72px;
-        flex-wrap: wrap;
-        gap: 0;
-        padding: 12px 0;
+        top: 10px;
+        width: calc(100% - 28px);
+        min-height: 66px;
+        padding: 9px 14px;
+        flex-wrap: nowrap;
+        gap: 12px;
+        background: rgba(10,26,58,.82);
+        border-radius: 14px;
+    }
+
+    .home-page .home-header.scrolled {
+        background: rgba(10,26,58,.72);
     }
 
     .home-page .brand {
@@ -926,13 +1150,14 @@
         height: 44px;
         padding: 10px;
         display: flex;
+        flex: 0 0 auto;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         gap: 5px;
-        border: 1px solid #d8e0ec;
+        border: 1px solid rgba(255,255,255,.22);
         border-radius: 9px;
-        background: #fff;
+        background: rgba(255,255,255,.12);
         cursor: pointer;
         -webkit-tap-highlight-color: transparent;
     }
@@ -942,7 +1167,7 @@
         height: 2px;
         display: block;
         border-radius: 4px;
-        background: var(--home-navy);
+        background: #ffffff;
         transition: transform .2s ease, opacity .2s ease;
     }
 
@@ -962,40 +1187,55 @@
         display: none;
     }
 
-    .home-page .main-nav {
-        order: 3;
-        flex-basis: 100%;
+    /* Mobile dropdown */
+    .home-page .home-header .main-nav {
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        left: 0;
+        z-index: 1001;
+
         width: 100%;
-        margin-top: 11px;
-        padding: 8px;
+        margin: 0;
+        padding: 12px;
+
         display: none;
         flex-direction: column;
         align-items: stretch;
-        gap: 3px;
-        border: 1px solid var(--home-line);
-        border-radius: 11px;
-        background: #fff;
-        box-shadow: 0 12px 28px rgba(10,26,58,.09);
+        gap: 4px;
+
+        background: rgba(10,26,58,.96);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+
+        border: 1px solid rgba(255,255,255,.14);
+        border-top: 2px solid var(--home-gold);
+        border-radius: 14px;
+
+        box-shadow: 0 14px 35px rgba(7,19,41,.18);
     }
 
-    .home-page .main-nav.is-open {
+    .home-page .home-header .main-nav.is-open {
         display: flex;
     }
 
-    .home-page .main-nav a {
+    .home-page .home-header .main-nav a {
         min-height: 45px;
-        padding: 0 13px;
+        padding: 12px 14px;
         display: flex;
         align-items: center;
-        border-radius: 7px;
+        border-radius: 8px;
+        color: rgba(255,255,255,.92);
         font-size: .86rem;
     }
 
-    .home-page .main-nav a:hover {
-        background: #f1f5fa;
+    .home-page .home-header .main-nav a:hover,
+    .home-page .home-header .main-nav a.active {
+        background: rgba(255,255,255,.1);
+        color: var(--home-gold);
     }
 
-    .home-page .main-nav a::after {
+    .home-page .home-header .main-nav a::after {
         display: none;
     }
 
@@ -1086,46 +1326,40 @@
         font-size: .53rem;
     }
 
+    /* About */
     .home-page .home-about {
-        width: calc(100% - 42px);
-        margin: 72px auto;
+        padding: 60px 20px;
+    }
+
+    .home-page .about-container {
         grid-template-columns: minmax(0, 1fr);
-        gap: 19px;
+        gap: 35px;
     }
 
-    .home-page .about-marker {
-        font-size: .58rem;
+    .home-page .about-visual-card {
+        min-height: 350px;
+        padding: 27px;
     }
 
-    .home-page .about-content .section-eyebrow,
-    .home-page .services-heading .section-eyebrow {
-        margin-bottom: 10px;
-        font-size: .63rem;
+    .home-page .about-content h2 {
+        font-size: clamp(30px, 8vw, 36px);
     }
 
-    .home-page .home-about h2,
-    .home-page .services-heading h2 {
-        font-size: clamp(2rem, 8vw, 2.65rem);
-        line-height: 1.13;
+    .home-page .about-content .about-marker {
+        margin-bottom: 20px;
     }
 
-    .home-page .about-content > p:last-child {
-        margin-top: 15px;
+    .home-page .about-description {
         font-size: .87rem;
         line-height: 1.85;
     }
 
-    .home-page .about-side {
-        grid-column: auto;
-        max-width: none;
-        margin: 4px 0 0 2px;
-        padding: 13px 0 13px 17px;
+    .home-page .about-values {
+        gap: 17px;
+        margin-top: 24px;
     }
 
-    .home-page .about-side p {
-        font-size: 1.05rem;
-    }
-
+    /* Services */
     .home-page .home-services {
         padding: 66px 0 72px;
     }
@@ -1144,6 +1378,15 @@
 
     .home-page .services-marker {
         margin-bottom: 20px;
+    }
+
+    .home-page .services-heading .section-eyebrow {
+        margin-bottom: 10px;
+        font-size: .63rem;
+    }
+
+    .home-page .services-heading h2 {
+        font-size: clamp(2rem, 8vw, 2.65rem);
     }
 
     .home-page .services-intro {
@@ -1183,6 +1426,7 @@
         margin-top: 21px;
     }
 
+    /* Closing strip */
     .home-page .home-closing {
         width: calc(100% - 42px);
         padding: 42px 0;
@@ -1208,23 +1452,51 @@
         font-size: .74rem;
     }
 
+    /* Footer */
     .home-page .home-footer {
         min-height: 0;
-        padding: 23px 21px;
-        align-items: flex-start;
+        padding: 32px 20px 25px;
+        align-items: center;
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
+    }
+
+    .home-page .home-footer .footer-organization {
+        max-width: 320px;
+        font-size: 1.08rem;
+        line-height: 1.4;
     }
 
     .home-page .home-footer p {
-        font-size: .69rem;
+        max-width: 340px;
+        font-size: .76rem;
+    }
+
+    .home-page .home-footer .footer-legal {
+        margin-top: 9px;
+        font-size: .68rem;
     }
 }
 
-/* Narrow phones */
+
+/* =========================================================
+   NARROW PHONES
+========================================================= */
+
 @media (max-width: 380px) {
+
+    .home-page {
+        padding-top: 86px;
+    }
+
     .home-page .home-header {
-        width: calc(100% - 26px);
+        top: 10px;
+        width: calc(100% - 20px);
+        padding: 8px 11px;
+    }
+
+    .home-page .brand {
+        font-size: .9rem;
     }
 
     .home-page .home-hero {
@@ -1241,7 +1513,24 @@
         padding: 20px;
     }
 
-    .home-page .home-about,
+    .home-page .home-about {
+        padding: 50px 16px;
+    }
+
+    .home-page .about-visual-card {
+        min-height: 320px;
+        padding: 22px;
+    }
+
+    .home-page .about-content h2 {
+        font-size: 28px;
+    }
+
+    .home-page .about-visual-label {
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
+
     .home-page .services-heading,
     .home-page .service-grid,
     .home-page .home-closing {
@@ -1258,8 +1547,13 @@
     }
 }
 
-/* Reduced motion and touch behavior */
+
+/* =========================================================
+   TOUCH DEVICE BEHAVIOR
+========================================================= */
+
 @media (hover: none) and (pointer: coarse) {
+
     .home-page .home-button:hover,
     .home-page .service-card:hover,
     .home-page .service-action:hover {
@@ -1267,7 +1561,17 @@
     }
 }
 
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
+
+    html {
+        scroll-behavior: auto;
+    }
+
     .home-page *,
     .home-page *::before,
     .home-page *::after {
@@ -1276,179 +1580,17 @@
         animation-iteration-count: 1 !important;
         transition-duration: .01ms !important;
     }
-}
-/* =========================================================
-   FLOATING GLASS NAVBAR — REFINED TRANSPARENT VERSION
-========================================================= */
 
-.home-page {
-    padding-top: 108px;
-    scroll-padding-top: 115px;
-}
-
-.home-page .home-header {
-    position: fixed;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-
-    width: min(1320px, calc(100% - 64px));
-    min-height: 74px;
-    padding: 0 26px;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    /* More transparent glass effect */
-    background: rgba(10, 26, 58, 0.58);
-    backdrop-filter: blur(18px) saturate(145%);
-    -webkit-backdrop-filter: blur(18px) saturate(145%);
-
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-bottom-color: rgba(224, 189, 106, 0.35);
-    border-radius: 16px;
-
-    box-shadow:
-        0 8px 30px rgba(7, 19, 41, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.08);
-
-    transition:
-        background 0.3s ease,
-        box-shadow 0.3s ease,
-        border-color 0.3s ease;
-}
-
-/* Brand */
-.home-page .home-header .brand {
-    color: #ffffff;
-}
-
-.home-page .home-header .brand-mark {
-    background: rgba(255, 255, 255, 0.95);
-    color: #0a1a3a;
-}
-
-/* Navigation links */
-.home-page .home-header .main-nav a {
-    color: rgba(255, 255, 255, 0.88);
-    transition: color 0.2s ease;
-}
-
-.home-page .home-header .main-nav a:hover,
-.home-page .home-header .main-nav a.active {
-    color: #e0bd6a;
-}
-
-/* CTA */
-.home-page .home-header .header-cta {
-    background: rgba(224, 189, 106, 0.95);
-    color: #0a1a3a;
-    border: 1px solid rgba(224, 189, 106, 0.7);
-}
-
-.home-page .home-header .header-cta:hover {
-    background: #f0d58e;
-}
-
-/* Tablet */
-@media (max-width: 900px) {
-    .home-page {
-        padding-top: 100px;
-    }
-
-    .home-page .home-header {
-        width: calc(100% - 40px);
-        min-height: 70px;
-        padding: 0 20px;
-    }
-}
-
-/* Mobile */
-@media (max-width: 700px) {
-    .home-page {
-        padding-top: 90px;
-    }
-
-    .home-page .home-header {
-        top: 10px;
-        width: calc(100% - 28px);
-        min-height: 66px;
-        padding: 9px 14px;
-
-        flex-wrap: nowrap;
-
-        background: rgba(10, 26, 58, 0.72);
-        border-radius: 14px;
-    }
-
-    .home-page .home-header .menu-toggle {
-        background: rgba(255, 255, 255, 0.12);
-        border: 1px solid rgba(255, 255, 255, 0.22);
-    }
-
-    .home-page .home-header .menu-toggle span {
-        background: #ffffff;
-    }
-
-    .home-page .home-header .header-cta {
-        display: none;
-    }
-
-    /* Keep existing JavaScript menu behavior */
-    .home-page .home-header .main-nav {
-        position: absolute;
-        top: calc(100% + 10px);
-        left: 0;
-        right: 0;
-
-        display: none;
-        flex-direction: column;
-        gap: 4px;
-
-        width: 100%;
-        margin: 0;
-        padding: 12px;
-
-        background: rgba(10, 26, 58, 0.94);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        border-top: 2px solid #e0bd6a;
-        border-radius: 14px;
-
-        box-shadow: 0 14px 35px rgba(7, 19, 41, 0.18);
-    }
-
-    .home-page .home-header .main-nav.is-open {
-        display: flex;
-    }
-
-    .home-page .home-header .main-nav a {
-        color: rgba(255, 255, 255, 0.92);
-        padding: 12px 14px;
-        border-radius: 8px;
-    }
-
-    .home-page .home-header .main-nav a:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: #e0bd6a;
-    }
-}
-
-/* Small phones */
-@media (max-width: 380px) {
-    .home-page .home-header {
-        width: calc(100% - 20px);
-        padding: 8px 11px;
-    }
-}
-
-/* Accessibility */
-@media (prefers-reduced-motion: reduce) {
     .home-page .home-header {
         transition: none;
     }
+}
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 50px;
+}
+
+.home-page #about,
+.home-page #services {
+    scroll-margin-top: -100px;
 }
