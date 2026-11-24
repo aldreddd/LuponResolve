@@ -1,0 +1,35 @@
+/* =========================================
+   FLOATING NAVBAR — SCROLL EFFECT
+========================================= */
+
+/* At the top: fully colored */
+.home-page .home-header {
+    background: #0a1a3a;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 25px rgba(7, 19, 41, 0.16);
+
+    transition:
+        background 0.35s ease,
+        backdrop-filter 0.35s ease,
+        box-shadow 0.35s ease,
+        border-color 0.35s ease;
+}
+
+/* After scrolling: transparent glass */
+.home-page .home-header.scrolled {
+    background: rgba(10, 26, 58, 0.48);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 8px 28px rgba(7, 19, 41, 0.10);
+}
+
+/* Mobile menu stays readable */
+@media (max-width: 700px) {
+    .home-page .home-header.scrolled .main-nav {
+        background: rgba(10, 26, 58, 0.94);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
+}

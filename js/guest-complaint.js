@@ -102,7 +102,154 @@ document.addEventListener("DOMContentLoaded", () => {
         messageBox.className = "";
         messageBox.style.whiteSpace = "";
     }
+    // ======================================
+    // PRELIMINARY JURISDICTION BLOCKER
+    // ======================================
 
+    
+    function getScreeningBlockReason() {
+
+        const answers = {
+            governmentParty: form.elements.governmentParty.value,
+            publicOfficial: form.elements.publicOfficial.value,
+            penaltyThreshold: form.elements.penaltyThreshold.value,
+            privateOffendedParty: form.elements.privateOffendedParty.value,
+            realPropertyException: form.elements.realPropertyException.value,
+            differentMunicipalitiesException:
+                form.elements.differentMunicipalitiesException.value
+        };
+
+        const complainantMunicipality =
+            form.elements.complainantMunicipality.value.trim().toLowerCase();
+
+        const respondentMunicipality =
+            form.elements.respondentMunicipality.value.trim().toLowerCase();
+
+        if (answers.governmentParty === "yes") {
+            return {
+                field: "governmentParty",
+                reason:
+                    "One party is identified as the government or one of its subdivisions or instrumentalities. Examples include the PNP, AFP, DepEd, DOH, DSWD, and local government units. Disputes involving the government as a party are excluded under Section 408(a) of RA 7160."
+            };
+        }
+
+        if (answers.publicOfficial === "yes") {
+            return {
+                field: "publicOfficial",
+                reason:
+                    "The dispute is identified as involving a public officer or employee in relation to official functions. This is excluded under Section 408(b) of RA 7160."
+            };
+        }
+
+        if (answers.penaltyThreshold === "yes") {
+            return {
+                field: "penaltyThreshold",
+                reason:
+                    "The stated possible penalty exceeds one year of imprisonment or a fine of ₱5,000. This may fall outside the ordinary jurisdiction of the Barangay Justice System under Section 408(c) of RA 7160."
+            };
+        }
+
+        if (
+            answers.penaltyThreshold === "not_applicable" &&
+            answers.privateOffendedParty !== "not_applicable"
+        ) {
+            return null; // Backend will classify this for staff review.
+        }
+
+        if (
+            answers.penaltyThreshold !== "not_applicable" &&
+            answers.privateOffendedParty === "no"
+        ) {
+            return {
+                field: "privateOffendedParty",
+                reason:
+                    "Your answer indicates that the alleged offense has no private offended party. This is an exclusion under Section 408(d) of RA 7160."
+            };
+        }
+
+        if (answers.realPropertyException === "yes") {
+            return {
+                field: "realPropertyException",
+                reason:
+                    "The real properties may be located in different cities or municipalities without an agreement to submit the dispute to this Lupon. This may fall outside its territorial jurisdiction under Section 408(e) of RA 7160."
+            };
+        }
+
+        if (
+            answers.differentMunicipalitiesException === "yes" &&
+            complainantMunicipality !== respondentMunicipality
+        ) {
+            return {
+                field: "differentMunicipalitiesException",
+                reason:
+                    "The parties may reside in different cities or municipalities where their barangays are not adjoining, or they do not both agree to submit the dispute to this Lupon. This is covered by Section 408(f) of RA 7160."
+            };
+        }
+
+        return null;
+    }
+
+
+    // ======================================
+    // DISPLAY JURISDICTION WARNING
+    // ======================================
+
+    function showJurisdictionWarning(blockReason) {
+
+        messageBox.replaceChildren();
+        messageBox.className = "message error";
+        messageBox.style.whiteSpace = "normal";
+
+        const warning = document.createElement("div");
+        warning.className = "jurisdiction-warning";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "Complaint Cannot Proceed";
+
+        const description = document.createElement("p");
+        description.textContent = blockReason.reason;
+
+        const legalNotice = document.createElement("p");
+        legalNotice.textContent =
+            "Based on your answers, this complaint may fall outside the jurisdiction of the Barangay Justice System under Section 408 of the Local Government Code (RA 7160).";
+
+        const instruction = document.createElement("p");
+        instruction.textContent =
+            "You cannot continue with this online complaint submission. Please review your answers or seek guidance from the appropriate office.";
+
+        const reviewButton = document.createElement("button");
+        reviewButton.type = "button";
+        reviewButton.className = "button button-secondary";
+        reviewButton.textContent = "Review My Answers";
+
+        reviewButton.addEventListener("click", () => {
+            const field = document.getElementById(blockReason.field);
+
+            if (field) {
+                field.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+                field.focus({ preventScroll: true });
+            }
+        });
+
+        warning.append(
+            heading,
+            description,
+            legalNotice,
+            instruction,
+            reviewButton
+        );
+
+        messageBox.appendChild(warning);
+
+        messageBox.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
     // ======================================
     // SUCCESS CARD
     // ======================================
@@ -213,7 +360,16 @@ document.addEventListener("DOMContentLoaded", () => {
             form.reportValidity();
             return;
         }
+        // ==================================
+        // CHECK PRELIMINARY JURISDICTION
+        // ==================================
 
+        const screeningBlock = getScreeningBlockReason();
+
+        if (screeningBlock) {
+            showJurisdictionWarning(screeningBlock);
+            return;
+        }
         
         // ==================================
         // COLLECT FORM VALUES
@@ -230,17 +386,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             governmentParty: formData.get("governmentParty"),
             publicOfficial: formData.get("publicOfficial"),
-            criminalOffense: formData.get("criminalOffense"),
+
             penaltyThreshold: formData.get("penaltyThreshold"),
             privateOffendedParty: formData.get("privateOffendedParty"),
 
-            realPropertyDispute: formData.get("realPropertyDispute"),
-            propertyDifferentCities: formData.get("propertyDifferentCities"),
-            propertyPartiesAgree: formData.get("propertyPartiesAgree"),
+            realPropertyException: formData.get("realPropertyException"),
 
-            barangaysAdjoining: formData.get("barangaysAdjoining"),
-            partiesAgree: formData.get("partiesAgree"),
-            otherException: formData.get("otherException")
+            differentMunicipalitiesException: formData.get(
+                "differentMunicipalitiesException"
+            )
         };
 
         // Convert screening answers into JSON text.
@@ -312,6 +466,18 @@ document.addEventListener("DOMContentLoaded", () => {
             // ==================================
 
             if (!response.ok) {
+
+                if (result.code === "JURISDICTION_EXCLUDED") {
+
+                    showJurisdictionWarning({
+                        field: "",
+                        reason:
+                            result.screeningReasons?.join("\n") ||
+                            result.message
+                    });
+
+                    return;
+                }
 
                 const errorMessage =
                     result.message ||

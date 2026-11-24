@@ -1,8 +1,8 @@
+
 // ======================================
 // LUPONRESOLVE — SERVER-SIDE COMPLAINT SCREENING
 // ======================================
 
-// Normalize municipality/barangay names.
 function normalizePlace(value) {
     return String(value || "")
         .trim()
@@ -10,7 +10,6 @@ function normalizePlace(value) {
         .toLowerCase();
 }
 
-// Normalize string answers such as " YES " to "yes".
 function normalizeAnswer(value) {
     if (typeof value !== "string") {
         return value;
@@ -19,7 +18,6 @@ function normalizeAnswer(value) {
     return value.trim().toLowerCase();
 }
 
-// Return a consistent staff-review result for invalid or incomplete input.
 function reviewResult(warnings = []) {
     return {
         status: "Requires Barangay Staff Review",
@@ -29,7 +27,10 @@ function reviewResult(warnings = []) {
     };
 }
 
-// Validate and normalize answers before applying screening rules.
+// ======================================
+// VALIDATE SCREENING ANSWERS
+// ======================================
+
 function validateAnswers(answers) {
     if (
         answers === null ||
@@ -47,7 +48,6 @@ function validateAnswers(answers) {
     const normalized = { ...answers };
     const warnings = [];
 
-    // Required location fields.
     const locationFields = [
         "complainantMunicipality",
         "complainantBarangay",
@@ -58,7 +58,8 @@ function validateAnswers(answers) {
     for (const field of locationFields) {
         if (
             typeof normalized[field] !== "string" ||
-            normalized[field].trim() === ""
+            normalized[field].trim() === "" ||
+            normalized[field].length > 200
         ) {
             warnings.push(
                 `The required location field "${field}" is missing or invalid.`
@@ -70,18 +71,18 @@ function validateAnswers(answers) {
         }
     }
 
-    // Allowed answers for each screening field.
     const answerFields = {
         governmentParty: ["yes", "no", "unsure"],
+
         publicOfficial: ["yes", "no", "unsure"],
 
-        criminalOffense: ["yes", "no", "unsure"],
         penaltyThreshold: [
             "yes",
             "no",
             "unsure",
             "not_applicable"
         ],
+
         privateOffendedParty: [
             "yes",
             "no",
@@ -89,34 +90,17 @@ function validateAnswers(answers) {
             "not_applicable"
         ],
 
-        realPropertyDispute: ["yes", "no", "unsure"],
-        propertyDifferentCities: [
+        realPropertyException: [
             "yes",
             "no",
-            "unsure",
-            "not_applicable"
-        ],
-        propertyPartiesAgree: [
-            "yes",
-            "no",
-            "unsure",
-            "not_applicable"
+            "unsure"
         ],
 
-        barangaysAdjoining: [
+        differentMunicipalitiesException: [
             "yes",
             "no",
-            "unsure",
-            "not_applicable"
-        ],
-        partiesAgree: [
-            "yes",
-            "no",
-            "unsure",
-            "not_applicable"
-        ],
-
-        otherException: ["yes", "no", "unsure"]
+            "unsure"
+        ]
     };
 
     for (const [field, allowedValues] of Object.entries(answerFields)) {
@@ -130,6 +114,7 @@ function validateAnswers(answers) {
         }
 
         const cleanValue = normalizeAnswer(value);
+
         normalized[field] = cleanValue;
 
         if (!allowedValues.includes(cleanValue)) {
@@ -146,10 +131,11 @@ function validateAnswers(answers) {
     };
 }
 
+// ======================================
+// MAIN SCREENING FUNCTION
+// ======================================
+
 function screenComplaint(answers) {
-    // ======================================
-    // VALIDATION FIRST
-    // ======================================
 
     const validation = validateAnswers(answers);
 
@@ -157,7 +143,6 @@ function screenComplaint(answers) {
         return reviewResult(validation.warnings);
     }
 
-    // Use normalized answers from this point forward.
     answers = validation.normalized;
 
     const reasons = [];
@@ -167,221 +152,179 @@ function screenComplaint(answers) {
     let needsReview = false;
 
     // ======================================
-    // RULE 1: Government party — Sec. 408(a)
+    // RULE 1: GOVERNMENT PARTY
+    // RA 7160, SECTION 408(a)
     // ======================================
 
     if (answers.governmentParty === "yes") {
         excluded = true;
+
         reasons.push(
             "One party is identified as the government or one of its subdivisions or instrumentalities."
         );
     } else if (answers.governmentParty === "unsure") {
         needsReview = true;
-        warnings.push("Government involvement needs verification.");
+
+        warnings.push(
+            "Government involvement needs verification."
+        );
     }
 
     // ======================================
-    // RULE 2: Public officer — Sec. 408(b)
+    // RULE 2: PUBLIC OFFICIAL
+    // RA 7160, SECTION 408(b)
     // ======================================
 
     if (answers.publicOfficial === "yes") {
         excluded = true;
+
         reasons.push(
             "The dispute is identified as involving a public officer or employee in relation to official functions."
         );
     } else if (answers.publicOfficial === "unsure") {
         needsReview = true;
+
         warnings.push(
             "The nature of any public officer's involvement needs review."
         );
     }
 
     // ======================================
-    // RULE 3 & 4: Criminal offense
-    // Sec. 408(c) and (d)
+    // RULES 3 & 4: CRIMINAL OFFENSE
+    // RA 7160, SECTION 408(c) AND (d)
     // ======================================
 
-    if (answers.criminalOffense === "yes") {
-        if (answers.penaltyThreshold === "yes") {
+    const penaltyAnswer = answers.penaltyThreshold;
+    const privatePartyAnswer = answers.privateOffendedParty;
+
+    if (penaltyAnswer === "not_applicable") {
+
+        // Not applicable means no criminal offense
+        // is being reported for this screening question.
+
+        if (privatePartyAnswer !== "not_applicable") {
+            needsReview = true;
+
+            warnings.push(
+                "The penalty question was marked not applicable, but the private-offended-party answer was not. Please clarify."
+            );
+        }
+
+    } else {
+
+        // A penalty answer of YES indicates that the
+        // possible penalty exceeds the stated threshold.
+
+        if (penaltyAnswer === "yes") {
             excluded = true;
+
             reasons.push(
                 "The stated possible penalty exceeds one year of imprisonment or a fine of ₱5,000."
             );
-        } else if (answers.penaltyThreshold === "unsure") {
+        } else if (penaltyAnswer === "unsure") {
             needsReview = true;
-            warnings.push("The applicable penalty needs legal verification.");
-        } else if (answers.penaltyThreshold === "not_applicable") {
-            needsReview = true;
+
             warnings.push(
-                "A criminal offense was indicated, but its penalty was marked not applicable."
+                "The applicable penalty needs legal verification."
             );
         }
 
-        if (answers.privateOffendedParty === "no") {
+        // Check whether a private offended party exists.
+
+        if (privatePartyAnswer === "no") {
             excluded = true;
+
             reasons.push(
                 "The answer indicates that the alleged offense has no private offended party."
             );
-        } else if (answers.privateOffendedParty === "unsure") {
+        } else if (privatePartyAnswer === "unsure") {
             needsReview = true;
+
             warnings.push(
                 "It needs to be established whether there is a private offended party."
             );
-        } else if (answers.privateOffendedParty === "not_applicable") {
+        } else if (privatePartyAnswer === "not_applicable") {
             needsReview = true;
-            warnings.push(
-                "The private-offended-party question was marked not applicable despite a criminal offense being indicated."
-            );
-        }
-    } else if (answers.criminalOffense === "no") {
-        if (
-            answers.penaltyThreshold !== "not_applicable" ||
-            answers.privateOffendedParty !== "not_applicable"
-        ) {
-            needsReview = true;
-            warnings.push(
-                "Some criminal-offense questions have answers inconsistent with the stated absence of a criminal offense."
-            );
-        }
-    } else {
-        needsReview = true;
-        warnings.push(
-            "It is unclear whether the complaint involves a criminal offense."
-        );
-    }
 
-    // ======================================
-    // RULE 5: Real property — Sec. 408(e)
-    // ======================================
-
-    if (answers.realPropertyDispute === "yes") {
-        if (answers.propertyDifferentCities === "yes") {
-            if (answers.propertyPartiesAgree === "no") {
-                excluded = true;
-                reasons.push(
-                    "The real properties are in different cities or municipalities and the parties do not agree to submit the dispute to an appropriate Lupon."
-                );
-            } else if (answers.propertyPartiesAgree === "unsure") {
-                needsReview = true;
-                warnings.push(
-                    "Agreement of the parties concerning real property in different cities or municipalities needs verification."
-                );
-            } else if (
-                answers.propertyPartiesAgree === "not_applicable"
-            ) {
-                needsReview = true;
-                warnings.push(
-                    "The property agreement question needs clarification."
-                );
-            }
-        } else if (answers.propertyDifferentCities === "no") {
-            if (answers.propertyPartiesAgree !== "not_applicable") {
-                needsReview = true;
-                warnings.push(
-                    "The properties were indicated as being in the same city or municipality, but the agreement question should be marked not applicable."
-                );
-            }
-        } else if (
-            answers.propertyDifferentCities === "unsure" ||
-            answers.propertyDifferentCities === "not_applicable"
-        ) {
-            needsReview = true;
             warnings.push(
-                "The locations of the real properties need verification."
-            );
-        }
-    } else if (answers.realPropertyDispute === "unsure") {
-        needsReview = true;
-        warnings.push(
-            "It needs to be established whether the dispute involves real property."
-        );
-    } else if (answers.realPropertyDispute === "no") {
-        if (
-            answers.propertyDifferentCities !== "not_applicable" ||
-            answers.propertyPartiesAgree !== "not_applicable"
-        ) {
-            needsReview = true;
-            warnings.push(
-                "Property-related answers need clarification because no real-property dispute was indicated."
+                "The private-offended-party question was marked not applicable despite a criminal-offense penalty answer being provided."
             );
         }
     }
 
     // ======================================
-    // RULE 6: Different municipalities
-    // Sec. 408(f)
+    // RULE 5: REAL PROPERTY
+    // RA 7160, SECTION 408(e)
+    // ======================================
+
+    if (answers.realPropertyException === "yes") {
+        excluded = true;
+
+        reasons.push(
+            "The real properties are located in different cities or municipalities and the parties do not agree to submit the dispute to this Lupon."
+        );
+    } else if (answers.realPropertyException === "unsure") {
+        needsReview = true;
+
+        warnings.push(
+            "The location of the real properties or the parties' agreement needs verification."
+        );
+    }
+
+    // ======================================
+    // RULE 6: DIFFERENT CITIES / MUNICIPALITIES
+    // RA 7160, SECTION 408(f)
     // ======================================
 
     const sameMunicipality =
         normalizePlace(answers.complainantMunicipality) ===
         normalizePlace(answers.respondentMunicipality);
 
-    if (!sameMunicipality) {
-        if (answers.barangaysAdjoining === "no") {
+    const sameBarangay =
+        normalizePlace(answers.complainantBarangay) ===
+        normalizePlace(answers.respondentBarangay);
+
+    if (answers.differentMunicipalitiesException === "yes") {
+
+        if (sameMunicipality) {
+            needsReview = true;
+
+            warnings.push(
+                "The answer indicates a different-city or municipality exception, but the supplied municipality names are the same. Staff verification is required."
+            );
+        } else {
             excluded = true;
+
             reasons.push(
-                "The parties reside in different cities or municipalities whose barangays are indicated as non-adjoining."
-            );
-        } else if (answers.barangaysAdjoining === "yes") {
-            if (answers.partiesAgree === "no") {
-                excluded = true;
-                reasons.push(
-                    "The parties reside in different cities or municipalities and do not both agree to submit the dispute to an appropriate Lupon."
-                );
-            } else if (answers.partiesAgree === "unsure") {
-                needsReview = true;
-                warnings.push("Agreement of both parties needs verification.");
-            } else if (
-                answers.partiesAgree === "not_applicable"
-            ) {
-                needsReview = true;
-                warnings.push(
-                    "The parties' agreement needs clarification."
-                );
-            }
-        } else if (answers.barangaysAdjoining === "unsure") {
-            needsReview = true;
-            warnings.push(
-                "It needs to be verified whether the barangays in the different cities or municipalities adjoin each other."
-            );
-        } else if (
-            answers.barangaysAdjoining === "not_applicable"
-        ) {
-            needsReview = true;
-            warnings.push(
-                "The adjoining-barangay question needs clarification."
+                "The parties reside in different cities or municipalities where their barangays are not adjoining, or they do not both agree to submit the dispute to this Lupon."
             );
         }
-    } else {
-        if (
-            normalizePlace(answers.complainantBarangay) !==
-            normalizePlace(answers.respondentBarangay)
-        ) {
-            warnings.push(
-                "The parties report different barangays within the same city or municipality. Venue should be checked under Section 409."
-            );
-        }
+
+    } else if (
+        answers.differentMunicipalitiesException === "unsure"
+    ) {
+        needsReview = true;
+
+        warnings.push(
+            "The relationship between the parties' barangays or their agreement to submit the dispute needs verification."
+        );
     }
 
-    // ======================================
-    // RULE 7: Other possible exclusions
-    // ======================================
+    // Same municipality but different barangays:
+    // retain the existing venue warning.
 
-    if (answers.otherException === "yes") {
-        needsReview = true;
+    if (sameMunicipality && !sameBarangay) {
         warnings.push(
-            "The resident identified another possible legal exclusion. Staff review is required."
-        );
-    } else if (answers.otherException === "unsure") {
-        needsReview = true;
-        warnings.push(
-            "Other possible legal exclusions have not been ruled out."
+            "The parties report different barangays within the same city or municipality. Venue should be checked under Section 409."
         );
     }
 
     // ======================================
-    // FINAL RESULT
+    // FINAL SCREENING RESULT
     // ======================================
+
+    // An identified exclusion takes priority
+    // over a staff-review warning.
 
     if (excluded) {
         return {

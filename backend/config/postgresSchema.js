@@ -6,7 +6,7 @@ async function initializePostgresSchema() {
 
     try {
         await client.query("BEGIN");
-
+        console.log("[SCHEMA] Transaction started.");
         // 1. User accounts
         await client.query(`
             CREATE TABLE IF NOT EXISTS users (

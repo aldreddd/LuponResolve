@@ -206,28 +206,22 @@ app.get("/admin.html", (req, res) => {
 // ======================================
 
 async function startServer() {
-
     try {
+        console.log("[STARTUP] Beginning PostgreSQL schema initialization...");
 
-        // Initialize PostgreSQL tables and indexes.
         await initializePostgresSchema();
 
-        // Start Express only after database initialization succeeds.
+        console.log("[STARTUP] PostgreSQL schema initialization completed.");
+
         app.listen(PORT, () => {
             console.log(`LuponResolve server running on port ${PORT}`);
         });
 
     } catch (error) {
-
-        console.error(
-            "Unable to initialize LuponResolve database:",
-            error
-        );
+        console.error("[STARTUP] Server initialization failed:", error);
 
         process.exit(1);
-
     }
-
 }
 
 startServer();

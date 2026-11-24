@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Submit a barangay complaint through LuponResolve.">
     <title>File a Complaint | LuponResolve</title>
-
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon.png?v=4">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/favicon.png?v=4">       
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/guest-complaint.css">
     <script src="js/config.js" defer></script>
@@ -385,9 +386,19 @@
                 <!-- GOVERNMENT PARTY -->
                 <div class="form-field full-width">
                     <label for="governmentParty">
-                        Is one of the parties the government, or a government subdivision or instrumentality?
+                        1. Is one of the parties the government, or a government subdivision or instrumentality?
                         <span class="required">*</span>
                     </label>
+
+                    <small class="screening-help">
+                        Examples include the Philippine National Police (PNP), Armed Forces
+                        of the Philippines (AFP), Department of Education (DepEd),
+                        Department of Health (DOH), Department of Social Welfare and
+                        Development (DSWD), and city or municipal governments.
+
+                        Answer Yes only when the government entity itself is a party
+                        to the dispute, not merely because a government employee is involved.
+                    </small>
 
                     <select id="governmentParty" name="governmentParty" required>
                         <option value="">Select an answer</option>
@@ -401,7 +412,7 @@
                 <!-- PUBLIC OFFICIAL -->
                 <div class="form-field full-width">
                     <label for="publicOfficial">
-                        Does the dispute involve a public officer or employee in relation to their official functions?
+                        2. Does the dispute involve a public officer or employee in relation to their official functions?
                         <span class="required">*</span>
                     </label>
 
@@ -413,36 +424,18 @@
                     </select>
                 </div>
 
-
-                <!-- CRIMINAL OFFENSE -->
-                <div class="form-field full-width">
-                    <label for="criminalOffense">
-                        Does the complaint involve an alleged criminal offense?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="criminalOffense" name="criminalOffense" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                    </select>
-                </div>
-
-
                 <!-- PENALTY THRESHOLD -->
                 <div class="form-field full-width">
                     <label for="penaltyThreshold">
-                        Does the offense potentially carry imprisonment exceeding one year or a fine exceeding ₱5,000?
+                        3. Does the offense potentially carry imprisonment exceeding one (1) year or a fine exceeding ₱5,000?
                         <span class="required">*</span>
                     </label>
-
                     <select id="penaltyThreshold" name="penaltyThreshold" required>
                         <option value="">Select an answer</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                         <option value="unsure">Unsure</option>
-                        <option value="not_applicable">Not applicable</option>
+                        <option value="not_applicable">Not applicable (no criminal offense)</option>
                     </select>
                 </div>
 
@@ -450,10 +443,9 @@
                 <!-- PRIVATE OFFENDED PARTY -->
                 <div class="form-field full-width">
                     <label for="privateOffendedParty">
-                        Is there a private offended party?
+                        4. Is there a private offended party?
                         <span class="required">*</span>
                     </label>
-
                     <select id="privateOffendedParty" name="privateOffendedParty" required>
                         <option value="">Select an answer</option>
                         <option value="yes">Yes</option>
@@ -466,105 +458,33 @@
 
                 <!-- REAL PROPERTY -->
                 <div class="form-field full-width">
-                    <label for="realPropertyDispute">
-                        Does the dispute involve real property?
+                    <label for="realPropertyException">
+                        5. If the dispute involves real property, are the properties located in different cities or municipalities without agreement to submit to this Lupon?
                         <span class="required">*</span>
                     </label>
 
-                    <select id="realPropertyDispute" name="realPropertyDispute" required>
+                    <select id="realPropertyException" name="realPropertyException" required>
                         <option value="">Select an answer</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                         <option value="unsure">Unsure</option>
                     </select>
                 </div>
-
-
-                <!-- PROPERTY LOCATION -->
-                <div class="form-field full-width">
-                    <label for="propertyDifferentCities">
-                        Are the properties involved located in different cities or municipalities?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="propertyDifferentCities" name="propertyDifferentCities" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                        <option value="not_applicable">Not applicable</option>
-                    </select>
-                </div>
-
-
-                <!-- PROPERTY AGREEMENT -->
-                <div class="form-field full-width">
-                    <label for="propertyPartiesAgree">
-                        If the properties are in different cities or municipalities, do both parties agree to submit the dispute to an appropriate Lupon?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="propertyPartiesAgree" name="propertyPartiesAgree" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                        <option value="not_applicable">Not applicable</option>
-                    </select>
-                </div>
-
 
                 <!-- ADJOINING BARANGAYS -->
                 <div class="form-field full-width">
-                    <label for="barangaysAdjoining">
-                        If you and the respondent live in different cities or municipalities, are your barangays adjoining?
+                    <label for="differentMunicipalitiesException">
+                        6. Do the complainant and respondent live in different cities or municipalities where their barangays are not adjoining, or, if adjoining, do they not both agree to submit the dispute to this Lupon?
                         <span class="required">*</span>
                     </label>
 
-                    <select id="barangaysAdjoining" name="barangaysAdjoining" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                        <option value="not_applicable">Not applicable</option>
-                    </select>
-                </div>
-
-
-                <!-- PARTIES AGREEMENT -->
-                <div class="form-field full-width">
-                    <label for="partiesAgree">
-                        If you and the respondent live in different cities or municipalities with adjoining barangays, do both parties agree to submit the dispute to an appropriate Lupon?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="partiesAgree" name="partiesAgree" required>
-                        <option value="">Select an answer</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                        <option value="unsure">Unsure</option>
-                        <option value="not_applicable">Not applicable</option>
-                    </select>
-                </div>
-
-
-                <!-- OTHER EXCEPTIONS -->
-                <div class="form-field full-width">
-                    <label for="otherException">
-                        Are you aware of any other reason this dispute may not be handled by the Barangay Justice System?
-                        <span class="required">*</span>
-                    </label>
-
-                    <select id="otherException" name="otherException" required>
+                    <select id="differentMunicipalitiesException" name="differentMunicipalitiesException" required>
                         <option value="">Select an answer</option>
                         <option value="yes">Yes</option>
                         <option value="no">No</option>
                         <option value="unsure">Unsure</option>
                     </select>
                 </div>
-
-            </section>
-
 
             <!-- SUBMISSION -->
             <section class="form-submit-section">

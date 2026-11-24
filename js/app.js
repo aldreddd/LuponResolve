@@ -65,3 +65,25 @@ if (currentYear) {
         }
     });
 })();
+// =========================================
+// FLOATING NAVBAR SCROLL EFFECT
+// =========================================
+
+const floatingHeader = document.querySelector(".home-header");
+
+if (floatingHeader) {
+    function updateNavbarOnScroll() {
+        if (window.scrollY > 40) {
+            floatingHeader.classList.add("scrolled");
+        } else {
+            floatingHeader.classList.remove("scrolled");
+        }
+    }
+
+    window.addEventListener("scroll", updateNavbarOnScroll, {
+        passive: true
+    });
+
+    // Set the correct appearance on page load
+    updateNavbarOnScroll();
+}

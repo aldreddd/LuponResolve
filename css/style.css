@@ -1207,3 +1207,178 @@
         transition-duration: .01ms !important;
     }
 }
+/* =========================================================
+   FLOATING GLASS NAVBAR — REFINED TRANSPARENT VERSION
+========================================================= */
+
+.home-page {
+    padding-top: 108px;
+    scroll-padding-top: 115px;
+}
+
+.home-page .home-header {
+    position: fixed;
+    top: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+
+    width: min(1220px, calc(100% - 64px));
+    min-height: 74px;
+    padding: 0 26px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    /* More transparent glass effect */
+    background: rgba(10, 26, 58, 0.58);
+    backdrop-filter: blur(18px) saturate(145%);
+    -webkit-backdrop-filter: blur(18px) saturate(145%);
+
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-bottom-color: rgba(224, 189, 106, 0.35);
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 30px rgba(7, 19, 41, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    transition:
+        background 0.3s ease,
+        box-shadow 0.3s ease,
+        border-color 0.3s ease;
+}
+
+/* Brand */
+.home-page .home-header .brand {
+    color: #ffffff;
+}
+
+.home-page .home-header .brand-mark {
+    background: rgba(255, 255, 255, 0.95);
+    color: #0a1a3a;
+}
+
+/* Navigation links */
+.home-page .home-header .main-nav a {
+    color: rgba(255, 255, 255, 0.88);
+    transition: color 0.2s ease;
+}
+
+.home-page .home-header .main-nav a:hover,
+.home-page .home-header .main-nav a.active {
+    color: #e0bd6a;
+}
+
+/* CTA */
+.home-page .home-header .header-cta {
+    background: rgba(224, 189, 106, 0.95);
+    color: #0a1a3a;
+    border: 1px solid rgba(224, 189, 106, 0.7);
+}
+
+.home-page .home-header .header-cta:hover {
+    background: #f0d58e;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .home-page {
+        padding-top: 100px;
+    }
+
+    .home-page .home-header {
+        width: calc(100% - 40px);
+        min-height: 70px;
+        padding: 0 20px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+    .home-page {
+        padding-top: 90px;
+    }
+
+    .home-page .home-header {
+        top: 10px;
+        width: calc(100% - 28px);
+        min-height: 66px;
+        padding: 9px 14px;
+
+        flex-wrap: nowrap;
+
+        background: rgba(10, 26, 58, 0.72);
+        border-radius: 14px;
+    }
+
+    .home-page .home-header .menu-toggle {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+
+    .home-page .home-header .menu-toggle span {
+        background: #ffffff;
+    }
+
+    .home-page .home-header .header-cta {
+        display: none;
+    }
+
+    /* Keep existing JavaScript menu behavior */
+    .home-page .home-header .main-nav {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        right: 0;
+
+        display: none;
+        flex-direction: column;
+        gap: 4px;
+
+        width: 100%;
+        margin: 0;
+        padding: 12px;
+
+        background: rgba(10, 26, 58, 0.94);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-top: 2px solid #e0bd6a;
+        border-radius: 14px;
+
+        box-shadow: 0 14px 35px rgba(7, 19, 41, 0.18);
+    }
+
+    .home-page .home-header .main-nav.is-open {
+        display: flex;
+    }
+
+    .home-page .home-header .main-nav a {
+        color: rgba(255, 255, 255, 0.92);
+        padding: 12px 14px;
+        border-radius: 8px;
+    }
+
+    .home-page .home-header .main-nav a:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #e0bd6a;
+    }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+    .home-page .home-header {
+        width: calc(100% - 20px);
+        padding: 8px 11px;
+    }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .home-page .home-header {
+        transition: none;
+    }
+}

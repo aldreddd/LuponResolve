@@ -477,6 +477,7 @@ router.post(
         });
     }
 
+    
     // ----------------------------------
     // VALIDATE SCREENING ANSWERS
     // ----------------------------------
@@ -488,15 +489,10 @@ router.post(
         "respondentBarangay",
         "governmentParty",
         "publicOfficial",
-        "criminalOffense",
         "penaltyThreshold",
         "privateOffendedParty",
-        "realPropertyDispute",
-        "propertyDifferentCities",
-        "propertyPartiesAgree",
-        "barangaysAdjoining",
-        "partiesAgree",
-        "otherException"
+        "realPropertyException",
+        "differentMunicipalitiesException"
     ];
 
     const freeTextAnswerKeys = [
@@ -506,12 +502,45 @@ router.post(
         "respondentBarangay"
     ];
 
-    const allowedAnswerValues = [
-        "yes",
-        "no",
-        "unsure",
-        "not_applicable"
-    ];
+    const allowedAnswerValues = {
+        governmentParty: [
+            "yes",
+            "no",
+            "unsure"
+        ],
+
+        publicOfficial: [
+            "yes",
+            "no",
+            "unsure"
+        ],
+
+        penaltyThreshold: [
+            "yes",
+            "no",
+            "unsure",
+            "not_applicable"
+        ],
+
+        privateOffendedParty: [
+            "yes",
+            "no",
+            "unsure",
+            "not_applicable"
+        ],
+
+        realPropertyException: [
+            "yes",
+            "no",
+            "unsure"
+        ],
+
+        differentMunicipalitiesException: [
+            "yes",
+            "no",
+            "unsure"
+        ]
+    };
 
     for (const key of requiredAnswerKeys) {
 
@@ -530,7 +559,9 @@ router.post(
 
         if (
             !freeTextAnswerKeys.includes(key) &&
-            !allowedAnswerValues.includes(answer)
+            !allowedAnswerValues[key].includes(
+                answer.trim().toLowerCase()
+            )
         ) {
             return res.status(400).json({
                 success: false,
@@ -538,6 +569,7 @@ router.post(
             });
         }
     }
+
     // ----------------------------------
 // VALIDATE EVIDENCE FILE CONTENTS
 // ----------------------------------
@@ -557,7 +589,17 @@ try {
     // ----------------------------------
 
     const screening = screenComplaint(screeningAnswers);
-    // Generate a one-time tracking secret for the resident.
+    // Reject complaints excluded from ordinary KP jurisdiction.
+        if (screening.category === "excluded") {
+        return res.status(422).json({
+            success: false,
+            code: "JURISDICTION_EXCLUDED",
+            message: screening.reasons.join(" "),
+            screeningStatus: screening.status,
+            screeningReasons: screening.reasons,
+            screeningWarnings: screening.warnings
+        });
+    }
     const trackingCode = generateTrackingCode();
     const trackingCodeHash = hashTrackingCode(trackingCode);
     // ----------------------------------
