@@ -1223,7 +1223,7 @@
     transform: translateX(-50%);
     z-index: 1000;
 
-    width: min(1220px, calc(100% - 64px));
+    width: min(1320px, calc(100% - 64px));
     min-height: 74px;
     padding: 0 26px;
 
