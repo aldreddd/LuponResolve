@@ -22,7 +22,10 @@ async function notifyHearingParties(hearingId, action) {
                 c.complainant_name,
                 c.respondent_name,
                 c.respondent_email,
-                u.email AS complainant_email
+                COALESCE(
+                    NULLIF(TRIM(c.complainant_email), ''),
+                    u.email
+                ) AS complainant_email
             FROM hearings h
             INNER JOIN cases c
                 ON c.id = h.case_id
