@@ -301,24 +301,59 @@ async function loadAdminProfile() {
 
 
 // ======================================
-// NAVIGATION ACTIVE STATE
+// ADMIN DASHBOARD PAGE NAVIGATION
 // ======================================
 
-document.querySelectorAll(".nav-link").forEach(link => {
+const navLinks = document.querySelectorAll(".nav-link");
+const dashboardSections = document.querySelectorAll(".dashboard-section");
 
-    link.addEventListener("click", () => {
+function showDashboardSection(sectionId) {
 
-        document.querySelectorAll(".nav-link").forEach(item => {
-            item.classList.remove("active");
-        });
+    // Hide all dashboard sections
+    dashboardSections.forEach(section => {
+        section.classList.remove("active-section");
+    });
 
-        link.classList.add("active");
+    // Remove active state from all sidebar links
+    navLinks.forEach(link => {
+        link.classList.remove("active");
+    });
+
+    // Show selected section
+    const selectedSection = document.getElementById(sectionId);
+
+    if (selectedSection) {
+        selectedSection.classList.add("active-section");
+    }
+
+    // Highlight selected sidebar link
+    const selectedLink = document.querySelector(
+        `.nav-link[href="#${sectionId}"]`
+    );
+
+    if (selectedLink) {
+        selectedLink.classList.add("active");
+    }
+
+}
+
+// Handle sidebar clicks
+navLinks.forEach(link => {
+
+    link.addEventListener("click", event => {
+
+        event.preventDefault();
+
+        const sectionId = link.getAttribute("href").substring(1);
+
+        showDashboardSection(sectionId);
 
     });
 
 });
 
-
+// Default page on dashboard load
+showDashboardSection("overview");
 // ======================================
 // REFRESH BUTTON
 // ======================================

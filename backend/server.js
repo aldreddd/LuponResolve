@@ -54,16 +54,21 @@ if (IS_PRODUCTION) {
 }
 
 
-// ======================================
+/// ======================================
 // MIDDLEWARE
 // ======================================
 
 // CORS is needed for local development because
 // Live Server and Express use different ports.
 
+const CLIENT_ORIGIN = process.env.CLIENT_URL;
+
+console.log("[CORS] Environment:", IS_PRODUCTION ? "Production" : "Development");
+console.log("[CORS] Allowed frontend origin:", CLIENT_ORIGIN);
+
 if (!IS_PRODUCTION) {
     app.use(cors({
-        origin: process.env.CLIENT_URL || "http://127.0.0.1:5500",
+        origin: CLIENT_ORIGIN,
         credentials: true
     }));
 }

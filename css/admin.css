@@ -2136,3 +2136,14 @@ table {
         }
     }
 }
+/* ======================================
+   ADMIN DASHBOARD PAGE SWITCHING
+====================================== */
+
+.dashboard-section {
+    display: none;
+}
+
+.dashboard-section.active-section {
+    display: block;
+}
