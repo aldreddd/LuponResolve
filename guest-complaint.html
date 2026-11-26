@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,14 +10,6 @@
     <link rel="apple-touch-icon" href="/assets/favicon.png?v=6">    
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/guest-complaint.css">
-    <style>
-        .guest-header-actions { display:flex; align-items:center; gap:12px; }
-        .language-toggle { white-space:nowrap; cursor:pointer; }
-        @media (max-width: 600px) {
-            .guest-header { flex-wrap:wrap; gap:12px; }
-            .guest-header-actions { width:100%; justify-content:space-between; }
-        }
-    </style>
     <script src="js/config.js" defer></script>
     <script src="js/guest-complaint.js" defer></script>
 </head>
@@ -26,7 +17,7 @@
 <body class="guest-complaint-page">
 
     <!-- HEADER -->
-    <header class="guest-header">
+    <header class="guest-header" id="guestHeader">
         <a class="brand" href="index.html" aria-label="LuponResolve home">
             <span class="brand-mark">LR</span>
             <span>LuponResolve</span>
@@ -109,7 +100,7 @@
                 <!-- GOVERNMENT PARTY -->
                 <div class="form-field full-width">
                     <label for="governmentParty">
-                        1. Is one of the parties the government, or a government subdivision or instrumentality?
+1. Is one of the parties the government, or a government subdivision or instrumentality?
                         <span class="required">*</span>
                     </label>
 
@@ -125,7 +116,7 @@
                 <!-- PUBLIC OFFICIAL -->
                 <div class="form-field full-width">
                     <label for="publicOfficial">
-                        2. Does the dispute involve a public officer or employee in relation to their official functions?
+2. Does the dispute involve a public officer or employee in relation to their official functions?
                         <span class="required">*</span>
                     </label>
 
@@ -140,7 +131,7 @@
                 <!-- PENALTY THRESHOLD -->
                 <div class="form-field full-width">
                     <label for="penaltyThreshold">
-                        3. Does the offense potentially carry imprisonment exceeding one (1) year or a fine exceeding ₱5,000?
+3. Does the offense potentially carry imprisonment exceeding one (1) year or a fine exceeding ₱5,000?
                         <span class="required">*</span>
                     </label>
                     <select id="penaltyThreshold" name="penaltyThreshold" required>
@@ -156,7 +147,7 @@
                 <!-- PRIVATE OFFENDED PARTY -->
                 <div class="form-field full-width">
                     <label for="privateOffendedParty">
-                        4. Is there a private offended party?
+4. Is there a private offended party?
                         <span class="required">*</span>
                     </label>
                     <select id="privateOffendedParty" name="privateOffendedParty" required>
@@ -172,7 +163,7 @@
                 <!-- REAL PROPERTY -->
                 <div class="form-field full-width">
                     <label for="realPropertyException">
-                        5. If the dispute involves real property, are the properties located in different cities or municipalities without agreement to submit to this Lupon?
+5. If the dispute involves real property, are the properties located in different cities or municipalities without agreement to submit to this Lupon?
                         <span class="required">*</span>
                     </label>
 
@@ -187,7 +178,7 @@
                 <!-- ADJOINING BARANGAYS -->
                 <div class="form-field full-width">
                     <label for="differentMunicipalitiesException">
-                        6. Do the complainant and respondent live in different cities or municipalities where their barangays are not adjoining, or, if adjoining, do they not both agree to submit the dispute to this Lupon?
+6. Do the complainant and respondent live in different cities or municipalities where their barangays are not adjoining, or, if adjoining, do they not both agree to submit the dispute to this Lupon?
                         <span class="required">*</span>
                     </label>
 
@@ -532,6 +523,15 @@
             &copy; 2026 LuponResolve. Compliant with RA 7160 &amp; RA 10173.
         </p>
     </footer>
+
+    <script>
+        window.addEventListener("scroll", () => {
+            const header = document.getElementById("guestHeader");
+            if (header) {
+                header.classList.toggle("scrolled", window.scrollY > 18);
+            }
+        }, { passive: true });
+    </script>
 
 </body>
 </html>
