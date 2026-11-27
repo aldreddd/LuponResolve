@@ -309,7 +309,7 @@ The structure above is a simplified overview. Actual files and subdirectories ma
 | Member | Role |
 |---|---|
 | Aldred Tampos | Project development, backend/frontend integration, database integration, GitHub coordination |
-| Jeremy | Frontend/UI contributions through GitHub branches and Pull Requests |
+| Jerimie Bual | Frontend/UI contributions through GitHub branches and Pull Requests |
 | Nathaniel Mandin | Frontend/Backend contributions through Pull Requests and Github branches |
 
 Roles listed above should be adjusted to reflect the team's official project assignments.
