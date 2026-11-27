@@ -199,13 +199,11 @@ The system supports role-based access for authorized system personnel.
 | Lupon Member | Assigned cases and proceedings management |
 | Resident / Complainant | Public complaint submission and case tracking |
 
-Sample credentials for demonstration must be provided separately and must not contain real user credentials.
-
 | Role | Username / Email | Password |
 |---|---|---|
-| Administrator | To be provided | Demo credential only |
-| Secretary | To be provided | Demo credential only |
-| Lupon Member | To be provided | Demo credential only |
+| Administrator | admin@gmail.com | adminpassword |
+| Secretary | secretary@gmail.com | secretarypassword |
+| Lupon Member | lupon@gmail.com | luponpassword |
 
 Residents can use the public complaint submission and tracking interfaces without requiring staff portal credentials.
 
@@ -251,7 +249,6 @@ The following functionality should be tested before final release:
 
 Document test execution, expected results, actual results, and defects in a separate testing document or project test report.
 
-Formal automated test coverage and a complete final test report have not been confirmed in this README.
 
 ## 7. Project Structure
 
@@ -312,7 +309,6 @@ The structure above is a simplified overview. Actual files and subdirectories ma
 | Jerimie Bual | Frontend/UI contributions through GitHub branches and Pull Requests |
 | Nathaniel Mandin | Frontend/Backend contributions through Pull Requests and Github branches |
 
-Roles listed above should be adjusted to reflect the team's official project assignments.
 
 ## 9. Known Limitations
 
@@ -333,8 +329,6 @@ Roles listed above should be adjusted to reflect the team's official project ass
 | Commit date | November 26, 2026 (merge date; verify the exact commit timestamp in GitHub) |
 | Deployment | Render |
 | Database | Neon PostgreSQL |
-
-The final commit ID and date should be re-verified against the repository's latest `main` branch before submission. Additional changes merged after this commit may supersede it.
 
 No open-source license has currently been specified for this project. All rights are reserved by the project owner unless a license is added.
 
