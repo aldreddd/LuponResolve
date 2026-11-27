@@ -9,8 +9,6 @@
 [![Deployment](https://img.shields.io/badge/Deployment-Render-46E3B7?style=flat)](https://render.com/)
 [![Version Control](https://img.shields.io/badge/Version%20Control-GitHub-181717?style=flat)](https://github.com/aldreddd/LuponResolve)
 
-# LuponResolve
-
 ## 1. Overview
 
 LuponResolve is a web-based Barangay dispute resolution and case management system designed to assist barangay personnel in handling complaints and managing the Katarungang Pambarangay process. It provides a digital platform for complaint submission, preliminary jurisdiction screening based on Section 408 of the Local Government Code of 1991 (Republic Act No. 7160), case review, case assignment, proceedings management, and case resolution tracking. The system includes a public/resident complaint interface and dedicated portals for the Secretary, Lupon Members, and administrators to improve case organization, workflow monitoring, and accessibility of barangay dispute resolution services.
