@@ -16,8 +16,8 @@
     --home-ink: #101d38;
     --home-muted: #60708a;
     --home-line: #dfe6f0;
-    --home-font: "Public Sans", "Segoe UI", system-ui, sans-serif;
-    --home-serif: "Source Serif 4", Georgia, serif;
+    --home-font: "Questrial", "Segoe UI", system-ui, sans-serif;
+    --home-serif: "Questrial", Georgia, serif;
 
     margin: 0;
     min-height: 100vh;
@@ -121,7 +121,7 @@
     color: #ffffff;
     font-size: 1.08rem;
     font-weight: 800;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.02em;
     white-space: nowrap;
 }
 
@@ -147,8 +147,8 @@
     align-items: center;
     gap: clamp(24px, 3.5vw, 48px);
     color: rgba(255,255,255,.88);
-    font-size: .86rem;
-    font-weight: 650;
+    font-size: .88rem;
+    font-weight: 600;
 }
 
 .home-page .main-nav a {
@@ -196,8 +196,8 @@
     border-radius: 7px;
     background: rgba(224,189,106,.95);
     color: var(--home-navy);
-    font-size: .82rem;
-    font-weight: 750;
+    font-size: .84rem;
+    font-weight: 700;
     transition: background .18s ease, color .18s ease, border-color .18s ease;
 }
 
@@ -273,8 +273,8 @@
     gap: 11px;
     margin: 0 0 16px;
     color: var(--home-gold);
-    font-size: .68rem;
-    font-weight: 800;
+    font-size: .7rem;
+    font-weight: 700;
     letter-spacing: .15em;
     line-height: 1.5;
 }
@@ -291,22 +291,22 @@
     margin: 0;
     color: #fff;
     font-family: var(--home-serif);
-    font-size: clamp(2.6rem, 4.8vw, 4.65rem);
+    font-size: clamp(2.5rem, 4.6vw, 4.4rem);
     font-weight: 600;
-    letter-spacing: -.052em;
-    line-height: 1.04;
+    letter-spacing: -.03em;
+    line-height: 1.08;
 }
 
 .home-page .home-hero h1 em {
     color: var(--home-gold);
-    font-weight: 500;
+    font-style: normal;
 }
 
 .home-page .hero-description {
     max-width: 560px;
     margin: 20px 0 24px;
-    color: rgba(238,244,255,.76);
-    font-size: clamp(.92rem, 1.1vw, 1.02rem);
+    color: rgba(238,244,255,.78);
+    font-size: clamp(.94rem, 1.1vw, 1.04rem);
     line-height: 1.8;
 }
 
@@ -325,8 +325,8 @@
     justify-content: center;
     gap: 18px;
     border-radius: 7px;
-    font-size: .84rem;
-    font-weight: 750;
+    font-size: .86rem;
+    font-weight: 700;
     transition: transform .18s ease, background .18s ease, border-color .18s ease;
 }
 
@@ -360,8 +360,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    color: rgba(235,242,255,.68);
-    font-size: .73rem;
+    color: rgba(235,242,255,.7);
+    font-size: .75rem;
     line-height: 1.5;
 }
 
@@ -375,7 +375,7 @@
     border-radius: 50%;
     color: var(--home-gold);
     font-size: .68rem;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 
@@ -419,8 +419,8 @@
 
 .home-page .hero-card-number {
     color: #7888a0;
-    font-size: 0.64rem;
-    font-weight: 800;
+    font-size: 0.66rem;
+    font-weight: 700;
     letter-spacing: 0.12em;
 }
 
@@ -445,16 +445,16 @@
     margin: 0;
     color: var(--home-navy);
     font-family: var(--home-serif);
-    font-size: 1.42rem;
+    font-size: 1.4rem;
     font-weight: 600;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.02em;
     line-height: 1.25;
 }
 
 .home-page .hero-action-card p {
     margin: 8px 0 0;
     color: var(--home-muted);
-    font-size: 0.83rem;
+    font-size: 0.85rem;
     line-height: 1.7;
 }
 
@@ -475,8 +475,8 @@
     border-radius: 7px;
     background: var(--home-navy);
     color: #ffffff;
-    font-size: 0.78rem;
-    font-weight: 750;
+    font-size: 0.8rem;
+    font-weight: 700;
     transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
 }
 
@@ -496,8 +496,8 @@
     align-items: center;
     gap: 12px;
     color: rgba(255,255,255,.47);
-    font-size: .59rem;
-    font-weight: 750;
+    font-size: .61rem;
+    font-weight: 700;
     letter-spacing: .13em;
 }
 
@@ -572,8 +572,8 @@
 
 .home-page .about-visual-label {
     color: #d9bd7d;
-    font-size: 9px;
-    font-weight: 800;
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 1.5px;
 }
 
@@ -596,8 +596,8 @@
 .home-page .about-visual-card > p {
     max-width: 390px;
     margin: 18px 0 0;
-    color: rgba(255,255,255,.75);
-    font-size: 13px;
+    color: rgba(255,255,255,.78);
+    font-size: 13.5px;
     line-height: 1.85;
 }
 
@@ -611,9 +611,9 @@
 }
 
 .home-page .about-visual-bottom span:first-child {
-    color: rgba(255,255,255,.6);
-    font-size: 9px;
-    font-weight: 800;
+    color: rgba(255,255,255,.65);
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 1.2px;
 }
 
@@ -633,8 +633,8 @@
     margin-bottom: 25px;
     padding: 0;
     color: var(--home-muted);
-    font-size: 9px;
-    font-weight: 800;
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 1.5px;
 }
 
@@ -651,16 +651,16 @@
 
 .home-page .about-content .marker-text {
     color: #64748b;
-    font-size: 9px;
-    font-weight: 800;
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 1.5px;
 }
 
 .home-page .about-content .section-eyebrow {
     margin: 0 0 12px;
     color: #9b7835;
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 10.5px;
+    font-weight: 700;
     letter-spacing: 1.6px;
 }
 
@@ -669,22 +669,22 @@
     margin: 0;
     color: var(--home-navy);
     font-family: var(--home-serif);
-    font-size: clamp(30px, 4vw, 43px);
+    font-size: clamp(30px, 4vw, 42px);
     font-weight: 600;
-    letter-spacing: -.045em;
+    letter-spacing: -.025em;
     line-height: 1.2;
 }
 
 .home-page .about-content h2 em {
     color: var(--home-gold-deep);
-    font-weight: 500;
+    font-style: normal;
 }
 
 .home-page .about-description {
     max-width: 620px;
     margin: 18px 0 0;
     color: var(--home-muted);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.9;
 }
 
@@ -711,21 +711,21 @@
     border-radius: 9px;
     background: #fbf8f0;
     color: #9b7835;
-    font-size: 10px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 700;
 }
 
 .home-page .about-value h3 {
     margin: 1px 0 5px;
     color: #17243a;
-    font-size: 13px;
-    font-weight: 800;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .home-page .about-value p {
     margin: 0;
     color: var(--home-muted);
-    font-size: 11px;
+    font-size: 12.5px;
     line-height: 1.75;
 }
 
@@ -739,8 +739,8 @@
     border-bottom: 1px solid #d9bd7d;
     background: transparent;
     color: #173c72;
-    font-size: 12px;
-    font-weight: 800;
+    font-size: 13px;
+    font-weight: 700;
     transition: gap .2s ease, color .2s ease, border-color .2s ease;
 }
 
@@ -794,8 +794,8 @@
     position: relative;
     z-index: 1;
     margin: 0;
-    color: rgba(255,255,255,.76);
-    font-size: .82rem;
+    color: rgba(255,255,255,.78);
+    font-size: .84rem;
     line-height: 1.7;
 }
 
@@ -813,8 +813,8 @@
     margin-top: 12px;
     padding-top: 12px;
     border-top: 1px solid rgba(255,255,255,.13);
-    color: rgba(255,255,255,.52);
-    font-size: .72rem;
+    color: rgba(255,255,255,.55);
+    font-size: .74rem;
 }
 
 
@@ -842,7 +842,7 @@
     }
 
     .home-page .home-hero h1 {
-        font-size: clamp(2.45rem, 5.5vw, 3.8rem);
+        font-size: clamp(2.35rem, 5.2vw, 3.6rem);
     }
 
     .home-page .about-container {
@@ -981,7 +981,7 @@
         align-items: center;
         border-radius: 8px;
         color: rgba(255,255,255,.92);
-        font-size: .86rem;
+        font-size: .88rem;
     }
 
     .home-page .home-header .main-nav a:hover,
@@ -999,7 +999,7 @@
         margin-top: 4px;
         background: var(--home-gold);
         color: var(--home-navy);
-        font-weight: 750;
+        font-weight: 700;
         justify-content: center;
     }
 
@@ -1015,7 +1015,7 @@
 
     .home-page .hero-kicker {
         align-items: flex-start;
-        font-size: .59rem;
+        font-size: .61rem;
         letter-spacing: .105em;
     }
 
@@ -1026,14 +1026,14 @@
 
     .home-page .home-hero h1 {
         max-width: 560px;
-        font-size: clamp(2.35rem, 9.4vw, 3.65rem);
-        line-height: 1.07;
-        letter-spacing: -.045em;
+        font-size: clamp(2.25rem, 9vw, 3.5rem);
+        line-height: 1.08;
+        letter-spacing: -.03em;
     }
 
     .home-page .hero-description {
         margin: 18px 0 23px;
-        font-size: clamp(.86rem, 3.5vw, .95rem);
+        font-size: clamp(.88rem, 3.5vw, .96rem);
         line-height: 1.8;
     }
 
@@ -1048,13 +1048,13 @@
         min-height: 48px;
         padding: 0 16px;
         justify-content: center;
-        font-size: .82rem;
+        font-size: .84rem;
     }
 
     .home-page .hero-assurance {
         align-items: flex-start;
         margin-top: 20px;
-        font-size: .68rem;
+        font-size: .7rem;
     }
 
     .home-page .assurance-icon {
@@ -1078,7 +1078,7 @@
         right: 22px;
         bottom: 20px;
         left: 22px;
-        font-size: .53rem;
+        font-size: .55rem;
     }
 
     /* About */
@@ -1101,7 +1101,7 @@
     }
 
     .home-page .about-content h2 {
-        font-size: clamp(30px, 8vw, 36px);
+        font-size: clamp(28px, 8vw, 35px);
     }
 
     .home-page .about-content .about-marker {
@@ -1109,7 +1109,7 @@
     }
 
     .home-page .about-description {
-        font-size: .87rem;
+        font-size: .89rem;
         line-height: 1.85;
     }
 
@@ -1135,12 +1135,12 @@
 
     .home-page .home-footer p {
         max-width: 340px;
-        font-size: .76rem;
+        font-size: .78rem;
     }
 
     .home-page .home-footer .footer-legal {
         margin-top: 9px;
-        font-size: .68rem;
+        font-size: .7rem;
     }
 }
 
@@ -1172,7 +1172,7 @@
     }
 
     .home-page .home-hero h1 {
-        font-size: clamp(2.05rem, 9.5vw, 2.45rem);
+        font-size: clamp(2rem, 9.2vw, 2.4rem);
     }
 
     .home-page .home-about {
@@ -1186,11 +1186,11 @@
     }
 
     .home-page .about-content h2 {
-        font-size: 28px;
+        font-size: 27px;
     }
 
     .home-page .about-visual-label {
-        font-size: 8px;
+        font-size: 8.5px;
         letter-spacing: 1px;
     }
 }
