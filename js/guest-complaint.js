@@ -21,10 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const languageToggleButton = document.getElementById("languageToggleBtn");
 
     const cebuanTranslations = {
-        "Back to Home": "Balik sa Panid sa Puy-anan",
-        "← Back to Home": "← Balik sa Panid sa Puy-anan",
+        "Back to Home": "Balik sa Home Page",
+        "← Back to Home": "← Balik sa Home Page",
         "PUBLIC COMPLAINT FILING": "PAGPASAKA OG REKLAMO SA PUBLIKO",
-        "File a complaint": "Pagpasaka og Reklamo",
+        "File a complaint": "Pag File og Reklamo",
         "Provide the details of your concern so barangay personnel can conduct an initial review. You do not need a resident account to submit this form.":
             "Ihatag ang mga detalye sa imong reklamo aron masusi kini sa mga kawani sa barangay. Dili kinahanglan nga adunay resident account aron mapasa kini nga porma.",
         "Important:": "Importante:",
@@ -92,6 +92,12 @@ document.addEventListener("DOMContentLoaded", () => {
             "Paghatag og tukmang mga detalye. Likayi ang paglakip og personal o sensitibong impormasyon nga walay kalabotan.",
         "Residence information": "Impormasyon sa Puloy-anan",
         "Where you and the respondent currently reside.": "Asa nagpuyo karon ikaw ug ang gireklamohan.",
+        "The purok, street, or area where you and the respondent currently reside.":
+            "Ang purok, dalan, o lugar diin nagpuyo karon ikaw ug ang gireklamohan.",
+        "Your purok, street, or area": "Imong purok, dalan, o lugar",
+        "Respondent's purok, street, or area": "Purok, dalan, o lugar sa gireklamohan",
+        "e.g. Purok 3, Sampaguita Street": "pananglitan: Purok 3, Sampaguita Street",
+        "e.g. Purok 5, Maharlika Area": "pananglitan: Purok 5, Maharlika Area",
         "Your city / municipality": "Imong Siyudad / Munisipyo",
         "Your barangay": "Imong Barangay",
         "Respondent's city / municipality": "Siyudad / Munisipyo sa Gireklamohan",
@@ -104,18 +110,23 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     let currentLanguage = "en";
-    const originalTextNodes = new Map();
-    const originalAttributes = new Map();
+    const originalTextNodes = new WeakMap();
+    const originalAttributes = new WeakMap();
+    const originalOptionLabels = new WeakMap();
 
     function applyPageLanguage(language) {
         const useCebuano = language === "ceb";
+
+        // 1. Walk regular text nodes, skipping <option> elements so dropdown choices stay separate.
         const walker = document.createTreeWalker(
             document.body,
             NodeFilter.SHOW_TEXT,
             {
                 acceptNode(node) {
                     if (!node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
-                    if (node.parentElement?.closest("script, style")) return NodeFilter.FILTER_REJECT;
+                    if (node.parentElement?.closest("script, style, option")) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
                     return NodeFilter.FILTER_ACCEPT;
                 }
             }
@@ -139,23 +150,23 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // 2. Translate input/textarea/button/link attributes.
         const attributeNames = ["placeholder", "aria-label", "title"];
 
         document.querySelectorAll("input, textarea, button, a").forEach((element) => {
             attributeNames.forEach((attribute) => {
                 if (!element.hasAttribute(attribute)) return;
 
-                const mapKey = `${attribute}`;
-
                 if (!originalAttributes.has(element)) {
                     originalAttributes.set(element, {});
                 }
 
-                if (!(mapKey in originalAttributes.get(element))) {
-                    originalAttributes.get(element)[mapKey] = element.getAttribute(attribute);
+                const stored = originalAttributes.get(element);
+                if (!(attribute in stored)) {
+                    stored[attribute] = element.getAttribute(attribute);
                 }
 
-                const original = originalAttributes.get(element)[mapKey];
+                const original = stored[attribute];
 
                 if (useCebuano && cebuanTranslations[original]) {
                     element.setAttribute(attribute, cebuanTranslations[original]);
@@ -165,19 +176,20 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
 
-        // Translate select options while preserving their submitted values.
+        // 3. Translate <select> options cleanly without destroying their original English labels.
         document.querySelectorAll("select option").forEach((option) => {
-            if (!option.dataset.originalLabel) {
-                option.dataset.originalLabel = option.textContent;
+            if (!originalOptionLabels.has(option)) {
+                originalOptionLabels.set(option, option.textContent.trim());
             }
 
-            const original = option.dataset.originalLabel.trim();
+            const originalEnglish = originalOptionLabels.get(option);
 
-            option.textContent = useCebuano && cebuanTranslations[original]
-                ? cebuanTranslations[original]
-                : option.dataset.originalLabel;
+            option.textContent = useCebuano && cebuanTranslations[originalEnglish]
+                ? cebuanTranslations[originalEnglish]
+                : originalEnglish;
         });
 
+        // 4. Update toggle button state.
         if (languageToggleButton) {
             languageToggleButton.textContent = useCebuano ? "English" : "Cebuano";
             languageToggleButton.setAttribute("aria-pressed", String(useCebuano));
@@ -321,10 +333,10 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         const complainantMunicipality =
-            form.elements.complainantMunicipality.value.trim().toLowerCase();
+            form.elements.complainantMunicipality?.value.trim().toLowerCase() || "butuan city";
 
         const respondentMunicipality =
-            form.elements.respondentMunicipality.value.trim().toLowerCase();
+            form.elements.respondentMunicipality?.value.trim().toLowerCase() || "butuan city";
 
         if (answers.governmentParty === "yes") {
             return {
@@ -497,8 +509,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // Municipality details are collected in the next step,
-            // so territorial screening is deferred until final submission.
             const screeningBlock = getScreeningBlockReason(false);
 
             if (screeningBlock) {
@@ -653,12 +663,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const formData = new FormData(form);
 
-        const screeningAnswers = {
-            complainantMunicipality: formData.get("complainantMunicipality"),
-            complainantBarangay: formData.get("complainantBarangay"),
+        const complainantArea = (formData.get("complainantArea") || "").trim();
+        const respondentArea = (formData.get("respondentArea") || "").trim();
 
-            respondentMunicipality: formData.get("respondentMunicipality"),
-            respondentBarangay: formData.get("respondentBarangay"),
+        const screeningAnswers = {
+            complainantArea,
+            respondentArea,
+            complainantMunicipality: formData.get("complainantMunicipality") || "Butuan City",
+            complainantBarangay: formData.get("complainantBarangay") || complainantArea || "Barangay Sumilihon",
+
+            respondentMunicipality: formData.get("respondentMunicipality") || "Butuan City",
+            respondentBarangay: formData.get("respondentBarangay") || respondentArea || "Barangay Sumilihon",
 
             governmentParty: formData.get("governmentParty"),
             publicOfficial: formData.get("publicOfficial"),
@@ -684,8 +699,10 @@ document.addEventListener("DOMContentLoaded", () => {
             "complainantName",
             "complainantContact",
             "complainantEmail",
+            "complainantArea",
             "respondentName",
             "respondentAddress",
+            "respondentArea",
             "respondentEmail",
             "disputeType",
             "incidentDetails"
